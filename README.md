@@ -1,4 +1,4 @@
-# 数学建模 Pro v2.3.16
+# 数学建模 Pro v2.3.17
 
 数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**。默认主链路 **LaTeX → PDF**（默认模板 `workshop`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -8,11 +8,12 @@
 - **5 门禁**：每阶段有可勾选清单，不达标不进入下一阶段。
 - **默认模板自带写作提示词**：`workshop` 模板 17 个章节文件末尾各带【本章节写作提示词】，写哪章读哪章；`main.tex` 顶部另有【全文写作总则】与【全文语言规范与去 AI 味】；同步副本在 `references/knowledge/10-chapter-writing-prompts.md`。
 - **写作口径可追溯**：人称、断句、禁 AI 高频词、去 AI 味 10 条自查，口径参考开源项目 `XiaoMaColtAI/math-modeling-skill` 的《论文手说明》，落地为模板注释块与 `references/knowledge/13-writing-injection.md` 第七节。
-- **四路图件**：
+- **四路图件**（路径与执行顺序见 `SKILL.md` 同名小节）：
   - 数据图：`plot_style`（中文字体 + 9 套期刊配色 + 组图 API）+ `check_figures.py` 闸门 + 11 个科研图模板；
-  - 机理图：TikZ，12 类；
-  - 论文主图：参考图 → SVG → PDF/PNG；
-  - 流程图：JSON → TikZ → PDF，独立成路。
+  - 机理图：TikZ，12 类，`xelatex` → `pdfcrop`（可跳过）→ `pdftoppm`，中文图只出 PDF+PNG；
+  - 论文主图：5 张实拍母版 → SVG → `render_figure.py` → PDF/PNG；
+  - 流程图两条路线：**A · TikZ**（`flow_*.json` → `flowchart.py` → PDF/PNG，进 LaTeX 论文）与 **B · SVG**（`flow_*.svg` → `svg_flow.py` → 可编辑 HTML + PNG/PDF，可在浏览器里直接改字），独立成路、互不混用。
+
 - **LaTeX 模板**：workshop（默认）、CUMCMThesis 2026（含 AI 声明）、MCM、华为杯、通用。
 - **Word 原生报告**：`reference.docx` + `report_kit.py`（三线表、目录/页码域、公式编号、题注），产出 `report/数据分析报告.docx`。
 - **得分点驱动**：S1 立可核验得分点 → S2 逐条核账补证据 → S4 落到公式号/图号/表号。
@@ -105,4 +106,4 @@ python scripts/build_prompts.py          # 改过模板提示词后重建 knowle
 
 ## 版本
 
-当前 `2.3.16`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。
+当前 `2.3.17`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。

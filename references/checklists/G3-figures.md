@@ -7,10 +7,12 @@
 - [ ] `python check_figures.py` 退出码 0（压字/空面板/平线/双轴柱/图例压数据/乱码为 0）
 - [ ] 数据图已 `read_image` 目检：轴标签带单位、图例不压数据、字够大
 - [ ] 数据图张数符合档位（国赛每问 4–5，上限 6），角色后缀命名正确
-- [ ] 机理图 xelatex 编译 0 error / 0 overfull
-- [ ] 机理图 PNG 已肉眼检查
+- [ ] 机理图 xelatex 编译 0 error / 0 overfull（`pdfcrop` 缺 perl 报错时跳过，不算失败）
+- [ ] 机理图 PNG 已肉眼检查（`read_image` 打开看过，不是只看日志）
 - [ ] 论文主图有 SVG + PDF + PNG
-- [ ] 流程图路线已判：有判定/回边 → `tools/flowchart`；全文分工总览 → 模板 TikZ（`2.总体分析.tex`）；同一内容不画两张
+- [ ] 流程图先判了 A/B 路线：进 LaTeX 且含判定/回边 → A（`flowchart.py`）；要手改/进网页/无 MiKTeX → B（`svg_flow.py`）；同一张图只走一条
+- [ ] 流程图 A 路：`flow_*.json` 是唯一人改入口，生成的 `.tex` 未手改
+- [ ] 流程图 B 路：`flow_*.svg` 为源、`flow_*.html` 可改、PNG 与 PDF 都真实存在
 - [ ] 流程图节点不重叠、分支有出口、循环有回边
 - [ ] 每张图有 caption（写清画的是哪些量、在对照什么）
 - [ ] 每张图有正文分析（≥100 字）

@@ -140,7 +140,9 @@ xelatex -interaction=nonstopmode probe.tex >/dev/null 2>&1; grep -m1 "^PROBE_" p
 - **产出**：`.tex` + `.pdf` + `.png` 三件套一律出（`.tex` 是交付主体，`.pdf` 进论文，`.png` 用来肉眼验收）；
   只有图内纯英文时才额外补 `.svg`。要"只出源码别编译"或别的规格，问用户。
 - **命名**：`<MH_OUT_DIR>/mech_<图名>.{tex,pdf,png}`，前缀固定 `mech_`。
-- **排版**：`standalone` 留白固定 `border=3pt`（标注被切时才调大）；编译后必跑一次 `pdfcrop`；
+- **排版**：`standalone` 留白固定 `border=3pt`（标注被切时才调大）；编译后跑一次 `pdfcrop`
+  （本机缺 Perl 时 `pdfcrop` 会报 `could not find the script engine 'perl'`，**直接跳过**，
+  `standalone` 已紧裁，用 `pdfinfo` 看 `Page size` 确认无大留白即可）；
   图下说明只进不超过 `0.5\textwidth` 的窄 parbox，长公式进正文。
 - **配色**：同一篇论文的多张图共用一套配色，不逐张换。
 - **验收**：编译 0 error / 0 overfull **加**用 Read 打开 PNG 逐张肉眼看，两条都过才算完。
@@ -246,7 +248,8 @@ tex="figures/mech_xxx.tex"; base="${tex%.tex}"
 # 1) 编译（-halt-on-error 让错误立刻停，别静默出残页）
 "$XELATEX" -interaction=nonstopmode -halt-on-error -output-directory="$(dirname "$tex")" "$tex"
 
-# 2) 裁边
+# 2) 裁边（可选）——缺 Perl 时 pdfcrop 直接报 script engine 错，跳过即可：
+#    standalone 的 border=3pt 已经是紧裁，pdfinfo 看 Page size 没有大留白就别管它
 pdfcrop "$base.pdf" "$base.pdf"
 
 # 3) 出 PNG——本机唯一可用链路

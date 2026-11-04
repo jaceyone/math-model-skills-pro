@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2.3.17（2026-11-04）
+
+### 流程图补 B 路（SVG）+ `SKILL.md` 写死路径与执行顺序
+
+- **加**：`tools/flowchart/scripts/svg_flow.py` —— 流程图 **B 路**：`flow_*.svg` → 可编辑 `flow_*.html`（浏览器里点字直改、一键「下载 SVG」回写源文件）→ `flow_*.png` / `flow_*.pdf`。渲染走 Edge 无头（`--screenshot` / `--print-to-pdf`），若装了 `cairosvg` 自动改走它，**全程不需要 LaTeX**。
+- **加**：`tools/flowchart/assets/flow_svg_template.svg` —— B 路母版：判定 + 回边的最小骨架，3 色、文字纯黑，改文字即可用。
+- **改**：`SKILL.md` 的「四路图件」重写为「**路径 / 读取顺序 / 执行顺序**」：每条路线写清先读哪几个文件（顺序不能跳）、跑哪条命令、产物落到哪、manifest 怎么登记；流程图拆成 **④A（TikZ）** 与 **④B（SVG）** 并给出选路判据，禁止同一张图两路各出一份。
+- **改**：`references/stages/03-figures.md`、`references/checklists/G3-figures.md`、`references/knowledge/05-figures.md`、`tools/flowchart/SKILL.md`、`README.md` 同步两条流程图路线；05-figures 只留「走哪一路」，命令与顺序统一指向 `SKILL.md`，不再两处各写一份。
+- **修**：`check_paper.py` 的文献检查把 `%` 注释里的 `\bibitem{标签}` 当成真实条目（workshop 模板注释自带 `\bibitem{标签}` 与 `\bibitem{behzadian2012topsis}` 两枚）→ 用模板写出来的论文**永远过不了「文献引用」这一项**，G4 无法达标。现在先剥注释再提取键；`\cite` 与 `\nocite` 扫描同样剥注释（注掉一枚角标不再算「引用过」）。
+- **修**：`make_manifest.py` 给所有 `route=flow` 的图硬写 `spec=figures/<stem>.json`，B 路（SVG 源）会写成不存在的 json。改为按实际存在的 `.svg` / `.json` 推断，`source` 同步写对脚本（`svg_flow.py` / `flowchart.py`）。
+- **修**：`mechanism-diagram` 把 `pdfcrop` 写成必经步骤，本机缺 Perl 时它直接报 `MiKTeX could not find the script engine 'perl'`（实测），会让人误判图坏了。改为「可选步骤，报错即跳过」——`standalone` 的 `border=3pt` 已紧裁，`pdfinfo` 看 `Page size` 无大留白即可。
+- **实测**：机理图链路 `xelatex → pdfcrop(跳过) → pdftoppm -r 300` 出 588×401 PNG、0 error / `Page size 140.96×96.04 pt`；流程图 A 路 `loop.json` 出 983×1469 PNG；B 路母版出 1800×1120 PNG + 矢量 PDF，中文与箭头均正常；`manifest` 两条路各自登记到正确的 `spec` / `source`。
+
 ## 2.3.16（2026-11-04）
 
 ### 第 4 轮终验（R4-A）后的 5 处修复

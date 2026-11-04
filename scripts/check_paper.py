@@ -210,7 +210,9 @@ def check_refs(project: Path) -> tuple[int, list[str]]:
     if refs is None:
         return 1, [f"{paper} 下没有任何文件含 \\begin{{thebibliography}} 或 \\bibitem"]
 
-    text = refs.read_text(encoding="utf-8-sig", errors="replace")
+    raw = refs.read_text(encoding="utf-8-sig", errors="replace")
+    # 注释里的 \bibitem{标签} 是写法示例，不是条目：不剥注释会把模板示例键当真实文献
+    text = "\n".join(COMMENT_RE.sub("", line) for line in raw.splitlines())
     keys = set(re.findall(r"\\bibitem(?:\[[^\]]*\])?\{([^}]+)\}", text))
     n_items = len(re.findall(r"\\item\b", text))
     lines: list[str] = []
@@ -229,7 +231,10 @@ def check_refs(project: Path) -> tuple[int, list[str]]:
     for path in sorted(paper.rglob("*.tex")):
         if path.name == refs.name:
             continue
-        for m in re.finditer(r"\\cite[a-z]*\{([^}]+)\}", path.read_text(encoding="utf-8-sig")):
+        # 注释掉的 \cite 不算引用（否则注掉一枚角标就能让未引条目蒙混过关）
+        body = "\n".join(COMMENT_RE.sub("", line)
+                         for line in path.read_text(encoding="utf-8-sig").splitlines())
+        for m in re.finditer(r"\\cite[a-z]*\{([^}]+)\}", body):
             ks = [k.strip() for k in m.group(1).split(",") if k.strip()]
             cited_all |= set(ks)
             # 一次 cite 一堆键 = 没真读：>3 个键的组只算「出现过」，不算「被引用」
@@ -238,8 +243,13 @@ def check_refs(project: Path) -> tuple[int, list[str]]:
 
     missing = sorted(cited_all - keys)
     unused = sorted(keys - cited_small)
-    nocite = any(re.search(r"\\nocite\{", p.read_text(encoding="utf-8-sig"))
-                 for p in paper.rglob("*.tex"))
+    nocite = False
+    for p in paper.rglob("*.tex"):
+        body = "\n".join(COMMENT_RE.sub("", line)
+                         for line in p.read_text(encoding="utf-8-sig").splitlines())
+        if re.search(r"\\nocite\{", body):
+            nocite = True
+            break
     lines.append(f"条目 {len(keys)} 条；\\cite 覆盖 {len(cited_all)} 个键，"
                  f"其中单独或小组（≤3 键）引用 {len(cited_small)} 个")
     if missing:

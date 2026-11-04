@@ -178,8 +178,21 @@ def main() -> int:
             "status": status,
         }
         if route == "flow":
-            spec = old.get("spec", f"figures/{stem}.json")
+            # 路线 A 的源是 .json（flowchart.py），路线 B 的源是 .svg（svg_flow.py）；
+            # 旧值只在对应扩展名真实存在时沿用，否则按现有文件反推
+            svg_hit = next((p for p in paths if p.suffix.lower() == ".svg"), None)
+            json_hit = next((p for p in paths if p.suffix.lower() == ".json"), None)
+            default_spec = f"figures/{stem}.svg" if svg_hit is not None else f"figures/{stem}.json"
+            old_spec = old.get("spec", "")
+            if old_spec and (root / old_spec).is_file():
+                spec = old_spec
+            else:
+                spec = default_spec
             item["spec"] = spec
+            if json_hit is None and svg_hit is not None:
+                item["source"] = old.get("source") or "tools/flowchart/scripts/svg_flow.py"
+            else:
+                item["source"] = old.get("source") or "tools/flowchart/scripts/flowchart.py"
         else:
             data = old.get("data", "")
             if data:

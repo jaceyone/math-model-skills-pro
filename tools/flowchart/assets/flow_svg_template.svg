@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  流程图母版（路线 B · SVG）。直接改文字即可，坐标不用动：
+  1) 用浏览器打开同名 .html（svg_flow.py --html 生成），点文字改成本题术语；
+     改完点「下载 SVG」覆盖本文件。
+  2) 需要挪框/加环节时直接改下面的 x/y/width/height；viewBox 决定画布，改完记得同步。
+  3) 色数 ≤3：线框 #333、浅填充 #eef2f7、强调 #1f4e79；文字一律纯黑，靠字重和字号强调。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560"
+     font-family="SimSun, 'Times New Roman', serif" font-size="15">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9"
+            orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- 起止：圆角框 -->
+  <rect x="70" y="40" width="160" height="48" rx="24" fill="#eef2f7" stroke="#333" stroke-width="1.6"/>
+  <text x="150" y="70" text-anchor="middle" fill="#000">输入数据</text>
+
+  <!-- 处理框 -->
+  <rect x="70" y="130" width="160" height="48" fill="#eef2f7" stroke="#333" stroke-width="1.6"/>
+  <text x="150" y="160" text-anchor="middle" fill="#000">初始化参数</text>
+
+  <!-- 判定菱形 -->
+  <path d="M150,194 L260,250 L150,306 L40,250 Z" fill="#eef2f7" stroke="#333" stroke-width="1.6"/>
+  <text x="150" y="255" text-anchor="middle" fill="#000">满足收敛条件？</text>
+
+  <!-- 迭代分支 -->
+  <rect x="70" y="340" width="160" height="48" fill="#eef2f7" stroke="#333" stroke-width="1.6"/>
+  <text x="150" y="370" text-anchor="middle" fill="#000">更新参数</text>
+
+  <!-- 终止框 -->
+  <rect x="70" y="460" width="160" height="48" rx="24" fill="#eef2f7" stroke="#333" stroke-width="1.6"/>
+  <text x="150" y="490" text-anchor="middle" fill="#000">输出结果</text>
+
+  <!-- 主干箭头 -->
+  <line x1="150" y1="88" x2="150" y2="130" stroke="#333" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="150" y1="178" x2="150" y2="194" stroke="#333" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 是：右出 → 下折 → 进终止框 -->
+  <path d="M260,250 L320,250 L320,484 L232,484" fill="none" stroke="#333" stroke-width="1.6"
+        marker-end="url(#arrow)"/>
+  <text x="330" y="244" fill="#000">是</text>
+
+  <!-- 否：向下进迭代框 -->
+  <line x1="150" y1="306" x2="150" y2="340" stroke="#333" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="160" y="330" fill="#000">否</text>
+
+  <!-- 回边：迭代框左出 → 上折 → 回初始化 -->
+  <path d="M70,364 L30,364 L30,154 L68,154" fill="none" stroke="#333" stroke-width="1.6"
+        marker-end="url(#arrow)"/>
+
+  <!-- 右侧说明（图内不放结果数值，只放语义） -->
+  <g font-size="14">
+    <text x="420" y="90" fill="#000" font-weight="bold">读法</text>
+    <text x="420" y="120" fill="#000">主干自左向下：数据 → 初始化 → 判定 → 输出。</text>
+    <text x="420" y="148" fill="#000">判定“否”走回边，更新参数后重回迭代。</text>
+    <text x="420" y="176" fill="#000">实线箭头 = 数据流方向；菱形 = 唯一分叉点。</text>
+    <text x="420" y="222" fill="#000" font-weight="bold">替换清单</text>
+    <text x="420" y="252" fill="#000">把五处文字换成本题术语：输入/初始化/判据/迭代量/输出。</text>
+    <text x="420" y="280" fill="#000">判据写成可检验的条件式，不写“效果不好”这类口语。</text>
+  </g>
+</svg>

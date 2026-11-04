@@ -18,9 +18,11 @@
 | 要画什么 | 走哪一路 |
 |---|---|
 | 技术路线图、方法框架图、总览图、分类图 | `tools/paper-figure`（5 张母版 → SVG → PDF/PNG） |
-| 算法流程、判定分支、循环迭代、多阶段流水线 | `tools/flowchart`（JSON → TikZ → PDF） |
+| 算法流程、判定分支、循环迭代、多阶段流水线 | `tools/flowchart`：**A** 路 `scripts/flowchart.py`（JSON → TikZ → PDF/PNG）；**B** 路 `scripts/svg_flow.py`（SVG → 可编辑 HTML → PNG/PDF） |
 | 可行域、相平面、受力、光路、状态转移、控制体 | `tools/mechanism-diagram`（TikZ） |
 | 折线/散点/柱状/热图/ROC/Taylor 等 | matplotlib + `assets/style/plot_style.py` |
+
+四路的**路径、读取顺序、执行顺序**只有一份权威版：`SKILL.md` 的「四路图件：路径 / 读取顺序 / 执行顺序」一节。本节只判“走哪一路”，不复述命令。
 
 主图只参考 `assets/figures/reference/roadmap/` 那 5 张母版（选版式看 `roadmap/README.md` 的骨架表），不引入其他图库或其他论文配图；一张图只回答一个问题，同类图风格统一、配色能灰度区分。
 

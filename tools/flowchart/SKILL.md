@@ -3,7 +3,7 @@ name: flowchart
 description: 数学建模论文流程图。用于“画流程图 / 算法流程 / 求解步骤 / 判定分支 / 循环迭代 / 多阶段流水线”等任务。从 8 张精选版式中选母版，写 flowchart.json，生成 TikZ，编译为 PDF/PNG。只做流程，不画数据图、机理图、技术路线图。
 ---
 
-# 流程图（TikZ）
+# 流程图（两条路线：TikZ / SVG）
 
 ## 定位
 
@@ -16,7 +16,42 @@ description: 数学建模论文流程图。用于“画流程图 / 算法流程 
 | 论文主图 | `paper-figure` | 整体路线/框架 |
 | **流程图** | **本工具** | **步骤/判断/循环/流水线** |
 
-## 8 张母版
+## 两条路线（先选路，再动笔）
+
+本工具同一件事有两种载体，**一张图只走一条**，不许两路各出一份混着用。
+
+| 判据 | A · TikZ 路（默认） | B · SVG 路 |
+|---|---|---|
+| 入口 | `scripts/flowchart.py` + `figures/flow_*.json` | `scripts/svg_flow.py` + `figures/flow_*.svg` |
+| 适合 | 判定框 + 回边、要与正文公式字体一致、直接进 LaTeX | 要交人改、要嵌 HTML/PPT、机器没 MiKTeX、要拖拽微调坐标 |
+| 改图 | 改 JSON 重跑脚本（别手改生成的 `.tex`） | 浏览器打开 `.html` 点字直改，或直接改 SVG 坐标 |
+| 产物 | `flow_*.json` / `.tex` / `.pdf` / `.png` | `flow_*.svg` / `.html` / `.png` / `.pdf` |
+| manifest | `route=flow`，`spec` 填 `.json` | `route=flow`，`spec` 填 `.svg`，`source` 填 `svg_flow.py` |
+
+### A · TikZ 路（JSON → TikZ → PDF/PNG）
+
+```bash
+python tools/flowchart/scripts/flowchart.py figures/flow_q1.json              # tex + pdf + png(300dpi)
+python tools/flowchart/scripts/flowchart.py figures/flow_q1.json --no-compile # 只出 .tex
+python tools/flowchart/scripts/flowchart.py figures/flow_q1.json --dpi 600    # 改 PNG 分辨率
+```
+
+链路：`flow_*.json` → `flow_*.tex`（脚本生成，不手改）→ `xelatex` → `flow_*.pdf` → `pdftoppm`（或 PyMuPDF）→ `flow_*.png`。
+
+### B · SVG 路（SVG → 可编辑 HTML → PNG/PDF，不需要 LaTeX）
+
+```bash
+cp tools/flowchart/assets/flow_svg_template.svg figures/flow_q1.svg   # 从母版起手
+python tools/flowchart/scripts/svg_flow.py figures/flow_q1.svg        # 默认 html + png + pdf
+python tools/flowchart/scripts/svg_flow.py figures/flow_q1.svg -s 3   # 3 倍图，进论文用
+python tools/flowchart/scripts/svg_flow.py figures/flow_q1.svg --html # 只出可编辑页面
+```
+
+**改字闭环**：打开 `figures/flow_q1.html` → 点图里的文字直接改 → 「下载 SVG」覆盖 `flow_q1.svg` → 重跑脚本刷 PNG/PDF。SVG 是 XML，本来就能内联进 HTML 改；没有 Edge 时这个 HTML 也能手工截图或浏览器「打印为 PDF」。装了 `cairosvg` 的话脚本自动改走它转 PNG，不依赖浏览器。
+
+母版：`tools/flowchart/assets/flow_svg_template.svg`（判定 + 回边的最小骨架，改文字即可用）。色数 ≤3、文字纯黑、图内不写结果数值，与 A 路同一套验收。
+
+## 8 张母版（A 路）
 
 `assets/figures/reference/flowchart/` 下有 8 份 `*.json` 与对应 PDF/PNG：
 
@@ -71,7 +106,7 @@ description: 数学建模论文流程图。用于“画流程图 / 算法流程 
 
 节点类型：`start`、`process`、`decision`、`io`、`subprocess`、`end`。
 
-## 使用
+## 使用（A 路的产物清单）
 
 ```bash
 python tools/flowchart/scripts/flowchart.py figures/flow_q1_solution.json
@@ -84,23 +119,29 @@ python tools/flowchart/scripts/flowchart.py figures/flow_q1_solution.json --no-c
 - `figures/flow_q1_solution.pdf`
 - `figures/flow_q1_solution.png`（300 dpi）
 
-## 验收
+B 路同名产物是 `flow_q1_solution.svg / .html / .png / .pdf`，两路的 PDF 形态不同：A 是 TikZ 矢量、字体跟随 LaTeX；B 是浏览器打印的矢量、字体跟随系统。
 
+## 验收（两条路通用）
+
+- [ ] 选对路线：要进 LaTeX 且结构含判定/回边 → A；要交人改/进网页 → B
 - [ ] 选对母版，不是“框+箭头”随便画
 - [ ] 每个判定有“是/否”出口
 - [ ] 循环有回边
 - [ ] 节点不重叠，箭头不穿核心节点
 - [ ] 术语与论文一致
 - [ ] 图内不写求解结果数值
+- [ ] B 路额外：`svg_flow.py` 跑完 PNG 与 PDF 都要真实存在，`id`（文件名 stem）与 manifest 一致
 - [ ] 有 caption，正文有 ≥100 字分析
-- [ ] 登记 `figures/manifest.json`（route=`flow`）
+- [ ] 登记 `figures/manifest.json`（route=`flow`；A 填 `spec` 为 `.json`，B 填 `spec` 为 `.svg`）
 
 ## 边界
 
 - 不画 §2 的「总体分析」分工图：那张是 workshop 模板内置 TikZ（1 根 → N 问 → 每问等长步骤，无判定/回边），改 `assets/templates/latex/workshop/2.总体分析.tex` 的 `\rows`，不要用本工具重画。
 - 不画数据图、机理图、技术路线图。
+- 同一张流程图不许 A、B 两路各出一份（manifest 只登记一条）。
 - 不为了凑图生成没有信息量的流程。
 - 复杂图拆成主流程 + 子流程，不堆在一张图里。
+
 
 ## 与模板 TikZ 的分工
 

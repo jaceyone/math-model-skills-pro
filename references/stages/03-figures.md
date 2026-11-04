@@ -22,7 +22,8 @@
 | ① 数据图 | 真实数据可视化 | matplotlib + `plot_style` + `tools/figure-templates` | `data_*.pdf/.png` |
 | ② 机理图 | 几何/公式/物理关系 | `tools/mechanism-diagram`（TikZ） | `mech_*.tex/.pdf/.png` |
 | ③ 论文主图 | 技术路线/框架/总览 | `tools/paper-figure`（SVG） | `paper_*.svg/.pdf/.png` |
-| ④ 流程图 | 步骤/判断/循环/流水线 | `tools/flowchart`（TikZ） | `flow_*.tex/.pdf/.png` |
+| ④A 流程图（TikZ） | 步骤/判断/循环/流水线 | `tools/flowchart/scripts/flowchart.py` | `flow_*.json/.tex/.pdf/.png` |
+| ④B 流程图（SVG） | 同上，但要手改/进网页 | `tools/flowchart/scripts/svg_flow.py` | `flow_*.svg/.html/.png/.pdf` |
 
 判据：
 
@@ -57,10 +58,9 @@
 
 ### 2. 机理图（路线 ②）
 
-- 读 `tools/mechanism-diagram/SKILL.md`；
-- 按模型类别选 12 类图型；
-- 产出 `.tex` + `.pdf` + `.png`；
-- 编译 0 error / 0 overfull；PNG 肉眼检查；
+- **读取顺序**：`tools/mechanism-diagram/SKILL.md` → `references/diagram-taxonomy.md`（选图型 + 数据红线）→ `references/tikz_rules.md`（配色铁律 + 自检 6 条）→ `references/mechanism-templates.tex`（抄构造）→ 写 `figures/mech_*.tex`；
+- 产出 `.tex` + `.pdf` + `.png`：`xelatex -interaction=nonstopmode -halt-on-error` → `pdfcrop`（缺 perl 会报 `script engine` 错，**直接跳过**，`standalone` 的 `border=3pt` 已紧裁）→ `pdftoppm -r 300 -png -singlefile`；
+- 编译 0 error / 0 overfull（`grep -c "Overfull\|Underfull" *.log` 必须 0）；PNG 必须 `read_image` 目检；
 - 图内不写求解结果数值。
 
 ### 3. 论文主图（路线 ③）
@@ -70,14 +70,30 @@
 - 生成 `paper_*.svg`，再转 `.pdf` + `.png`；
 - 技术路线图通常至少 1 张，放在问题重述/总体思路。
 
-### 4. 流程图（路线 ④）
+### 4. 流程图（路线 ④：先选 A 还是 B）
+
+先按判据选路，再动笔；一张图只走一条。
+
+| 判据 | A · TikZ 路 | B · SVG 路 |
+|---|---|---|
+| 什么时候用 | 要进 LaTeX、与正文公式字体一致、含判定/回边 | 要交人改、要嵌 HTML/PPT、机器没 MiKTeX |
+| 入口 | `figures/flow_*.json` | `figures/flow_*.svg`（母版 `tools/flowchart/assets/flow_svg_template.svg`） |
+| 产物 | `.json/.tex/.pdf/.png` | `.svg/.html/.png/.pdf` |
+
+**A · TikZ 路**
 
 - 读 `tools/flowchart/SKILL.md`；
-- 从 8 张参考版式中选母版；
-- 写 `flow_*.json` 规格；
-- 运行 `python tools/flowchart/scripts/flowchart.py flow_*.json`；
-- xelatex 编译 PDF；pdftoppm 出 PNG；
+- 从 `assets/figures/reference/flowchart/` 的 8 张母版里选版式；
+- 写 `figures/flow_*.json` 规格；
+- `python tools/flowchart/scripts/flowchart.py figures/flow_q1.json`（脚本内部 xelatex + pdftoppm）；
 - 检查节点不重叠、分支有出口、循环有回边、术语一致。
+
+**B · SVG 路**
+
+- 复制母版：`tools/flowchart/assets/flow_svg_template.svg` → `figures/flow_*.svg`；
+- `python tools/flowchart/scripts/svg_flow.py figures/flow_q1.svg`（默认同时出 `.html` + `.png` + `.pdf`；`-s 3` 出 3 倍图）；
+- 改字：浏览器打开 `figures/flow_q1.html` 点字直改 → 「下载 SVG」覆盖源文件 → 重跑脚本刷 PNG/PDF；
+- 没有 Edge 时：`--html` 出的页面可手工截图，或浏览器「打印为 PDF」。
 
 ### 5. 出图闸门（进 manifest 之前）
 
