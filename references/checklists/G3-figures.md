@@ -10,6 +10,7 @@
 - [ ] 机理图 xelatex 编译 0 error / 0 overfull（`pdfcrop` 缺 perl 报错时跳过，不算失败）
 - [ ] 机理图 PNG 已肉眼检查（`read_image` 打开看过，不是只看日志）
 - [ ] 论文主图有 SVG + PDF + PNG
+- [ ] 总流程图（问题分析/任务分组）用了 `totalflow` 5 套母版之一（`quadrant`/`multi-panel`/`nested`/`pipeline-groups`/`five-steps`），不是从零画、也不是拉成 TikZ 树
 - [ ] 流程图先判了 A/B 路线：进 LaTeX 且含判定/回边 → A（`flowchart.py`）；要手改/进网页/无 MiKTeX → B（`svg_flow.py`）；同一张图只走一条
 - [ ] 流程图 A 路：`flow_*.json` 是唯一人改入口，生成的 `.tex` 未手改
 - [ ] 流程图 B 路：`flow_*.svg` 为源、`flow_*.html` 可改、PNG 与 PDF 都真实存在

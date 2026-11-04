@@ -1,0 +1,25 @@
+{
+  "note": "总流程图实例母版：src=实拍参考图，svg=复刻源（tools/flowchart/assets/totalflow），preview=复刻渲染 PNG",
+  "items": [
+    {"id": "tf_01_quadrant_tasks", "title": "四象限任务分组", "pattern": "quadrant",
+     "src": "src/01-quadrant-tasks.jpg", "svg": "../../../../tools/flowchart/assets/totalflow/tf_01_quadrant_tasks.svg",
+     "preview": "preview/tf_01_quadrant_tasks.png",
+     "use": "3–4 个任务并列且任务间有先后/派生关系", "avoid": "任务 >5 或只有一条主线"},
+    {"id": "tf_02_multi_panel", "title": "多面板（流程+分析+分类）", "pattern": "multi-panel",
+     "src": "src/02-multi-panel-model.jpg", "svg": "../../../../tools/flowchart/assets/totalflow/tf_02_multi_panel.svg",
+     "preview": "preview/tf_02_multi_panel.png",
+     "use": "一张图同时交代模型流程、特征分析与难点分类", "avoid": "只有一条主线"},
+    {"id": "tf_03_nested_sustainability", "title": "嵌套议题包裹（任务 1–5）", "pattern": "nested",
+     "src": "src/03-nested-sustainability.jpg", "svg": "../../../../tools/flowchart/assets/totalflow/tf_03_nested_sustainability.svg",
+     "preview": "preview/tf_03_nested_sustainability.png",
+     "use": "有总议题/子议题两层归类，任务分属不同议题", "avoid": "层级只有一层"},
+    {"id": "tf_04_pipeline_groups", "title": "左入右出流水线（任务组串联）", "pattern": "pipeline-groups",
+     "src": "src/04-pipeline-groups.jpg", "svg": "../../../../tools/flowchart/assets/totalflow/tf_04_pipeline_groups.svg",
+     "preview": "preview/tf_04_pipeline_groups.png",
+     "use": "一条完整链路，每组是一段方法", "avoid": "有回边/判定循环（改走 ④A TikZ）"},
+    {"id": "tf_05_five_steps", "title": "五步骤阶段图", "pattern": "five-steps",
+     "src": "src/05-five-steps.jpg", "svg": "../../../../tools/flowchart/assets/totalflow/tf_05_five_steps.svg",
+     "preview": "preview/tf_05_five_steps.png",
+     "use": "方法分评估→优化→协议→扩展→落地等阶段", "avoid": "步骤数 ≤3"}
+  ]
+}

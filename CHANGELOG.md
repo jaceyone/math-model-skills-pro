@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2.3.19（2026-11-04）
+
+### 流程图路线纠正：总流程图 = SVG（④B），算法细节 = TikZ（④A）；新增 5 套总流程图实例母版
+
+- **加**：`assets/figures/reference/totalflow/` —— 用户实拍入库的 **5 张总流程图**（`src/*.jpg`）+ **SVG 复刻渲染的 PNG**（`preview/*.png`）+ `index.json` + `README.md`。版式：`quadrant`（四象限任务分组）、`multi-panel`（流程+分析+分类）、`nested`（议题嵌套包裹，任务 1–5）、`pipeline-groups`（左入右出流水线）、`five-steps`（五步骤阶段图）。
+- **加**：`tools/flowchart/assets/totalflow/tf_*.svg` —— 5 套**可编辑 SVG 复刻**（1440×800，虚线分组框 + 任务标签页 + 淡色填充 + 正交箭头 + 空心跨组箭头），以及 PNG 2×（2880×1600）。
+- **加**：`tools/flowchart/scripts/build_totalflow.py` —— 五套版式的 SVG 生成器（坐标在代码里，改一个数就能重排），`--png` 顺带调 `svg_flow.py` 出图，实测 5/5 成功。
+- **改（路线纠正）**：`tools/flowchart/SKILL.md`、`SKILL.md` ④、`03-figures.md` §4、`05-figures.md` 统一口径 —— **总流程图/问题分析总览 = ④B SVG**（`svg_flow.py`，母版 5 套）；**算法流程/判定/回边 = ④A TikZ**（`flowchart.py`，母版 8 套）；几何/物理机理仍归 ② `mechanism-diagram`。此前把总流程图默认写成 TikZ，是错的。
+- **改**：`05-figures.md` 原「一问一列的分工总览走哪条」重写为「总流程图与算法流程图走哪条」——2.3.18 把分工总览推给 `paper-figure` 也不对，它属于 ④B。
+- **改**：`tools/flowchart/SKILL.md` 的定位表拆成「总流程图（B 路）/ 算法流程（A 路）」两行；边界条不再把总流程图推给 `paper-figure`。
+- **实测**：5 套 SVG 全部渲染成功（PNG 2×），逐张目检：文字不压线、箭头闭合、跨组空心箭头对齐；`build_totalflow.py --png` 一次跑通。
+
 ## 2.3.18（2026-11-04）
 
 ### 按用户要求移除 `workshop/` 与 `cumcmthesis/`，默认模板改为 `default/`

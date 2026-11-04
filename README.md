@@ -1,4 +1,4 @@
-# 数学建模 Pro v2.3.18
+# 数学建模 Pro v2.3.19
 
 数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**。默认主链路 **LaTeX → PDF**（默认模板 `default`，`ctexart`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -106,4 +106,4 @@ python scripts/build_prompts.py          # 改过模板提示词后重建 knowle
 
 ## 版本
 
-当前 `2.3.18`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。
+当前 `2.3.19`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。

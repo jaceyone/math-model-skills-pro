@@ -22,8 +22,8 @@
 | ① 数据图 | 真实数据可视化 | matplotlib + `plot_style` + `tools/figure-templates` | `data_*.pdf/.png` |
 | ② 机理图 | 几何/公式/物理关系 | `tools/mechanism-diagram`（TikZ） | `mech_*.tex/.pdf/.png` |
 | ③ 论文主图 | 技术路线/框架/总览 | `tools/paper-figure`（SVG） | `paper_*.svg/.pdf/.png` |
-| ④A 流程图（TikZ） | 步骤/判断/循环/流水线 | `tools/flowchart/scripts/flowchart.py` | `flow_*.json/.tex/.pdf/.png` |
-| ④B 流程图（SVG） | 同上，但要手改/进网页 | `tools/flowchart/scripts/svg_flow.py` | `flow_*.svg/.html/.png/.pdf` |
+| ④B 总流程图（SVG） | 问题分析总流程/任务分组 | `tools/flowchart/scripts/svg_flow.py` | `flow_*.svg/.html/.png/.pdf` |
+| ④A 算法流程（TikZ） | 步骤/判断/循环/流水线 | `tools/flowchart/scripts/flowchart.py` | `flow_*.json/.tex/.pdf/.png` |
 
 判据：
 
@@ -70,30 +70,31 @@
 - 生成 `paper_*.svg`，再转 `.pdf` + `.png`；
 - 技术路线图通常至少 1 张，放在问题重述/总体思路。
 
-### 4. 流程图（路线 ④：先选 A 还是 B）
+### 4. 流程图（路线 ④：总流程图走 B/SVG，算法细节走 A/TikZ）
 
 先按判据选路，再动笔；一张图只走一条。
 
-| 判据 | A · TikZ 路 | B · SVG 路 |
+| 判据 | B · SVG 路（总流程图默认） | A · TikZ 路（算法细节） |
 |---|---|---|
-| 什么时候用 | 要进 LaTeX、与正文公式字体一致、含判定/回边 | 要交人改、要嵌 HTML/PPT、机器没 MiKTeX |
-| 入口 | `figures/flow_*.json` | `figures/flow_*.svg`（母版 `tools/flowchart/assets/flow_svg_template.svg`） |
-| 产物 | `.json/.tex/.pdf/.png` | `.svg/.html/.png/.pdf` |
+| 什么时候用 | 问题分析总流程、任务分组、总体思路（要交人改/进网页也用它） | 算法流程含判定/回边、要进 LaTeX、与正文公式字体一致 |
+| 入口 | `figures/flow_*.svg`（母版 `assets/figures/reference/totalflow/` 5 套，可编辑源在 `tools/flowchart/assets/totalflow/`） | `figures/flow_*.json`（母版 `assets/figures/reference/flowchart/` 8 套） |
+| 产物 | `.svg/.html/.png/.pdf` | `.json/.tex/.pdf/.png` |
 
-**A · TikZ 路**
+**B · SVG 路（总流程图）**
 
-- 读 `tools/flowchart/SKILL.md`；
+- 读 `tools/flowchart/SKILL.md` 与 `assets/figures/reference/totalflow/README.md`；
+- 按版式表选一套：`quadrant`（任务分组）/ `multi-panel`（多面板）/ `nested`（议题包裹）/ `pipeline-groups`（左入右出）/ `five-steps`（多步骤）；
+- 复制 `tools/flowchart/assets/totalflow/tf_*.svg` → `figures/flow_*.svg`，改文字与框位；
+- `python tools/flowchart/scripts/svg_flow.py figures/flow_total.svg`（默认出 `.html` + `.png` + `.pdf`；`-s 3` 出 3 倍图）；
+- 改字闭环：浏览器打开 `figures/flow_total.html` 点字直改 → 「下载 SVG」覆盖源文件 → 重跑脚本刷 PNG/PDF；
+- 没有 Edge 时：`--html` 出的页面可手工截图，或浏览器「打印为 PDF」。
+
+**A · TikZ 路（算法流程）**
+
 - 从 `assets/figures/reference/flowchart/` 的 8 张母版里选版式；
 - 写 `figures/flow_*.json` 规格；
 - `python tools/flowchart/scripts/flowchart.py figures/flow_q1.json`（脚本内部 xelatex + pdftoppm）；
 - 检查节点不重叠、分支有出口、循环有回边、术语一致。
-
-**B · SVG 路**
-
-- 复制母版：`tools/flowchart/assets/flow_svg_template.svg` → `figures/flow_*.svg`；
-- `python tools/flowchart/scripts/svg_flow.py figures/flow_q1.svg`（默认同时出 `.html` + `.png` + `.pdf`；`-s 3` 出 3 倍图）；
-- 改字：浏览器打开 `figures/flow_q1.html` 点字直改 → 「下载 SVG」覆盖源文件 → 重跑脚本刷 PNG/PDF；
-- 没有 Edge 时：`--html` 出的页面可手工截图，或浏览器「打印为 PDF」。
 
 ### 5. 出图闸门（进 manifest 之前）
 

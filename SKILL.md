@@ -3,7 +3,7 @@ name: math-modeling-pro
 description: 数学建模竞赛与项目工作流。用于“数学建模 / 建模比赛 / 数模论文 / 数学建模竞赛 / 建模分析 / 建模求解 / CUMCM / MCM / ICM / 画流程图 / 画机理图 / 技术路线图 / LaTeX 论文 / PDF 论文 / LaTeX 导出 Word / Word 数据分析报告 / 章节写作提示词 / 论文图片风格 / 得分点 / 论文搜索 / 论文评审 / 能拿多少分 / 怎么提分”等任务。主链路默认 LaTeX → PDF，默认模板为 default 中文论文模板（ctexart：摘要/目录/8 章/参考文献/附录，含 \fig/\tabcaption 排版宏）；赛题强制 Word 时走 Word 原生分支。内置数据图（plot_style 统一版式 + 出图闸门）、机理图、论文主图、流程图四路图件，S0–S4 阶段门禁、得分点驱动验证与评委式评审。
 ---
 
-# 数学建模 Pro v2.3.18
+# 数学建模 Pro v2.3.19
 
 本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -15,7 +15,7 @@ description: 数学建模竞赛与项目工作流。用于“数学建模 / 建�
 | “进行建模分析” | 只执行 S1 |
 | “进行代码实现” | 只执行 S2 |
 | “画技术路线图 / 框架图” | S3，路线 ③ `tools/paper-figure` |
-| “画流程图” | S3，路线 ④ 先选路：A `tools/flowchart/scripts/flowchart.py`（JSON→TikZ）/ B `tools/flowchart/scripts/svg_flow.py`（SVG→HTML/PNG） |
+| “画流程图” | S3，路线 ④ 先选路：总流程图/问题分析 → ④B `tools/flowchart/scripts/svg_flow.py`（SVG→HTML/PNG）；算法/判定 → ④A `flowchart.py`（JSON→TikZ） |
 | “画可行域 / 相平面 / 受力图” | S3，路线 ② `tools/mechanism-diagram` |
 | “写论文 / 编译 PDF” | S4 LaTeX 分支，默认 `assets/templates/latex/default/` |
 | “这一章怎么写 / 摘要怎么写” | 读 `references/knowledge/10-chapter-writing-prompts.md` 对应节 |
@@ -60,11 +60,11 @@ description: 数学建模竞赛与项目工作流。用于“数学建模 / 建�
 | ① | 数据图 | matplotlib + `assets/style/plot_style.py` | `code/outputs/*.csv`、`results/results.json` | `figures/data_*.png/.pdf` | 同左 + `figures/_figure_lint.json` | S2 |
 | ② | 机理图 | `tools/mechanism-diagram`（TikZ） | 正文公式、题面几何、`reports/symbols.md` | `figures/mech_*.tex` | `figures/mech_*.pdf/.png` + `figures/mech_includes.tex` | S3 |
 | ③ | 论文主图 | `tools/paper-figure`（SVG） | `assets/figures/reference/roadmap/` 5 张母版 | `figures/paper_*.svg` | `figures/paper_*.pdf/.png` | S3 |
-| ④A | 流程图（TikZ） | `tools/flowchart/scripts/flowchart.py` | `figures/flow_*.json`（8 张母版 JSON 二选一改造） | `figures/flow_*.tex` | `figures/flow_*.pdf/.png` | S3 |
-| ④B | 流程图（SVG） | `tools/flowchart/scripts/svg_flow.py` | `figures/flow_*.svg`（母版 `tools/flowchart/assets/flow_svg_template.svg`） | `figures/flow_*.html` | `figures/flow_*.png/.pdf` | S3 |
+| ④B | 总流程图（SVG） | `tools/flowchart/scripts/svg_flow.py` | `figures/flow_*.svg`（母版 `assets/figures/reference/totalflow/` 5 套：`quadrant`/`multi-panel`/`nested`/`pipeline-groups`/`five-steps`，可编辑源 `tools/flowchart/assets/totalflow/`） | `figures/flow_*.html` | `figures/flow_*.png/.pdf` | S3 |
+| ④A | 算法流程（TikZ） | `tools/flowchart/scripts/flowchart.py` | `figures/flow_*.json`（`assets/figures/reference/flowchart/` 8 张母版改造） | `figures/flow_*.tex` | `figures/flow_*.pdf/.png` | S3 |
 
-**边界判据**：有真实数据点/数值结果 → ①；价值在精确几何/公式刻度/符号 → ②；价值在“整体路线/框架一眼讲清” → ③；价值在“步骤、判断、循环、输入输出” → ④（A 或 B）。
-**禁止**：一种图跨两条路线重复生成；用 TikZ 画数据图；用 matplotlib 画流程图/路线图；把流程图塞进 `paper-figure`；同一张流程图 A、B 两路各出一份混着用。
+**边界判据**：有真实数据点/数值结果 → ①；价值在精确几何/公式刻度/符号 → ②；价值在“整体路线/框架一眼讲清” → ③；价值在“问题怎么分析、任务怎么分组”（总流程图）→ ④B；价值在“步骤、判断、循环、回边”（算法细节）→ ④A。
+**禁止**：一种图跨两条路线重复生成；用 TikZ 画数据图；用 matplotlib 画流程图/路线图；把总流程图塞进 ③ `paper-figure` 或画成 TikZ 树；同一张流程图 ④A、④B 两路各出一份混着用。
 
 ### ① 数据图
 
@@ -96,33 +96,35 @@ description: 数学建模竞赛与项目工作流。用于“数学建模 / 建�
 - 执行顺序：`python tools/paper-figure/scripts/select_reference.py --list` 选版式 → 写 `figures/paper_<图名>.svg` → `python tools/paper-figure/scripts/render_figure.py figures/paper_x.svg`（Edge 无头渲染，默认出 `.png` + `.pdf`，`--html` 额外出预览页）。
 - 环境变量：`MSEDGE` 指 Edge 可执行文件（留空自动探测），`PF_SCALE` 控 PNG 倍率。
 
-### ④ 流程图：两条实现路线，先选路再动笔
+### ④ 流程图：两条实现路线（总流程图走 SVG，算法细节走 TikZ）
 
-| 判据 | A · TikZ 路（默认） | B · SVG 路 |
+| 判据 | B · SVG 路（**总流程图默认**） | A · TikZ 路（算法/判定细节） |
 |---|---|---|
-| 载体 | JSON 规格 → 生成 `.tex` → xelatex | 手写/改 `.svg` → Edge 渲染 |
-| 适合 | 判定框 + 回边、要与正文公式字体一致、直接进 LaTeX | 要交人改、要嵌 HTML/PPT、机器没 MiKTeX、要拖拽微调坐标 |
-| 改图方式 | 改 `.json` 重跑脚本（**别手改生成的 `.tex`**） | 浏览器打开 `.html` 点字直改，或直接改 `.svg` |
-| 产物 | `flow_*.{json,tex,pdf,png}` | `flow_*.{svg,html,png,pdf}` |
-| manifest | `route=flow`、`spec` 填 `.json` | `route=flow`、`spec` 填 `.svg`、`source` 填 `svg_flow.py` |
+| 画什么 | 问题分析总流程、任务分组、总体思路、多面板总图 | 算法流程、判定分支、循环迭代、多阶段流水线 |
+| 载体 | 手写/改 `.svg` → 可编辑 HTML → Edge 渲染 | JSON 规格 → 生成 `.tex` → xelatex |
+| 适合 | 要交人改、要嵌 HTML/PPT、机器没 MiKTeX、要拖拽微调坐标 | 判定框 + 回边、要与正文公式字体一致、直接进 LaTeX |
+| 改图方式 | 浏览器打开 `.html` 点字直改，或直接改 `.svg` | 改 `.json` 重跑脚本（**别手改生成的 `.tex`**） |
+| 产物 | `flow_*.{svg,html,png,pdf}` | `flow_*.{json,tex,pdf,png}` |
+| manifest | `route=flow`、`spec` 填 `.svg`、`source` 填 `svg_flow.py` | `route=flow`、`spec` 填 `.json`、`source` 填 `flowchart.py` |
 
-**A · TikZ 路（读取 → 执行）**：`tools/flowchart/SKILL.md` → `assets/figures/reference/flowchart/<母版>.json`（`linear` / `decision` / `loop` / `pipeline` / `parallel` / `layered` / `algorithm` / `multi_question`）→ 写 `figures/flow_<图名>.json` → 
+**B · SVG 路（读取 → 执行）**：`tools/flowchart/SKILL.md` → **总流程图 5 套实例母版** `assets/figures/reference/totalflow/`（`quadrant`／`multi-panel`／`nested`／`pipeline-groups`／`five-steps`，实拍图 + 复刻 SVG + PNG）→ 复制 `tools/flowchart/assets/totalflow/tf_*.svg` 成 `figures/flow_<图名>.svg` → 改字 → 出图：
+
+```bash
+python tools/flowchart/scripts/svg_flow.py figures/flow_total.svg --html   # 生成可编辑页面
+python tools/flowchart/scripts/svg_flow.py figures/flow_total.svg -s 3     # 3 倍 PNG + 矢量 PDF
+python tools/flowchart/scripts/build_totalflow.py --png                    # 重生成 5 套母版
+```
+
+**A · TikZ 路（读取 → 执行）**：`tools/flowchart/SKILL.md` → `assets/figures/reference/flowchart/<母版>.json`（`linear` / `decision` / `loop` / `pipeline` / `parallel` / `layered` / `algorithm` / `multi_question`）→ 写 `figures/flow_<图名>.json` →
 
 ```bash
 python tools/flowchart/scripts/flowchart.py figures/flow_q1.json            # 出 tex+pdf+png（300 dpi）
 python tools/flowchart/scripts/flowchart.py figures/flow_q1.json --no-compile  # 只出 tex
 ```
 
-**B · SVG 路（读取 → 执行）**：`tools/flowchart/SKILL.md` → `tools/flowchart/assets/flow_svg_template.svg` → 复制成 `figures/flow_<图名>.svg` →
+SVG 本质是 XML：`figures/flow_total.html` 在浏览器里点文字即可改，改完点「下载 SVG」覆盖源文件，重跑脚本刷新 PNG/PDF；没有 Edge 时该 HTML 也可直接手工截图或交给浏览器「打印为 PDF」。`cairosvg` 若已安装则自动改走它转 PNG，不依赖浏览器。
 
-```bash
-python tools/flowchart/scripts/svg_flow.py figures/flow_q1.svg        # 默认出 html + png + pdf
-python tools/flowchart/scripts/svg_flow.py figures/flow_q1.svg -s 3   # 3 倍图，进论文用
-```
-
-SVG 本质是 XML：脚本产出的 `figures/flow_q1.html` 在浏览器里点文字即可改，改完点「下载 SVG」覆盖源文件，重跑脚本刷新 PNG/PDF；没有 Edge 时该 HTML 也可直接手工截图或交给浏览器「打印为 PDF」。`cairosvg` 若已安装则自动改走它转 PNG，不依赖浏览器。
-
-**选路一句话**：要进 LaTeX 论文且结构是“判定 + 回边”→ A；要给人改、要进网页/PPT、或机器上没有 LaTeX → B。
+**选路一句话**：讲「全文怎么分析、任务怎么分组」的总流程图 → B（SVG，母版 5 套）；讲「这个算法怎么跑、判定什么、什么时候回边」的细节 → A（TikZ，母版 8 套）。**几何/物理机理**（可行域、受力、光路）不在这两路，走 ② `mechanism-diagram`。
 
 ## 项目骨架
 

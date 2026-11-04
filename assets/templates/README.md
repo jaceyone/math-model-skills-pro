@@ -1,6 +1,6 @@
 # 模板总览（assets/templates/）
 
-本目录是技能自带的全部模板/母版：**论文模板 3 套 + Word 一套 + 四类图件母版**，全部在本机实测编译/渲染通过（2.3.18，2026-11-04，MiKTeX + xelatex）。
+本目录是技能自带的全部模板/母版：**论文模板 3 套 + Word 一套 + 四类图件母版（含 5 套总流程图实例）**，全部在本机实测编译/渲染通过（2.3.18，2026-11-04，MiKTeX + xelatex）。
 
 > 2.3.18 起 **`workshop/` 与 `cumcmthesis/` 已按用户要求移出本包**，默认模板改为 `default/`；写作提示词不随模板走，统一在 `references/knowledge/10-chapter-writing-prompts.md`。
 
@@ -49,7 +49,7 @@ Word 原生分支（赛题强制 Word 时）用它生成 `report/数据分析报
 | ② 机理图 | `tools/mechanism-diagram/references/mechanism-templates.tex` | 12 类 TikZ 骨架 | 可行域、相平面/向量场、自由体受力、光路、几何推导（旗舰）、SEIR 仓室、控制体微元、马尔可夫状态转移、PINN 内部机理、指标层次、元胞自动机邻域、临界双态对比 |
 | ③ 论文主图 | `assets/figures/reference/roadmap/src/` | 5 张实拍母版（jpg）+ `index.json` + `README.md` | `grouped-tasks` / `nested-cluster` / `quad-matrix` / `multi-panel` / `staged-steps`；`select_reference.py --list` |
 | ④A 流程图（TikZ） | `assets/figures/reference/flowchart/` | 8 套 JSON + 对应 PDF/PNG | `linear` / `decision` / `loop` / `pipeline` / `parallel` / `layered` / `algorithm` / `multi_question` |
-| ④B 流程图（SVG） | `tools/flowchart/assets/flow_svg_template.svg` | 1 套骨架 | 判定 + 回边最小结构，改文字即用；`svg_flow.py` 转 HTML/PNG/PDF |
+| ④B 总流程图（SVG） | `assets/figures/reference/totalflow/`（实拍 + 复刻 PNG）、`tools/flowchart/assets/totalflow/`（可编辑 SVG） | **5 套 + 1 骨架** | 任务分组 / 多面板 / 议题嵌套 / 左入右出 / 五步骤；`svg_flow.py` 出 HTML/PNG/PDF，`build_totalflow.py` 可重生 |
 
 > 四路的路径与执行顺序以 `SKILL.md`「四路图件：路径 / 读取顺序 / 执行顺序」为唯一权威；本文件只回答“有哪些模板、各自适合什么”。
 

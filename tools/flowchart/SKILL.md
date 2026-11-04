@@ -1,6 +1,6 @@
 ---
 name: flowchart
-description: 数学建模论文流程图。用于“画流程图 / 算法流程 / 求解步骤 / 判定分支 / 循环迭代 / 多阶段流水线”等任务。从 8 张精选版式中选母版，写 flowchart.json，生成 TikZ，编译为 PDF/PNG。只做流程，不画数据图、机理图、技术路线图。
+description: 数学建模论文流程图。两条路线：总流程图 / 问题分析总览用 SVG（5 套实拍母版 → 可编辑 HTML → PNG/PDF，不需要 LaTeX）；算法流程 / 判定分支 / 循环迭代用 TikZ（8 套 JSON 母版 → TeX → PDF/PNG）。触发词：画流程图 / 问题分析流程图 / 总流程图 / 算法流程 / 求解步骤 / 判定分支 / 循环迭代。只做流程，不画数据图、机理图、技术路线图。
 ---
 
 # 流程图（两条路线：TikZ / SVG）
@@ -12,21 +12,23 @@ description: 数学建模论文流程图。用于“画流程图 / 算法流程 
 | 图 | 工具 | 画什么 |
 |---|---|---|
 | 数据图 | matplotlib | 真实数据 |
-| 机理图 | `mechanism-diagram` | 几何/公式/物理关系 |
+| 机理图 | `mechanism-diagram` | 几何/公式/物理关系（可行域/受力/光路） |
 | 论文主图 | `paper-figure` | 整体路线/框架 |
-| **流程图** | **本工具** | **步骤/判断/循环/流水线** |
+| **总流程图** | **本工具 · B 路（SVG）** | **问题怎么分析、任务怎么分组（5 套实拍母版）** |
+| **算法流程** | **本工具 · A 路（TikZ）** | **步骤/判断/循环/流水线（8 套 JSON 母版）** |
 
 ## 两条路线（先选路，再动笔）
 
 本工具同一件事有两种载体，**一张图只走一条**，不许两路各出一份混着用。
 
-| 判据 | A · TikZ 路（默认） | B · SVG 路 |
+| 判据 | B · SVG 路（**总流程图默认**） | A · TikZ 路（算法/判定细节） |
 |---|---|---|
-| 入口 | `scripts/flowchart.py` + `figures/flow_*.json` | `scripts/svg_flow.py` + `figures/flow_*.svg` |
-| 适合 | 判定框 + 回边、要与正文公式字体一致、直接进 LaTeX | 要交人改、要嵌 HTML/PPT、机器没 MiKTeX、要拖拽微调坐标 |
-| 改图 | 改 JSON 重跑脚本（别手改生成的 `.tex`） | 浏览器打开 `.html` 点字直改，或直接改 SVG 坐标 |
-| 产物 | `flow_*.json` / `.tex` / `.pdf` / `.png` | `flow_*.svg` / `.html` / `.png` / `.pdf` |
-| manifest | `route=flow`，`spec` 填 `.json` | `route=flow`，`spec` 填 `.svg`，`source` 填 `svg_flow.py` |
+| 入口 | `scripts/svg_flow.py` + `figures/flow_*.svg` | `scripts/flowchart.py` + `figures/flow_*.json` |
+| 画什么 | 问题分析总流程、任务分组、总体思路、多面板总图 | 算法流程、判定分支、循环迭代、多阶段流水线 |
+| 适合 | 要交人改、要嵌 HTML/PPT、机器没 MiKTeX、要拖拽微调坐标 | 判定框 + 回边、要与正文公式字体一致、直接进 LaTeX |
+| 改图 | 浏览器打开 `.html` 点字直改，或直接改 SVG 坐标 | 改 JSON 重跑脚本（别手改生成的 `.tex`） |
+| 产物 | `flow_*.svg` / `.html` / `.png` / `.pdf` | `flow_*.json` / `.tex` / `.pdf` / `.png` |
+| manifest | `route=flow`，`spec` 填 `.svg`，`source` 填 `svg_flow.py` | `route=flow`，`spec` 填 `.json`，`source` 填 `flowchart.py` |
 
 ### A · TikZ 路（JSON → TikZ → PDF/PNG）
 
@@ -49,7 +51,12 @@ python tools/flowchart/scripts/svg_flow.py figures/flow_q1.svg --html # 只出�
 
 **改字闭环**：打开 `figures/flow_q1.html` → 点图里的文字直接改 → 「下载 SVG」覆盖 `flow_q1.svg` → 重跑脚本刷 PNG/PDF。SVG 是 XML，本来就能内联进 HTML 改；没有 Edge 时这个 HTML 也能手工截图或浏览器「打印为 PDF」。装了 `cairosvg` 的话脚本自动改走它转 PNG，不依赖浏览器。
 
-母版：`tools/flowchart/assets/flow_svg_template.svg`（判定 + 回边的最小骨架，改文字即可用）。色数 ≤3、文字纯黑、图内不写结果数值，与 A 路同一套验收。
+母版两档：
+
+- **总流程图 5 套实拍母版**：`assets/figures/reference/totalflow/`（`src/` 实拍图 + `preview/` 复刻 PNG + `index.json`），可编辑 SVG 在 `tools/flowchart/assets/totalflow/tf_*.svg`，`build_totalflow.py` 可重生；
+- **最小骨架**：`tools/flowchart/assets/flow_svg_template.svg`（判定 + 回边，改文字即可用）。
+
+色数 ≤3（最多 5）、文字纯黑、图内不写结果数值，与 A 路同一套验收。
 
 ## 8 张母版（A 路）
 
@@ -136,17 +143,17 @@ B 路同名产物是 `flow_q1_solution.svg / .html / .png / .pdf`，两路的 PD
 
 ## 边界
 
-- 不画「一问一列各几步」的分工总览：那种图没有判定框、没有回边，走 ③ `paper-figure`（SVG）；本工具只画有判定/回边的流程。
+- 不画几何/物理机理（可行域、受力、光路）→ ② `mechanism-diagram`；不画技术路线图 → ③ `paper-figure`。总流程图的“任务分组/问题分析”仍由本工具 B 路承担，别推给 paper-figure。
 - 不画数据图、机理图、技术路线图。
 - 同一张流程图不许 A、B 两路各出一份（manifest 只登记一条）。
 - 不为了凑图生成没有信息量的流程。
 - 复杂图拆成主流程 + 子流程，不堆在一张图里。
 
 
-## 与 paper-figure / 手写分工图的分工
+## 与 paper-figure / mechanism-diagram 的分工
 
 | 判据 | 用哪个 |
 |---|---|
 | 有「是/否」判定框、有回边 | 本工具（`decision` / `loop` / `algorithm` 母版） |
-| 只是「全文一问一列各几步」的分工总览 | ③ `paper-figure`（SVG），不用本工具 |
+| 「问题怎么分析、任务怎么分组」的总流程图 | 本工具 B 路（SVG，`totalflow` 5 套母版） |
 | 要独立成件、可复用、单独渲染质检 | 本工具 |
