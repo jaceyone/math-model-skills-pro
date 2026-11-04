@@ -185,13 +185,15 @@ SVG 本质是 XML：脚本产出的 `figures/flow_q1.html` 在浏览器里点文
 
 ## LaTeX 模板
 
-| 场景 | 模板 |
-|---|---|
-| **默认**（国赛/省赛/校赛/课程论文） | `assets/templates/latex/workshop/`（默认论文模板，17 章带写作提示词 + `main.tex` 顶部【全文写作总则】） |
-| CUMCM 官方格式 | `assets/templates/latex/cumcmthesis/`（CUMCMThesis 2026，含 AI 声明） |
-| MCM/ICM（英文） | `assets/templates/latex/mcm/` |
-| 华为杯 | `assets/templates/latex/huaweibei/` |
-| 通用中文结构（`ctexart`，无竞赛格式要求时） | `assets/templates/latex/default/` |
+| 场景 | 模板 | 文件数 | 空白首编实测 |
+|---|---|---|---|
+| **默认**（国赛/省赛/校赛/课程论文） | `assets/templates/latex/workshop/`（17 章带写作提示词 + `main.tex` 顶部【全文写作总则】） | 23 | 10 页 / 0 error / 0 Overfull |
+| CUMCM 官方格式 | `assets/templates/latex/cumcmthesis/`（CUMCMThesis v2.9 + `cumcm2026.sty`，含 AI 声明） | 4 | 4 页 / 0 error / 0 Overfull |
+| MCM/ICM（英文） | `assets/templates/latex/mcm/`（Summary Sheet + 8 章英文链条） | 12 | 11 页 / 0 error / 0 Overfull |
+| 华为杯 | `assets/templates/latex/huaweibei/`（封面 logo/title PDF 内置） | 14 | 10 页 / 0 error / 0 Overfull |
+| 通用中文结构（`ctexart`，无竞赛格式要求时） | `assets/templates/latex/default/` | 11 | 8 页 / 0 error / 0 Overfull |
+
+模板清单、每套的文件/章节结构、Word 模板与四路图件母版（数据图 11 / 机理 12 / 主图 5 / 流程图 8+1）见 **`assets/templates/README.md`**；选模板先看那张总览表，再看这里的场景列。
 
 编译与 Word 分支的细节见 `references/stages/04-writing.md`（编译两遍、`fonts/` 同级、Word 原生分支不经过 LaTeX）。禁止用 Typst。
 

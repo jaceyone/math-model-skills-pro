@@ -7,6 +7,8 @@
 - **加**：`tools/flowchart/scripts/svg_flow.py` —— 流程图 **B 路**：`flow_*.svg` → 可编辑 `flow_*.html`（浏览器里点字直改、一键「下载 SVG」回写源文件）→ `flow_*.png` / `flow_*.pdf`。渲染走 Edge 无头（`--screenshot` / `--print-to-pdf`），若装了 `cairosvg` 自动改走它，**全程不需要 LaTeX**。
 - **加**：`tools/flowchart/assets/flow_svg_template.svg` —— B 路母版：判定 + 回边的最小骨架，3 色、文字纯黑，改文字即可用。
 - **改**：`SKILL.md` 的「四路图件」重写为「**路径 / 读取顺序 / 执行顺序**」：每条路线写清先读哪几个文件（顺序不能跳）、跑哪条命令、产物落到哪、manifest 怎么登记；流程图拆成 **④A（TikZ）** 与 **④B（SVG）** 并给出选路判据，禁止同一张图两路各出一份。
+- **加**：`assets/templates/README.md` —— 模板总览：5 套论文模板的文档类 / 文件清单 / 空白首编实测（workshop 10 页、cumcmthesis 4 页、mcm 11 页、华为杯 10 页、default 8 页，均 0 error / 0 Overfull）+ Word 模板 + 四路图件母版（数据图 11 / 机理 12 / 主图 5 / 流程图 8+1）与选型口径。
+- **修**：`workshop/README.md` 写「12 个章节文件」，实际 17 章 + `main.tex`；写「首编 8 处 Overfull」，实测 0 Overfull、2 处 `fig:xxx` 占位未定义引用（同一标签）。按实测改正。
 - **改**：`references/stages/03-figures.md`、`references/checklists/G3-figures.md`、`references/knowledge/05-figures.md`、`tools/flowchart/SKILL.md`、`README.md` 同步两条流程图路线；05-figures 只留「走哪一路」，命令与顺序统一指向 `SKILL.md`，不再两处各写一份。
 - **修**：`check_paper.py` 的文献检查把 `%` 注释里的 `\bibitem{标签}` 当成真实条目（workshop 模板注释自带 `\bibitem{标签}` 与 `\bibitem{behzadian2012topsis}` 两枚）→ 用模板写出来的论文**永远过不了「文献引用」这一项**，G4 无法达标。现在先剥注释再提取键；`\cite` 与 `\nocite` 扫描同样剥注释（注掉一枚角标不再算「引用过」）。
 - **修**：`make_manifest.py` 给所有 `route=flow` 的图硬写 `spec=figures/<stem>.json`，B 路（SVG 源）会写成不存在的 json。改为按实际存在的 `.svg` / `.json` 推断，`source` 同步写对脚本（`svg_flow.py` / `flowchart.py`）。
