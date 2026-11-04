@@ -1,0 +1,63 @@
+{
+  "layout": "parallel",
+  "direction": "TB",
+  "title": "并行算法流程",
+  "nodes": [
+    {
+      "id": "s",
+      "type": "start",
+      "text": "输入"
+    },
+    {
+      "id": "split",
+      "type": "process",
+      "text": "任务分解"
+    },
+    {
+      "id": "a",
+      "type": "process",
+      "text": "算法 A"
+    },
+    {
+      "id": "b",
+      "type": "process",
+      "text": "算法 B"
+    },
+    {
+      "id": "merge",
+      "type": "process",
+      "text": "结果融合"
+    },
+    {
+      "id": "e",
+      "type": "end",
+      "text": "输出"
+    }
+  ],
+  "edges": [
+    [
+      "s",
+      "split"
+    ],
+    [
+      "split",
+      "a"
+    ],
+    [
+      "split",
+      "b"
+    ],
+    [
+      "a",
+      "merge"
+    ],
+    [
+      "b",
+      "merge"
+    ],
+    [
+      "merge",
+      "e"
+    ]
+  ]
+}

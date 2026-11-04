@@ -1,0 +1,92 @@
+{
+  "layout": "loop",
+  "direction": "TB",
+  "title": "迭代收敛流程",
+  "nodes": [
+    {
+      "id": "s",
+      "type": "start",
+      "text": "输入数据",
+      "pos": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "init",
+      "type": "process",
+      "text": "初始化参数",
+      "pos": [
+        0,
+        -2
+      ]
+    },
+    {
+      "id": "solve",
+      "type": "process",
+      "text": "求解模型",
+      "pos": [
+        0,
+        -4
+      ]
+    },
+    {
+      "id": "check",
+      "type": "decision",
+      "text": "满足收敛条件?",
+      "pos": [
+        0,
+        -6
+      ]
+    },
+    {
+      "id": "update",
+      "type": "process",
+      "text": "更新参数",
+      "pos": [
+        0,
+        -8
+      ]
+    },
+    {
+      "id": "e",
+      "type": "end",
+      "text": "输出结果",
+      "pos": [
+        0,
+        -10
+      ]
+    }
+  ],
+  "edges": [
+    [
+      "s",
+      "init"
+    ],
+    [
+      "init",
+      "solve"
+    ],
+    [
+      "solve",
+      "check"
+    ],
+    [
+      "check",
+      "e",
+      "是",
+      "right"
+    ],
+    [
+      "check",
+      "update",
+      "否"
+    ],
+    [
+      "update",
+      "solve",
+      "",
+      "left"
+    ]
+  ]
+}

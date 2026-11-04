@@ -1,0 +1,50 @@
+{
+  "layout": "multi_question",
+  "direction": "LR",
+  "title": "多子问题串联",
+  "nodes": [
+    {
+      "id": "s",
+      "type": "start",
+      "text": "开始"
+    },
+    {
+      "id": "q1",
+      "type": "process",
+      "text": "问题一：预测"
+    },
+    {
+      "id": "q2",
+      "type": "process",
+      "text": "问题二：优化"
+    },
+    {
+      "id": "q3",
+      "type": "process",
+      "text": "问题三：评价"
+    },
+    {
+      "id": "e",
+      "type": "end",
+      "text": "结论"
+    }
+  ],
+  "edges": [
+    [
+      "s",
+      "q1"
+    ],
+    [
+      "q1",
+      "q2"
+    ],
+    [
+      "q2",
+      "q3"
+    ],
+    [
+      "q3",
+      "e"
+    ]
+  ]
+}

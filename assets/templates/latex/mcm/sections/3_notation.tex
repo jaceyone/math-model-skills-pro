@@ -1,0 +1,44 @@
+\section{Notation}
+
+Table~\ref{tab:symbols} fixes the notation used throughout the paper. Symbols are listed in order of first appearance, each symbol denotes exactly one quantity, and the unit is written with the symbol; numerical values are collected in the parameter table of the model chapter instead of being repeated here.
+
+% longtable: breaks across pages, fixed-width columns, centred symbol column.
+% Column widths follow the house rule: with @{} at both ends, total = 1.04 - 0.04*N (N = 2 -> 0.96);
+\begingroup\small
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.78\textwidth}@{}}
+  \caption{Notation.}
+  \label{tab:symbols} \\
+  \toprule
+  Symbol & Meaning \\
+  \midrule
+  \endfirsthead
+  \caption{Notation (continued).} \\
+  \toprule
+  Symbol & Meaning \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  $x_1$ & [quantity] (unit)\\
+  $x_2$ & [quantity] (unit)\\
+  $\theta$ & [quantity] (rad)\\
+  $\Delta t$ & [quantity] (s)\\
+\end{longtable}
+\endgroup
+
+
+% ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+% 【Section writing prompt】
+% ════════════════════════════════════════════
+% Position: always the section right after Assumptions and before Model Design — a reader must meet
+%           every symbol before the first equation that uses it. Do not bury the table inside the
+%           model chapter.
+% One symbol, one meaning: no symbol may denote two quantities; order rows by first appearance in
+%           the text; temporary loop indices stay out of the table.
+% Columns:  exactly two (symbol + meaning). Do not add a separate "Value" or "Unit" column — the unit
+%           goes in parentheses at the end of the meaning cell, the value goes in the parameter table.
+% Header:   column names are not bold.
+% Layout:   longtable + fixed-width columns so that it can break; symbol column centred, meaning
+%           column ragged-right (fully centred meaning text turns ragged once a cell wraps).
+% Caption:  \caption before \label, and \label followed by \\ inside the head.
+% ════════════════════════════════════════════

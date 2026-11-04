@@ -1,0 +1,65 @@
+{
+  "layout": "algorithm",
+  "direction": "TB",
+  "title": "遗传算法流程",
+  "nodes": [
+    {
+      "id": "s",
+      "type": "start",
+      "text": "开始"
+    },
+    {
+      "id": "init",
+      "type": "process",
+      "text": "初始化种群"
+    },
+    {
+      "id": "fit",
+      "type": "process",
+      "text": "计算适应度"
+    },
+    {
+      "id": "check",
+      "type": "decision",
+      "text": "达到终止条件?"
+    },
+    {
+      "id": "evolve",
+      "type": "process",
+      "text": "选择/交叉/变异"
+    },
+    {
+      "id": "e",
+      "type": "end",
+      "text": "输出最优解"
+    }
+  ],
+  "edges": [
+    [
+      "s",
+      "init"
+    ],
+    [
+      "init",
+      "fit"
+    ],
+    [
+      "fit",
+      "check"
+    ],
+    [
+      "check",
+      "e",
+      "是"
+    ],
+    [
+      "check",
+      "evolve",
+      "否"
+    ],
+    [
+      "evolve",
+      "fit"
+    ]
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "layout": "linear",
+  "direction": "TB",
+  "title": "线性求解流程",
+  "nodes": [
+    {
+      "id": "s",
+      "type": "start",
+      "text": "开始"
+    },
+    {
+      "id": "p1",
+      "type": "process",
+      "text": "读取数据"
+    },
+    {
+      "id": "p2",
+      "type": "process",
+      "text": "建立模型"
+    },
+    {
+      "id": "p3",
+      "type": "process",
+      "text": "求解"
+    },
+    {
+      "id": "e",
+      "type": "end",
+      "text": "输出结果"
+    }
+  ],
+  "edges": [
+    [
+      "s",
+      "p1"
+    ],
+    [
+      "p1",
+      "p2"
+    ],
+    [
+      "p2",
+      "p3"
+    ],
+    [
+      "p3",
+      "e"
+    ]
+  ]
+}

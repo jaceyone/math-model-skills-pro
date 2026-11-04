@@ -1,0 +1,59 @@
+{
+  "layout": "layered",
+  "direction": "TB",
+  "title": "主流程 + 子流程",
+  "nodes": [
+    {
+      "id": "s",
+      "type": "start",
+      "text": "开始"
+    },
+    {
+      "id": "main1",
+      "type": "process",
+      "text": "主流程：数据准备"
+    },
+    {
+      "id": "sub1",
+      "type": "subprocess",
+      "text": "子流程：数据清洗"
+    },
+    {
+      "id": "sub2",
+      "type": "subprocess",
+      "text": "子流程：参数估计"
+    },
+    {
+      "id": "main2",
+      "type": "process",
+      "text": "主流程：模型求解"
+    },
+    {
+      "id": "e",
+      "type": "end",
+      "text": "输出"
+    }
+  ],
+  "edges": [
+    [
+      "s",
+      "main1"
+    ],
+    [
+      "main1",
+      "sub1"
+    ],
+    [
+      "sub1",
+      "sub2"
+    ],
+    [
+      "sub2",
+      "main2"
+    ],
+    [
+      "main2",
+      "e"
+    ]
+  ]
+}
