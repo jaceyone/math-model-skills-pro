@@ -2,14 +2,7 @@
 
 本技能包含以下第三方资产。分发或商用前请再次确认上游许可证。
 
-## CUMCMThesis
-
-- 来源：https://github.com/latexstudio/CUMCMThesis
-- 快照：master，`cumcmthesis.cls` v2.9（2026/08/26），`cumcm2026.sty` v1.0
-- 位置：`assets/templates/latex/cumcmthesis/`
-- 用途：CUMCM 论文 LaTeX 模板（承诺书、编号页、封面、摘要、AI 使用声明）
-- 许可证：仓库未发现显式 LICENSE 文件；`cumcmthesis.cls` 头部未声明开源许可证
-- 处理：保留 `README-upstream.md` 与来源说明；发布前确认许可证；无法确认时改为“用户自行下载”，不随包分发
+> **2026-11-04（2.3.18）**：`assets/templates/latex/workshop/`（自建模板）与 `assets/templates/latex/cumcmthesis/`（上游 CUMCMThesis 快照）已按用户要求**从技能包与仓库中移除**，默认论文模板改为 `assets/templates/latex/default/`。写作提示词不随模板走，落成独立口径库 `references/knowledge/10-chapter-writing-prompts.md`。
 
 ## MathModelAgent
 

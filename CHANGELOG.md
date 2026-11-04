@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2.3.18（2026-11-04）
+
+### 按用户要求移除 `workshop/` 与 `cumcmthesis/`，默认模板改为 `default/`
+
+- **删**：`assets/templates/latex/workshop/`（17 章 + `format.cls` + 3 个字体，30.8 MB）与 `assets/templates/latex/cumcmthesis/`（4 个文件）从工作副本移除；随后用 `git filter-branch` 清理历史提交并强推，仓库里不再有这两套模板（体积从约 31 MB 降到 1 MB 量级）。
+- **改**：默认论文模板 → `assets/templates/latex/default/`（`ctexart`：标题页 + `\abstractcn` + `\tocpage` + 8 章 + `\referencescn` + `\appendixcn`，自带 `\fig` / `\tabcaption` / `\threelinetable`）。`SKILL.md`、`00-start.md`、`G0-start.md`、`G4-writing.md`、`03-figures.md`、`04-writing.md`、`05-figures.md`、`README.md`、`scripts/doctor.py` 全部改为 default。
+- **改**：写作提示词转为**独立口径库**——`knowledge/10` 不再从模板注释抽取（`scripts/build_prompts.py` 删除、`00-index.md` 同步），17 节按「章」组织；`04-writing.md` §2 新增「`knowledge/10` ↔ `default/sections`」映射表（摘要→`\abstractcn`、引言/总体→`1_restatement`、假设→`2_assumptions`、符号→`3_symbols`、各问→`4_problem1`/`5_problem2`/`6_problem3`、检验→`7_sensitivity`、评价→`8_evaluation`、参考文献→`references.tex`、附录→`A_code.tex`）。
+- **改**：`04-writing.md` §4 图表写法翻转为「default 自带 `\fig{宽}{路径}{题}{label}` 与 `\tabcaption{题}{label}{列格式}{表头}{表体}`，直接调用；只有跨页长表才手写 `longtable`」。
+- **改**：`05-figures.md` 的「§2 的总体分析图：模板 TikZ 还是 `tools/flowchart`」整节重写为「一问一列的分工总览走哪条」——模板内置 TikZ 随 workshop 移除，分工总览归 ③ `paper-figure`（SVG），有判定/回边的才走 ④。
+- **改**：`VENDORED.md` 删除 CUMCMThesis 条目并记录移除；`LICENSE_NOTICE.md` 同步（AI 声明不再依赖模板宏）。
+- **实测**：`default` 首编 **8 页 / 0 error / 0 Overfull**；`doctor.py` 三项检查全绿；`check_paper.py` 六项退出码 0。
+
 ## 2.3.17（2026-11-04）
 
 ### 流程图补 B 路（SVG）+ `SKILL.md` 写死路径与执行顺序

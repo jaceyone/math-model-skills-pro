@@ -22,7 +22,7 @@ python scripts/doctor.py --json
 | 命令 | xelatex、pandoc、pdftoppm、pdftotext、pdfinfo、drawio（可选） |
 | Python 包 | numpy、pandas、matplotlib、scipy、sklearn、openpyxl、python-docx、pypdf、fitz、PIL |
 | 字体 | 宋体、黑体、楷体、Times New Roman、Arial |
-| 模板 | CUMCMThesis、MCM、华为杯、通用 |
+| 模板 | default（默认）、MCM、华为杯 |
 
 ## 判定
 

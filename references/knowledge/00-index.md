@@ -35,6 +35,6 @@
 ## 内容范围
 
 - `01`–`06`：题面拆解、模型选型、题型防错、代码与结果、图种选择、验收六类通用方法，按主题拆分。
-- `10`：从 `assets/templates/latex/workshop/*.tex` 末尾【本章节写作提示词】+ `main.tex` 的【全文写作总则】【全文语言规范与去 AI 味】自动抽取（`python scripts/build_prompts.py` 可重建）。
+- `10`：本技能现役写作口径库（17 节，按「章」组织，不绑定模板）；与 `default/sections` 的映射见 `stages/04-writing.md` §2。原 `build_prompts.py` 随 workshop 模板一并移出。
 - `11`–`14`：执行纪律、得分点与验证、写作注入、绘图契约四类硬约束；`14` 的 API 表对应 `assets/style/plot_style.py`。
 - **写作与赛事类内容不单列文件**：写作底线并入 `12`–`14`（灵敏度默认做法、赛制页数与 Summary Sheet 口径、配色可读性），评分与评审细则由 `tools/review/` 承担。早期另有三份拆分文件（论文写作规范、MCM/ICM 专项、国赛评审要点）已按此合并，文件名不再保留；需要时从本索引直接跳对应小节。

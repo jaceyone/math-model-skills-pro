@@ -4,16 +4,15 @@
 
 ## 第三方使用限制
 
-1. **CUMCMThesis**：来源 https://github.com/latexstudio/CUMCMThesis 。仓库未发现显式 LICENSE；使用前请确认上游条款。若需公开分发，建议改为“提供下载脚本，由用户自行获取”。
-2. **MathModelAgent**：来源 https://github.com/jihe520/MathModelAgent 。上游许可为“个人免费使用、请勿商业用途、禁止闭源分发、不可在其基础上提供商业服务”。本技能保留其署名与来源说明，不用于商业服务。
-3. **优秀论文与参考图**：`assets/figures/reference/roadmap/` 为 5 张入库样张（高清 jpg），仅作版式参考；成品论文中的图必须按本论文内容重画，不直接把原图贴进论文，也不引入其他图库或外部论文配图。
-4. **数据图模板**：来自 MathModelAgent `mathmodel-figure-templates`，遵循其上游许可。
+1. **MathModelAgent**：来源 https://github.com/jihe520/MathModelAgent 。上游许可为“个人免费使用、请勿商业用途、禁止闭源分发、不可在其基础上提供商业服务”。本技能保留其署名与来源说明，不用于商业服务。
+2. **优秀论文与参考图**：`assets/figures/reference/roadmap/` 为 5 张入库样张（高清 jpg），仅作版式参考；成品论文中的图必须按本论文内容重画，不直接把原图贴进论文，也不引入其他图库或外部论文配图。
+3. **数据图模板**：来自 MathModelAgent `mathmodel-figure-templates`，遵循其上游许可。
 
 ## 学术诚信
 
 - 论文中的数值必须来自实际运行结果，不得编造。
 - 参考文献必须真实可查，不得编造 DOI、作者、期刊。
-- AI 使用情况按赛事要求填写声明（CUMCM 2026 模板已内置）。
+- AI 使用情况按赛事要求填写声明；本包模板不含专用宏，按赛事要求用无编号小节 + 一句话声明。
 - 本技能不承诺获奖，生成内容需人工复核。
 
 ## 商业使用

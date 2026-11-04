@@ -205,7 +205,7 @@ def check_refs(project: Path) -> tuple[int, list[str]]:
     paper = project / "paper"
     if not paper.is_dir():
         paper = project / "paper_zh"
-    # 文献不强制叫 references.tex：workshop 模板把 bib 内联在 10.参考文献.tex
+    # 文献不强制叫 references.tex：有的模板把 bib 内联在某个章节 .tex 里
     refs = _bib_file(paper)
     if refs is None:
         return 1, [f"{paper} 下没有任何文件含 \\begin{{thebibliography}} 或 \\bibitem"]

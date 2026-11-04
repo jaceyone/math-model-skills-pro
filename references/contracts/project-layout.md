@@ -39,7 +39,7 @@
 │   ├── flow_*.tex/.pdf/.png
 │   ├── _figure_lint.json         # 闸门结果
 │   └── manifest.json
-├── paper/                       # LaTeX 模式（默认 workshop 模板）
+├── paper/                       # LaTeX 模式（默认 default 模板）
 │   ├── main.tex
 │   ├── format.cls
 │   ├── fonts/

@@ -4,7 +4,7 @@
 - [ ] 语言已确认（中文 / 英文）
 - [ ] 子问题数量已确认，或标记“待分析确定”
 - [ ] 交付形态已确认：LaTeX → PDF（默认）/ Word（赛题强制）
-- [ ] 模板已确认：本技能默认模板 `assets/templates/latex/workshop/`（入口 `main.tex`），不混入其他模板文件、不改 `format.cls`
+- [ ] 模板已确认：本技能默认模板 `assets/templates/latex/default/`（入口 `main.tex`），不混入其他模板文件、不重写 `main.tex` 导言区
 - [ ] `项目N/` 骨架已创建
 - [ ] 工程资产已铺：`code/plot_style.py`、根目录 `check_figures.py`、`run_all.py`
 - [ ] LaTeX 模式：模板（含 `format.cls` 与 `fonts/`）已整目录复制到 `paper/`

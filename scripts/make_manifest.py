@@ -78,7 +78,7 @@ def _caption_of(body: str) -> str:
 def captions_from_paper(root: Path) -> dict:
     """从 paper/ 抓 caption 与所在章节。
 
-    按 `\\input` 顺序把全文摊平后再定位：workshop 模板的 `\\section` 在包装文件里、
+    按 `\\input` 顺序把全文摊平后再定位：多文件模板的 `\\section` 在包装文件里、
     图在 `5.X.Y` 子文件里（还常用 `\\subsubsection`），只在本文件内向前找必然找不到。
     """
     paper = root / "paper"

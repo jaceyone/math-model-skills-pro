@@ -17,7 +17,7 @@
 - `figures/manifest.json`
 - `references/knowledge/10-chapter-writing-prompts.md`（**逐章写作提示词，写哪章读哪节**）
 - `references/knowledge/13-writing-injection.md`（摘要句链、推导三段式、一致性、表格、统计、引用）
-- `assets/templates/latex/workshop/`（LaTeX 默认模板）
+- `assets/templates/latex/default/`（LaTeX 默认模板）
 - `assets/templates/docx/reference.docx` + `assets/templates/docx/report_kit.py`（Word 模式）
 
 ## 步骤
@@ -31,73 +31,98 @@
 
 | 场景 | 模板 |
 |---|---|
-| **默认（国赛/省赛/校赛/课程论文，无特殊要求）** | `assets/templates/latex/workshop/`（默认论文模板：`format.cls` + 17 个带写作提示词的章节文件） |
-| CUMCM 官方格式（要 AI 声明宏、官方封面） | `assets/templates/latex/cumcmthesis/` |
+| **默认（国赛/省赛/校赛/课程论文，无特殊要求）** | `assets/templates/latex/default/`（`ctexart`：摘要宏 + 目录 + 8 章 + 参考文献 + 附录，`\fig`/`\tabcaption`/`\threelinetable` 现成） |
 | MCM/ICM（英文） | `assets/templates/latex/mcm/` |
 | 华为杯 | `assets/templates/latex/huaweibei/` |
-| 通用中文结构（`ctexart`，无竞赛格式要求时） | `assets/templates/latex/default/` |
+| 用户自带模板 | 用户指定目录；整目录复制到 `paper/`，按该模板自己的宏写，不混用 `\fig`/`\tabcaption` |
 
-**整目录复制到 `paper/`，不要从零写文档类**。workshop 模板的 `fonts/` 必须跟 `main.tex` 同级（`format.cls` 用 `./fonts/` 相对路径取思源宋体与隶书），并在 `paper/` 目录内编译。
+**整目录复制到 `paper/`，不要从零写文档类**。`default` 走 `fontset=windows`（系统宋体/黑体/楷体），不依赖模板自带字体；用自带字体的模板时，字体目录必须与 `main.tex` 同级，并在 `paper/` 目录内编译。
 
-> 逐章写作提示词只覆盖 `workshop`（17 个 `.tex` 末尾的【本章节写作提示词】）。用 `mcm` / `huaweibei` / `cumcmthesis` 时没有对应提示词文件：按该模板 `sections/` 里的注释块与总则【英文链条】走，不要硬套中文提示词；章节顺序见 `knowledge/10` 的【英文链条】。
+> **写作提示词与模板解耦**：口径全部在 `references/knowledge/10-chapter-writing-prompts.md`（17 节，按「章」组织，不绑定文件名），`default/` 的 `main.tex` 顶部另有一份 6 条写作提示。用 `mcm` 走英文链条（见 `knowledge/10` 的【英文链条】），用 `huaweibei` 按它自己的 `sections/` 顺序；**章节名不同不影响读哪一节**，映射见下表。
 
 ### 2. 章节骨架
 
 ```text
 paper/
-├── main.tex                 入口：队伍信息 + 标题 + \input 各章
-├── format.cls               模板类文件（不改）
-├── fonts/                   三套字体（不删）
-├── 0.摘要.tex
-├── 1.引言.tex
-├── 2.总体分析.tex
-├── 3.模型假设.tex
-├── 4.符号说明.tex
-├── 5.模型的建立与求解.tex   \input 5.1.问题一.tex
-├── 5.1.问题一.tex
-├── 5.1.1.具体分析.tex
-├── 5.1.2.模型准备.tex
-├── 5.1.3.模型建立.tex
-├── 5.1.4.模型求解.tex
-├── 6.模型检验.tex
-├── 7.模型评价.tex
-├── 8.模型改进推广.tex
-├── 9.AI说明.tex
-├── 10.参考文献.tex
-└── 11.附录.tex
+├── main.tex                 标题页 + \abstractcn{摘要}{关键词} + \tocpage + 页眉页脚
+│                            + \fig{宽}{路径}{图题}{label} / \tabcaption{题}{label}{列格式}{表头}{表体}
+├── references.tex           \bibitem 条目（\referencescn 引出）
+└── sections/
+    ├── 1_restatement.tex    一、问题重述（背景 + 总体思路）
+    ├── 2_assumptions.tex    二、模型假设
+    ├── 3_symbols.tex        三、符号说明（longtable 两列）
+    ├── 4_problem1.tex       四、问题一（\subsection 分「分析/准备/建立/求解」）
+    ├── 5_problem2.tex       五、问题二
+    ├── 6_problem3.tex       六、问题三（问数不足就删文件并改 main.tex 的 \input）
+    ├── 7_sensitivity.tex    七、模型检验（误差 + 灵敏度）
+    ├── 8_evaluation.tex     八、模型评价与推广
+    └── A_code.tex           附录 A 核心代码（\appendixcn 引出）
 ```
 
-问题数 >1 时，把 `5.1.*` 五件套复制成 `5.2.*`、`5.3.*`，在 `5.模型的建立与求解.tex` 里依次 `\input`；每问内部仍是「具体分析 → 模型准备 → 模型建立 → 模型求解」四小节。
+问数 >3 时照 `4_problem1.tex` 复制 `7_problem4.tex` 并在 `main.tex` 里加 `\input`；问内固定四小节「具体分析 → 模型准备 → 模型建立 → 模型求解」。
 
-用 CUMCMThesis / MCM / 华为杯模板时，骨架按该模板 `sections/` 的既有文件走，不套 workshop 的文件名。
+用 MCM / 华为杯 / 用户自带模板时，骨架按该模板 `sections/` 的既有文件走，不套 `default` 的文件名。
+
+**`knowledge/10` 与 `default/sections` 的映射**（提示词按左列读，内容按右列写）：
+
+| knowledge/10 的节 | 写到哪 |
+|---|---|
+| 0 · 摘要 | `main.tex` 的 `\abstractcn{}{}` |
+| 1 · 引言 | `1_restatement.tex` 前半（背景 + 意义） |
+| 2 · 总体分析 | `1_restatement.tex` 后半（总体思路/技术路线），不单列一章 |
+| 3 · 模型假设 | `2_assumptions.tex` |
+| 4 · 符号说明 | `3_symbols.tex` |
+| 5 / 5.1 / 5.1.1–5.1.4 · 主体与逐问 | `4_problem1.tex` / `5_problem2.tex` / `6_problem3.tex`，问内 `\subsection` 对应「具体分析 → 模型准备 → 模型建立 → 模型求解」 |
+| 6 · 模型检验 | `7_sensitivity.tex` |
+| 7 · 模型评价 + 8 · 改进推广 | `8_evaluation.tex` |
+| 9 · AI 说明 | 赛题要求时在 `8_evaluation.tex` 末尾加 `\section*{AI 工具使用声明}` |
+| 10 · 参考文献 | `references.tex`（`\bibitem`）+ 正文 `\cite` |
+| 11 · 附录 | `sections/A_code.tex` |
 
 ### 3. 逐章写作（先读提示词，再动笔）
 
 对每一章：
 
-1. 读 `references/knowledge/10-chapter-writing-prompts.md` 里该章那一节（模板 `.tex` 末尾也有同一份注释）；
+1. 读 `references/knowledge/10-chapter-writing-prompts.md` 里该章那一节（按 §2 的映射表找到对应文件）；
 2. 按提示词给定的结构、句式、字数、表格列宽写；
-3. 写完对着该节末尾的「【禁止】/【格式】」逐条自查；
+3. 写完对着该节里的硬性项（【禁止】【格式】【列宽】【caption/label】等，各节标签不完全相同，凡带【】的约束都逐条过）；
 4. 数值从 `results.json` 取，图号表号按插入顺序。
 
-**顺序**：先写 5.X（主体）→ 6 检验 → 7 评价 → 8 推广 → 2 总体分析 → 1 引言 → 3 假设 → 4 符号 → **最后写 0 摘要**（摘要必须在全文完成后提炼，且写满一页不溢出）。参考文献与附录随写随补。
+**顺序**：先写主体（问题一/二/三）→ 模型检验 → 评价与推广 → 问题重述+总体思路 → 假设 → 符号 → **最后写摘要**（摘要必须在全文完成后提炼，且写满一页不溢出）。参考文献与附录随写随补。
 
 ### 4. 图表插入
 
-workshop 模板不带 `\fig` / `\tabcaption` 辅助宏，直接写标准环境：
+`default` 模板自带两个排版宏，直接调用，不要手写 `figure`/`table` 环境：
 
 ```latex
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=0.8\textwidth]{../figures/data_q3_fit.png}
-  \caption{训练集拟合值与真实值对比}
-  \label{fig:q3_fit}
-\end{figure}
+\fig{0.75}{../figures/data_q1_fit.png}{问题一模型输出与实测位移对比}{fig:q1_fit}
+\tabcaption{符号说明}{tab:symbols}{>{\centering\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.78\textwidth}}{符号 & 说明}{$x_1$ & 固定酸度（g/L）}
+```
+
+`\fig` 参数：宽（相对 `\textwidth`）、图片路径、图题、`label`；`\tabcaption` 参数：表题、`label`、列格式、表头、表体（内部是 `tabular`，**不跨页**）。跨页长表（符号表、参数表、结果表）改手写环境：
+
+```latex
+\begin{longtable}{>{\centering\arraybackslash}p{0.18\textwidth}>{\centering\arraybackslash}p{0.78\textwidth}}
+  \caption{符号说明}
+  \label{tab:symbols} \\
+  \toprule
+  符号 & 说明 \\
+  \midrule
+  \endfirsthead
+  \caption{符号说明（续）} \\
+  \toprule
+  符号 & 说明 \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  $x_1$ & 固定酸度（g/L） \\
+\end{longtable}
 ```
 
 - **图片路径按 `main.tex` 所在目录解析**（xelatex 在 `paper/` 下跑）：图片写 `../figures/xxx.png`。这条只针对 LaTeX；Python 脚本里禁止 `../figures/`（见 `11-engineering-contract.md`）。
 - **宽度按宽高比档位**：宽高比 ≥0.9（竖图）用 `0.55~0.65\textwidth`；0.6~0.9 用 `0.60~0.70`；<0.6（宽幅）用 `0.65~0.75`；并排两张各 `0.45~0.50`。只给 `width=`，不要只给 `height=`。
-- **表格一律 `longtable` + 定宽列**，首尾加 `@{}` 后列宽总和 = `1.04 − 0.04×N`（N 为列数），表头列名不加粗，必须带 `\caption`：
+- **跨页表一律 `longtable` + 定宽列**，首尾加 `@{}` 后列宽总和 = `1.04 − 0.04×N`（N 为列数），表头列名不加粗，必须带 `\caption`（小表用 `\tabcaption`，见上）：
 
 ```latex
 \begin{longtable}{>{\centering\arraybackslash}p{0.18\textwidth}>{\centering\arraybackslash}p{0.78\textwidth}}
@@ -119,7 +144,7 @@ workshop 模板不带 `\fig` / `\tabcaption` 辅助宏，直接写标准环境�
 ```
 
 - 表题在表上、图题在图下；题注写清「画的是哪些量、在对照什么」（见 `13-writing-injection.md` 第三节第 10 条）。
-- 用 CUMCMThesis 等带 helper 的模板时，按该模板 `main.tex` 顶部的写作提示用 `\fig{宽度}{路径}{题}{label}` / `\tabcaption{题}{label}{列格式}{内容}`，不要混用两套写法。
+- 用 MCM / 华为杯 / 用户自带模板时，按该模板 `main.tex` 顶部的写法来（有 `\fig` 之类 helper 就用它），**不要混用两套写法**。
 
 ### 5. 数值与一致性核账
 

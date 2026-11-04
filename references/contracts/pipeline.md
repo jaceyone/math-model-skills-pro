@@ -40,7 +40,7 @@
 |---|---|---|
 | 四路图件与选路判据 | `knowledge/05-figures.md` | `SKILL.md`、`03-figures.md` 只列路线名，不复述判据 |
 | 模板选择 | `stages/04-writing.md` §1 | `SKILL.md` 表格标"详见 04" |
-| 章节链与逐章写法 | `knowledge/10-chapter-writing-prompts.md`（由 workshop 模板生成） | 别处不重复列章节顺序 |
+| 章节链与逐章写法 | `knowledge/10-chapter-writing-prompts.md`（独立口径库，不绑定模板） | 别处不重复列章节顺序；与 `default/sections` 的映射见 `stages/04-writing.md` §2 |
 | 页数口径 | `knowledge/13-writing-injection.md`（赛制档位） | G4 只写"符合档位" |
 | 表格列宽 | `knowledge/10-chapter-writing-prompts.md`【列宽记账】 | 模板与门禁只引不复述 |
 | 数值 | `results/results.json`（派生量在 `results/numbers_allow.txt` 申报） | 全文引用，不复制 |

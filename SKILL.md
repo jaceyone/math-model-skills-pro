@@ -1,11 +1,11 @@
 ---
 name: math-modeling-pro
-description: 数学建模竞赛与项目工作流。用于“数学建模 / 建模比赛 / 数模论文 / 数学建模竞赛 / 建模分析 / 建模求解 / CUMCM / MCM / ICM / 画流程图 / 画机理图 / 技术路线图 / LaTeX 论文 / PDF 论文 / LaTeX 导出 Word / Word 数据分析报告 / 章节写作提示词 / 论文图片风格 / 得分点 / 论文搜索 / 论文评审 / 能拿多少分 / 怎么提分”等任务。主链路默认 LaTeX → PDF，默认模板为 workshop 论文模板（17 章逐章写作提示词 + main.tex 全文写作总则）；赛题强制 Word 时走 Word 原生分支。内置数据图（plot_style 统一版式 + 出图闸门）、机理图、论文主图、流程图四路图件，S0–S4 阶段门禁、得分点驱动验证与评委式评审。
+description: 数学建模竞赛与项目工作流。用于“数学建模 / 建模比赛 / 数模论文 / 数学建模竞赛 / 建模分析 / 建模求解 / CUMCM / MCM / ICM / 画流程图 / 画机理图 / 技术路线图 / LaTeX 论文 / PDF 论文 / LaTeX 导出 Word / Word 数据分析报告 / 章节写作提示词 / 论文图片风格 / 得分点 / 论文搜索 / 论文评审 / 能拿多少分 / 怎么提分”等任务。主链路默认 LaTeX → PDF，默认模板为 default 中文论文模板（ctexart：摘要/目录/8 章/参考文献/附录，含 \fig/\tabcaption 排版宏）；赛题强制 Word 时走 Word 原生分支。内置数据图（plot_style 统一版式 + 出图闸门）、机理图、论文主图、流程图四路图件，S0–S4 阶段门禁、得分点驱动验证与评委式评审。
 ---
 
-# 数学建模 Pro v2.3.17
+# 数学建模 Pro v2.3.18
 
-本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `workshop`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
+本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
 ## 快速开始
 
@@ -17,7 +17,7 @@ description: 数学建模竞赛与项目工作流。用于“数学建模 / 建�
 | “画技术路线图 / 框架图” | S3，路线 ③ `tools/paper-figure` |
 | “画流程图” | S3，路线 ④ 先选路：A `tools/flowchart/scripts/flowchart.py`（JSON→TikZ）/ B `tools/flowchart/scripts/svg_flow.py`（SVG→HTML/PNG） |
 | “画可行域 / 相平面 / 受力图” | S3，路线 ② `tools/mechanism-diagram` |
-| “写论文 / 编译 PDF” | S4 LaTeX 分支，默认 `assets/templates/latex/workshop/` |
+| “写论文 / 编译 PDF” | S4 LaTeX 分支，默认 `assets/templates/latex/default/` |
 | “这一章怎么写 / 摘要怎么写” | 读 `references/knowledge/10-chapter-writing-prompts.md` 对应节 |
 | “写 Word 报告（赛题强制）” | S4 Word 分支，`report_kit.py` 产出 `report/数据分析报告.docx` |
 | “导出 Word 改稿副本” | 仅 LaTeX 模式，运行 `scripts/latex2docx.py` |
@@ -45,7 +45,7 @@ description: 数学建模竞赛与项目工作流。用于“数学建模 / 建�
 
 | 资产 | 用途 | 铺到哪 |
 |---|---|---|
-| `assets/templates/latex/workshop/` | **默认论文模板**：`format.cls` + 17 个章节文件（每个都带【本章节写作提示词】）+ `fonts/` | `paper/` |
+| `assets/templates/latex/default/` | **默认论文模板**（`ctexart`）：`main.tex` 内含摘要宏、目录、页眉、`\fig`/`\tabcaption`；`sections/` 8 章 + `references.tex` + `A_code.tex` | `paper/` |
 | `assets/style/plot_style.py` | 统一绘图版式（中文字体 + 期刊配色 + 组图 + 存图体检） | `code/` |
 | `assets/style/check_figures.py` | 出图闸门，硬伤退出码 1 | 项目根 |
 | `assets/scaffold/run_all.py` | 批量跑 `code/` 下脚本 | 项目根 |
@@ -158,10 +158,9 @@ SVG 本质是 XML：脚本产出的 `figures/flow_q1.html` 在浏览器里点文
 │   ├── _figure_lint.json
 │   └── manifest.json
 └── paper/                      # LaTeX 模式（Word 模式换成 report/）
-    ├── main.tex
-    ├── format.cls
-    ├── fonts/
-    └── 0.摘要.tex … 11.附录.tex
+    ├── main.tex                # 标题页 + 摘要宏 + 目录 + 页眉 + \fig/\tabcaption
+    ├── references.tex
+    └── sections/1_restatement … 8_evaluation + A_code.tex
 ```
 
 契约：
@@ -187,15 +186,13 @@ SVG 本质是 XML：脚本产出的 `figures/flow_q1.html` 在浏览器里点文
 
 | 场景 | 模板 | 文件数 | 空白首编实测 |
 |---|---|---|---|
-| **默认**（国赛/省赛/校赛/课程论文） | `assets/templates/latex/workshop/`（17 章带写作提示词 + `main.tex` 顶部【全文写作总则】） | 23 | 10 页 / 0 error / 0 Overfull |
-| CUMCM 官方格式 | `assets/templates/latex/cumcmthesis/`（CUMCMThesis v2.9 + `cumcm2026.sty`，含 AI 声明） | 4 | 4 页 / 0 error / 0 Overfull |
+| **默认**（国赛/省赛/校赛/课程论文，无特殊要求） | `assets/templates/latex/default/`（`ctexart`：摘要/目录/8 章/参考文献/附录，`\fig`/`\tabcaption` 现成） | 11 | 8 页 / 0 error / 0 Overfull |
 | MCM/ICM（英文） | `assets/templates/latex/mcm/`（Summary Sheet + 8 章英文链条） | 12 | 11 页 / 0 error / 0 Overfull |
 | 华为杯 | `assets/templates/latex/huaweibei/`（封面 logo/title PDF 内置） | 14 | 10 页 / 0 error / 0 Overfull |
-| 通用中文结构（`ctexart`，无竞赛格式要求时） | `assets/templates/latex/default/` | 11 | 8 页 / 0 error / 0 Overfull |
 
 模板清单、每套的文件/章节结构、Word 模板与四路图件母版（数据图 11 / 机理 12 / 主图 5 / 流程图 8+1）见 **`assets/templates/README.md`**；选模板先看那张总览表，再看这里的场景列。
 
-编译与 Word 分支的细节见 `references/stages/04-writing.md`（编译两遍、`fonts/` 同级、Word 原生分支不经过 LaTeX）。禁止用 Typst。
+编译与 Word 分支的细节见 `references/stages/04-writing.md`（xelatex 两遍、图片路径相对 `main.tex`、Word 原生分支不经过 LaTeX）。禁止用 Typst。
 
 ## 关键规则
 
@@ -204,7 +201,7 @@ SVG 本质是 XML：脚本产出的 `figures/flow_q1.html` 在浏览器里点文
 3. **权威版本按交付形态定**：LaTeX 模式以 PDF 为准，Word 只作改稿副本；Word 模式以 DOCX 为准，PDF 只作预览。
 4. **不编造文献**：`paper/references.tex` 用 `thebibliography` + `\bibitem{key}`，正文用 `\cite{key}`，键与条目一一对应、条目带完整出版信息；`scripts/check_paper.py` 机器校验，不通过的参考文献等于装饰。
 5. **不泄露内部文件名**：论文正文不得出现 `reports/`、`code/`、`results.json`、`plan.md`。
-6. **AI 声明**：CUMCM 使用 `\CumcmAIUsed{...}` 或 `\CumcmAINotUsed`，不得留空。
+6. **AI 声明**：赛题要求 AI 使用声明时按赛事口径写（模板无对应宏就用无编号小节 + 一句话声明），不得留空。
 7. **先门禁后推进**：上一阶段不达标，不进入下一阶段。
 8. **评审提分**：终稿前跑 `tools/review`，先修 P0/P1，再修格式与摘要；评分只作定位，不承诺获奖。
 9. **无人值守**：不中途提问、不停在方案阶段；歧义取保守可验证解释并写进 `plan.md` 假设段（`references/knowledge/11-engineering-contract.md`）。
@@ -247,7 +244,6 @@ SVG 本质是 XML：脚本产出的 `figures/flow_q1.html` 在浏览器里点文
 | `scripts/doctor.py` | 环境检查（xelatex 必选；pandoc / pdftoppm 可选） |
 | `scripts/build_paper.py` | xelatex 编译 + PDF 页检查（退出码 0=PASS / 1=FAIL / 2=WARN） |
 | `scripts/check_paper.py` | 论文自检 6 项：数字↔`results.json`、文献↔`\cite`、章节结构（符号说明独立且前置）、产物闭环（含 SCORE_MAP 落点）、内部文件名、图件↔`manifest.json`（G4 前必跑，退出码 0 才算过） |
-| `scripts/build_prompts.py` | 从 workshop 模板重建 `knowledge/10-chapter-writing-prompts.md` |
 | `scripts/latex2docx.py` | LaTeX → Word 旁路导出 |
 | `scripts/make_manifest.py` | 扫描 `figures/` 生成 manifest（自动从 `paper/` 抓 caption/section；`flow_*` 按实存的 `.svg`/`.json` 推断 `spec`） |
 | `tools/flowchart/scripts/svg_flow.py` | 流程图 B 路：`--html`（可编辑页）/ `--png` / `--pdf`，Edge 无头渲染，`cairosvg` 可选 |

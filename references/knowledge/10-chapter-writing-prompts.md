@@ -1,12 +1,12 @@
-# 10 · 章节写作提示词（模板内置，逐章照做）
+# 10 · 章节写作提示词（独立口径库，逐章照做）
 
-这些提示词是国赛评委口径的写作要求，随 `assets/templates/latex/workshop/` 每个章节文件
-末尾的 `% 【本章节写作提示词】` 注释块一起发货；`main.tex` 顶部另有 `% 【全文写作总则】`。
+这些提示词是国赛评委口径的写作要求，按「章」组织、**不绑定任何模板文件名**（2.3.18 起随 workshop 模板移出的同时转为本技能自有口径库）。
+落到 `default` 模板时按 `stages/04-writing.md` §2 的映射表找文件；`default/main.tex` 顶部另有一份 6 条写作提示。
 **写哪一章就先读哪一节**，读完立刻落笔，不要通读全文浪费时间。
 
 使用规则：
 
-1. 章节顺序与文件名、`main.tex` 的 `\input` 顺序一一对应；多问题复制 `5.1.*` 四件套为 `5.2.*`、`5.3.*`。
+1. 章节按「章」组织，不绑定文件名；落到具体模板时按 `stages/04-writing.md` §2 的映射表挑文件，问数不足就删多余章节。
 2. 提示词里给了版式与句式模板（如摘要「针对问题N，」句链、假设「**假设名**：口径」）→ 直接套用，不自由发挥。
 3. 提示词里的「必须/禁止/不得」是硬约束，写完逐条自查；软要求（篇幅、语气）按实际内容取舍。
 4. 数值一律来自 `results/results.json`，图一律来自 `figures/manifest.json`；提示词不改变这两条。
@@ -20,7 +20,7 @@
 
 ## 总纲 · 全文写作总则与语言规范
 
-源文件：`assets/templates/latex/workshop/main.tex`
+落到模板：`default/main.tex` 顶部 6 条写作提示
 
 【全文写作总则】（动笔前读一遍；每章细则见该章 .tex 末尾的【本章节写作提示词】）
 【章节链】摘要 → 引言 → 总体分析 → 模型假设 → 符号说明 → 模型的建立与求解 → 模型检验 → 模型评价 → 模型改进推广 → AI 说明 → 参考文献 → 附录；章节顺序 = 文件名 = 下方 \input 顺序，不新增、不调序、不合并。
@@ -48,7 +48,7 @@
 
 ## 0 · 摘要
 
-源文件：`assets/templates/latex/workshop/0.摘要.tex`
+落到模板：`default/main.tex` 的 `\abstractcn{}{}`
 
 【写作时机】摘要放在最后写，待全文各章完成后依据实际内容提炼；main.tex 已通过 \input 把本文件固定在第 1 章前，但内容须最后补全。
 【页数】摘要必须写满一页，且严格限定在一页之内（300~1000 字）；全篇 PDF 页数**按赛制档位**（国赛 28~30、华为杯 50+、美赛 ≤25、亚太约 22，见 references/knowledge/13-writing-injection.md），档位以 plan.md 为准，不写死一个数字。
@@ -72,7 +72,7 @@
 
 ## 1 · 引言
 
-源文件：`assets/templates/latex/workshop/1.引言.tex`
+落到模板：`default/sections/1_restatement.tex` 前半
 
 【结构】引言 = 问题背景 + 问题重述，用自然段落（禁止分点）。
 【顺序】先读 main.tex 确认 \section 序号；禁止在 \section/\subsection 标题前后多写 {}（如 \section{问题重述} 会触发 Runaway argument）。
@@ -81,7 +81,7 @@
 
 ## 2 · 总体分析
 
-源文件：`assets/templates/latex/workshop/2.总体分析.tex`
+落到模板：`default/sections/1_restatement.tex` 后半（总体思路）
 
 【正文主干（照上面正文模板写；针对具体问题调整语言，简洁说明解决问题的具体流程）】
   针对本文所提出的问题，首先，针对问题一本文设计了…，建立了…，分析了…，得出了…，改进了…，确保了…（题目要求）。
@@ -91,7 +91,7 @@
 
 ## 3 · 模型假设
 
-源文件：`assets/templates/latex/workshop/3.模型假设.tex`
+落到模板：`default/sections/2_assumptions.tex`
 
 【结构】两段式：第一段引文 + \begin{itemize} 分点列出每条假设。
 【引文】第一段固定：「为简化问题，本文做出以下假设：」。
@@ -102,7 +102,7 @@
 
 ## 4 · 符号说明
 
-源文件：`assets/templates/latex/workshop/4.符号说明.tex`
+落到模板：`default/sections/3_symbols.tex`
 
 【位置】固定排在模型假设之后、模型的建立与求解之前；读者必须在第一条用到符号的公式之前见到它，禁止把符号表塞进模型章。
 【引文】开头引文表达符号说明的意义并引出表，篇幅控制在 2 行内。
@@ -119,7 +119,7 @@
 
 ## 5 · 模型的建立与求解
 
-源文件：`assets/templates/latex/workshop/5.模型的建立与求解.tex`
+落到模板：`default/sections/4_problem1.tex` 等逐问文件
 
 【结构】本文件是一级标题「模型的建立与求解」的包装：\section{模型的建立与求解}，内部由下方「__SUBS__ 占位」注入
   其「子块（二级标题）」的 \input 列表，子块来自 subs/ 下（如 5.1问题1的建立求解、5.2问题2的建立求解…）。
@@ -129,7 +129,7 @@
 
 ## 5.1 · 问题一
 
-源文件：`assets/templates/latex/workshop/5.1.问题一.tex`
+落到模板：`default/sections/4_problem1.tex`
 
 【作用】这是每个小问的包装（二级标题）：题目有几个小问，就在 模型的建立与求解 组成里放几个 5.X 子块，
   并为每个小问复制本块为 5.X.问题X的建立求解（X = 第几小问）。
@@ -139,7 +139,7 @@
 
 ## 5.1.1 · 具体分析
 
-源文件：`assets/templates/latex/workshop/5.1.1.具体分析.tex`
+落到模板：`4_problem1.tex` 的第一个 `\subsection`
 
 【定位】本块为每个问题的「具体分析」（三级子块），是「问题X的模型的建立和求解」里最先出现的子块。
 【开头段】说明针对问题几、点出问题类型（评价/分类/预测/优化/机理分析）、点出本问大致建模方法。
@@ -149,7 +149,7 @@
 
 ## 5.1.2 · 模型准备
 
-源文件：`assets/templates/latex/workshop/5.1.2.模型准备.tex`
+落到模板：`4_problem1.tex` 的第二个 `\subsection`
 
 【定位】本块为每个问题的「模型准备」（三级子块），放在具体分析之后，用于把原始数据/问题转化为可建模样。
 【结构】本块只有一个三级标题 \subsubsection{模型准备}；下面的「数据预处理」「算法选择」用加粗四级标题 \textbf{1.数据预处理} / \textbf{2.算法选择}（可带序号，无单独 \subsubsection）。
@@ -160,7 +160,7 @@
 
 ## 5.1.3 · 模型建立
 
-源文件：`assets/templates/latex/workshop/5.1.3.模型建立.tex`
+落到模板：`4_problem1.tex` 的第三个 `\subsection`
 
 【定位】本块为每个问题的「模型建立」（三级子块），放在模型准备之后，用于建立本问的数学模型并展示中间结果。
 【结构】开头段引文 → 分题型建模 → 结尾段总结。
@@ -179,7 +179,7 @@
 
 ## 5.1.4 · 模型求解
 
-源文件：`assets/templates/latex/workshop/5.1.4.模型求解.tex`
+落到模板：`4_problem1.tex` 的第四个 `\subsection`
 
 【定位】本块为每个问题的「模型求解」（三级子块），放在模型建立之后，用于展示求解结果并分析。
 【结构】开头段引文 → 结果表/图 → 分析文字。
@@ -194,7 +194,7 @@
 
 ## 6 · 模型检验
 
-源文件：`assets/templates/latex/workshop/6.模型检验.tex`
+落到模板：`default/sections/7_sensitivity.tex`
 
 【结构】开头段文字引入 → 二级标题区分不同检验类型 → 文字解释检验必要性 → 表/图列出检验结果【表优先】→ 对检验结果分析。
 【开头段】文字引入，说明检验的目的与必要性。
@@ -207,7 +207,7 @@
 
 ## 7 · 模型评价
 
-源文件：`assets/templates/latex/workshop/7.模型评价.tex`
+落到模板：`default/sections/8_evaluation.tex`
 
 【条数】优点数量必须大于缺点数量；建议优点 4 条 + 缺点 2 条（或按模型数量等比调整，但须满足优点>缺点）。
 【格式】\begin{itemize} 每条以 \textbf{优点N：} / \textbf{缺点N：} 开头（注意缺点用「缺点N：」），每条 ≤2 行，用自然语言，不叠加空话。
@@ -217,7 +217,7 @@
 
 ## 8 · 模型改进推广
 
-源文件：`assets/templates/latex/workshop/8.模型改进推广.tex`
+落到模板：`default/sections/8_evaluation.tex` 后半
 
 【结构】\subsection{模型的改进} + \subsection{模型的推广}。
 【模型的改进】任选一种写法：① 整段写（直接 AI 生成即可）；② 分点写（一定不要偏题）。内容即当前模型的不足 + 可优化方向（方法/参数/数据层面，贴近现实可行）。
@@ -226,14 +226,14 @@
 
 ## 9 · AI说明
 
-源文件：`assets/templates/latex/workshop/9.AI说明.tex`
+落到模板：`8_evaluation.tex` 末尾的无编号小节
 
 【结构】\section*{AI工具使用声明}（无编号）；一句话声明使用情况。
 【使用】若竞赛中使用了AI工具，写明【简要用途】，并注明详细情况见支撑材料。
 
 ## 10 · 参考文献
 
-源文件：`assets/templates/latex/workshop/10.参考文献.tex`
+落到模板：`default/references.tex` + 正文 `\cite`
 
 【内容】必须根据论文实际内容生成，禁止保留模板示例文献。
 【格式】国标 GB/T 7714-2015 格式，纯文本一行，禁 emph/textbf/textit/underline。必须删除 DOI 号。每条 \bibitem{标签} 一行。
@@ -243,7 +243,7 @@
 
 ## 11 · 附录
 
-源文件：`assets/templates/latex/workshop/11.附录.tex`
+落到模板：`default/sections/A_code.tex`
 
 【内容】① 附件说明表（必须，按模板）；② 代码（选填，按模板）。
 【附件说明表】两列 {LX}（文件 + 说明），列长放不下可调列宽；文件名用 问题X_xxx.py、xxx.png 等真实产物名，说明列写该文件作用。

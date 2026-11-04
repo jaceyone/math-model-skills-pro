@@ -23,7 +23,7 @@
 
 ## LaTeX 模式
 
-- [ ] 模板已确认：本技能默认 `assets/templates/latex/workshop/`（未混入其他模板文件、未另写文档类）
+- [ ] 模板已确认：本技能默认 `assets/templates/latex/default/`（未混入其他模板文件、未另写文档类）
 - [ ] 已整目录复制到 `paper/`（含 `format.cls` 与 `fonts/`），只改章节 `.tex` 与 `main.tex` 的队伍信息
 - [ ] 未在 `paper/main.tex` 临时加包或另写文档类
 - [ ] 章节文件齐全，`\input` 顺序正确；多问题已复制 `5.2.*`、`5.3.*`

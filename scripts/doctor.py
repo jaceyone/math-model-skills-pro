@@ -52,17 +52,13 @@ FONTS = {
 }
 
 TEMPLATES = [
-    (SKILL_ROOT / "assets/templates/latex/workshop/main.tex", "默认论文模板（workshop）"),
-    (SKILL_ROOT / "assets/templates/latex/cumcmthesis/cumcmthesis.cls", "CUMCMThesis"),
+    (SKILL_ROOT / "assets/templates/latex/default/main.tex", "默认论文模板（default）"),
     (SKILL_ROOT / "assets/templates/latex/mcm/main.tex", "MCM"),
     (SKILL_ROOT / "assets/templates/latex/huaweibei/main.tex", "华为杯"),
-    (SKILL_ROOT / "assets/templates/latex/default/main.tex", "通用"),
 ]
 
 # 默认模板/工具箱资产：缺了会导致 S2 出图闸门或 S4 Word 分支直接跑不动
 ASSETS = [
-    (SKILL_ROOT / "assets/templates/latex/workshop/format.cls", "workshop format.cls"),
-    (SKILL_ROOT / "assets/templates/latex/workshop/fonts/SourceHanSerifCN-Regular.otf", "workshop 思源宋体"),
     (SKILL_ROOT / "assets/style/plot_style.py", "plot_style 数据图版式"),
     (SKILL_ROOT / "assets/style/check_figures.py", "check_figures 出图闸门"),
     (SKILL_ROOT / "assets/scaffold/run_all.py", "run_all 批量运行"),
