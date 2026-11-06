@@ -1,4 +1,4 @@
-# 数学建模 Pro v2.3.19
+# 数学建模 Pro v2.3.22
 
 数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**。默认主链路 **LaTeX → PDF**（默认模板 `default`，`ctexart`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -12,7 +12,7 @@
   - 数据图：`plot_style`（中文字体 + 9 套期刊配色 + 组图 API）+ `check_figures.py` 闸门 + 11 个科研图模板；
   - 机理图：TikZ，12 类，`xelatex` → `pdfcrop`（可跳过）→ `pdftoppm`，中文图只出 PDF+PNG；
   - 论文主图：5 张实拍母版 → SVG → `render_figure.py` → PDF/PNG；
-  - 流程图两条路线：**A · TikZ**（`flow_*.json` → `flowchart.py` → PDF/PNG，进 LaTeX 论文）与 **B · SVG**（`flow_*.svg` → `svg_flow.py` → 可编辑 HTML + PNG/PDF，可在浏览器里直接改字），独立成路、互不混用。
+  - 流程图两条路线：**A · TikZ**（`flow_*.json` → `tools/flowchart/scripts/flowchart.py` → PDF/PNG，进 LaTeX 论文）与 **B · SVG**（`flow_*.svg` → `tools/flowchart/scripts/svg_flow.py` → 可编辑 HTML + PNG/PDF，可在浏览器里直接改字），独立成路、互不混用。
 
 - **LaTeX 模板**：default（默认，`ctexart`：摘要/目录/8 章/参考文献/附录）、MCM（英文）、华为杯；用户自带模板可直接替换。
 - **Word 原生报告**：`reference.docx` + `report_kit.py`（三线表、目录/页码域、公式编号、题注），产出 `report/数据分析报告.docx`。

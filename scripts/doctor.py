@@ -8,6 +8,7 @@ import importlib.util
 import json
 import platform
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -20,6 +21,7 @@ COMMANDS = [
     ("pdftoppm", "PDF -> PNG 预览（可选）", False),
     ("pdftotext", "PDF 文本提取", False),
     ("pdfinfo", "PDF 页数/尺寸", False),
+    ("soffice", "LibreOffice：xlsx 重算 / docx 转换（可选）", False),
     ("drawio", "drawio 导出（可选）", False),
 ]
 
@@ -80,6 +82,90 @@ def check_package(name: str) -> str | None:
     return spec.origin if spec else None
 
 
+def entry_scripts() -> list[Path]:
+    """所有可执行入口:scripts/*.py 与 tools/*/scripts/*.py。"""
+    out = []
+    for pat in ("scripts/*.py", "tools/*/scripts/*.py"):
+        for p in sorted(SKILL_ROOT.glob(pat)):
+            if p.name.startswith("_"):
+                continue
+            out.append(p)
+    return out
+
+
+def probe_script(path: Path, timeout: int = 30) -> dict:
+    """跑一次 `--help`,看它到底是能跑、缺包,还是自己崩。
+
+    2026-11 实测过一次:PDF 工具 `from pdf2image import ...` 写在模块顶层,
+    开发机没装 pdf2image,一条命令都跑不了,而 doctor 只查「包在不在」、
+    不查「脚本能不能起来」,所以全绿。这类失败必须由 doctor 自己撞一次。
+    """
+    rel = str(path.relative_to(SKILL_ROOT)).replace("\\", "/")
+    try:
+        r = subprocess.run([sys.executable, str(path), "--help"],
+                           capture_output=True, text=True, timeout=timeout,
+                           cwd=str(SKILL_ROOT))
+    except subprocess.TimeoutExpired:
+        return {"script": rel, "ok": False, "why": f"超时（>{timeout}s）"}
+    except OSError as e:
+        return {"script": rel, "ok": False, "why": f"起不来：{e}"}
+    blob = (r.stdout or "") + (r.stderr or "")
+    if r.returncode == 0 or "usage:" in blob.lower():
+        return {"script": rel, "ok": True, "why": ""}
+    for line in blob.splitlines():
+        line = line.strip()
+        if line.startswith("ModuleNotFoundError"):
+            return {"script": rel, "ok": False, "why": line}
+        if line.startswith("ImportError"):
+            return {"script": rel, "ok": False, "why": line}
+    tail = [ln.strip() for ln in blob.strip().splitlines() if ln.strip()]
+    return {"script": rel, "ok": False,
+            "why": (tail[-1] if tail else f"退出码 {r.returncode}")[:160]}
+
+
+def check_doc_links() -> dict:
+    """文档里的技能内部路径是否都能对上磁盘。"""
+    checker = SKILL_ROOT / "scripts" / "check_links.py"
+    if not checker.is_file():
+        return {"ok": False, "why": "缺 scripts/check_links.py", "detail": ""}
+    try:
+        r = subprocess.run([sys.executable, str(checker)], capture_output=True,
+                           text=True, timeout=120, cwd=str(SKILL_ROOT))
+    except (OSError, subprocess.TimeoutExpired) as e:
+        return {"ok": False, "why": str(e), "detail": ""}
+    blob = (r.stdout or "") + (r.stderr or "")
+    return {"ok": r.returncode == 0, "why": "全部可达" if r.returncode == 0 else "有失联路径",
+            "detail": blob.strip()}
+
+
+def check_gate_copies(project: Path | None) -> list[dict]:
+    """项目里的出图闸门副本是否与技能内一致、是否多铺了 `code/` 副本。
+
+    闸门是**复制**进项目的,技能升级后副本不会自己跟着变。旧版副本在找不到
+    `figures/` 时会打印「没有需要体检的结果图」并 exit 0——闸门静默放行,
+    两次实测都被它骗过。这里按字节比对技能内原件,不一致就点名。
+    """
+    if project is None:
+        return []
+    src = SKILL_ROOT / "assets/style/check_figures.py"
+    rows = []
+    for rel in ("check_figures.py", "code/check_figures.py"):
+        p = Path(project) / rel
+        if not p.is_file():
+            continue
+        try:
+            same = src.is_file() and p.read_bytes() == src.read_bytes()
+        except OSError:
+            same = False
+        rows.append({
+            "path": str(p),
+            "ok": same,
+            "why": "与技能内原件一致" if same else
+                   "副本陈旧或多余：把 assets/style/check_figures.py 重铺到项目根，删掉 code/ 那份",
+        })
+    return rows
+
+
 def font_rows() -> list[dict]:
     system = platform.system()
     rows = []
@@ -92,6 +178,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="数学建模 Pro 环境检查")
     parser.add_argument("--project", help="项目目录；给出时写入 reports/ENV_REPORT.md")
     parser.add_argument("--json", action="store_true", help="输出 JSON")
+    parser.add_argument("--deep", action="store_true",
+                        help="逐个入口脚本跑一次 --help（约 20–40s），揪出「装了但跑不起来」")
+    parser.add_argument("--no-deep", dest="deep", action="store_false")
+    parser.set_defaults(deep=True)
     args = parser.parse_args()
 
     commands = []
@@ -126,10 +216,20 @@ def main() -> int:
 
     fonts = font_rows()
 
+    links = check_doc_links()
+    gate_copies = check_gate_copies(Path(args.project) if args.project else None)
+    scripts = []
+    if args.deep:
+        for p in entry_scripts():
+            scripts.append(probe_script(p))
+    scripts_ok = all(s["ok"] for s in scripts)
+
     required_ok = all(x["ok"] for x in commands if x["required"])
     required_ok = required_ok and all(x["ok"] for x in packages if x["required"])
     required_ok = required_ok and any(x["ok"] for x in templates)
     required_ok = required_ok and all(x["ok"] for x in assets)
+    # 文档失联与脚本崩溃都属于「工具自己坏了」,和缺包一样算必修
+    required_ok = required_ok and links["ok"] and scripts_ok
 
     data = {
         "platform": platform.platform(),
@@ -141,6 +241,9 @@ def main() -> int:
         "fonts": fonts,
         "templates": templates,
         "assets": assets,
+        "links": links,
+        "gate_copies": gate_copies,
+        "scripts": scripts,
     }
 
     if args.json:
@@ -202,6 +305,16 @@ def main() -> int:
         ]
         for x in assets:
             lines.append(f"| {x['name']} | {'OK' if x['ok'] else 'MISS'} | {x['path']} |")
+        if gate_copies:
+            lines += [
+                "",
+                "## 项目内的出图闸门副本",
+                "",
+                "| 副本 | 状态 | 说明 |",
+                "|---|---|---|",
+            ]
+            for x in gate_copies:
+                lines.append(f"| {x['path']} | {'OK' if x['ok'] else 'STALE'} | {x['why']} |")
         lines += [
             "",
             "## 缺失时的安装建议（Windows）",

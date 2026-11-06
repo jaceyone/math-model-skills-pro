@@ -32,6 +32,17 @@ description: 数学建模论文流程图。两条路线：总流程图 / 问题�
 
 ### A · TikZ 路（JSON → TikZ → PDF/PNG）
 
+#### 走向铁律：直来直去（不允许曲线）
+
+**这不是审美偏好，是交付要求。** 流程图里的弧线读起来要追着弯走，回边一弯就压住别的框，评委第一眼看的就是这张图。
+
+- 只许正交折线：`--`（同一列/行直连）、`-|`（先横后竖）、`|-`（先竖后横）、`-- ++(dx,0) |-`（让开障碍再拐）。
+- **禁止**：`to[out=..,in=..]`、`bend left/right`、`looseness`、`controls`、`out=`/`in=` 任何曲线写法；也不许斜线直接连两个不同列的框。
+- **回边**只从外侧绕：`direction=TB` 从东/西侧 `-- ++(0.9,0) |-`；`direction=LR` 从南/北侧 `-- ++(0,-0.9) -|`。禁止从框内穿过、禁止横穿节点。
+- **判定框的两个分支不许都从 `south` 出**（竖段会重叠成一团）：左分支 `(d.west) -|`，右分支 `(d.east) -|`。
+- `flowchart.py` 已按上述规则生成；**看到曲线说明 spec 里写了非法 `route` 字段，改 spec，不要退回去改脚本**。
+- 验收：PNG 上目检「全直角、无曲线、无斜线穿框、箭头落在框边」——四条全过才算完。
+
 ```bash
 python tools/flowchart/scripts/flowchart.py figures/flow_q1.json              # tex + pdf + png(300dpi)
 python tools/flowchart/scripts/flowchart.py figures/flow_q1.json --no-compile # 只出 .tex

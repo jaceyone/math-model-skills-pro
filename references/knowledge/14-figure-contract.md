@@ -8,7 +8,7 @@
 | 文件 | 放哪 | 干什么 |
 |---|---|---|
 | `assets/style/plot_style.py` | 复制到项目 `code/` | 统一字体/配色/版式，`savefig` 时自动体检 |
-| `assets/style/check_figures.py` | 复制到项目根 | 读 `figures/_figure_lint.json`，有硬伤退出码 1 |
+| `assets/style/check_figures.py` | **只复制到项目根**，不要放 `code/` | 读 `figures/_figure_lint.json`，有硬伤退出码 1；找不到 `figures/` 时退出码 2（`[闸门未执行]`），不再静默放行 |
 | `assets/scaffold/run_all.py` | 复制到项目根 | 依次跑 `code/` 下脚本，批量出图 |
 
 ```python

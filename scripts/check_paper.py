@@ -620,6 +620,48 @@ def check_figures_refs(project: Path) -> tuple[int, list[str]]:
     return 0, [f"正文 {len(set(used))} 张图全部登记在 manifest.json（共 {len(stems)} 条）"]
 
 
+def check_escaped_percent(project: Path) -> tuple[int, list[str]]:
+    r"""正文把 `%` 当百分号写：LaTeX 会把它当注释，吞掉整行后半句。
+
+    编译 0 error、0 Overfull，数字检查也照样通过（`35.7 ` 还在），但读者看到的是
+    "suppressing internal loading by 35.7" 接"the two attractors"——整句被吃掉。
+    这是唯一一类"门禁全绿、论文却是残句"的缺陷，所以单独设一项检查。
+    """
+    paper = _paper_dir(project)
+    hits: list[str] = []
+    for path in sorted(paper.rglob("*.tex")):
+        in_listing = False
+        for lineno, raw in enumerate(
+                path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            s = raw.strip()
+            if s.startswith("\\begin{lstlisting}"):
+                in_listing = True
+                continue
+            if s.startswith("\\end{lstlisting}"):
+                in_listing = False
+                continue
+            if in_listing or s.startswith("%"):
+                continue
+            pos = 0
+            while True:
+                pos = raw.find("%", pos)
+                if pos < 0:
+                    break
+                if pos > 0 and raw[pos - 1] == "\\":
+                    pos += 1
+                    continue
+                before = raw[:pos].rstrip()
+                after = raw[pos + 1:].strip()
+                if before and before[-1].isdigit() and after:
+                    hits.append(f"  {path.relative_to(project).as_posix()}:{lineno}"
+                                f"  {raw.strip()[:70]}")
+                break
+    if not hits:
+        return 0, ["正文没有未转义的百分号"]
+    return 1, [f"命中 {len(hits)} 处「数字 + 裸 %」——会被当成注释吞掉整行后半句，"
+               f"改成 `\\%`："] + hits[:30]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--project", default=".", help="项目根目录（含 results/ 与 paper/）")
@@ -659,7 +701,8 @@ def main() -> int:
         for name, label, fn in (("structure", "章节结构", check_structure),
                                 ("artifacts", "产物闭环", check_artifacts),
                                 ("forbidden", "内部文件名", check_forbidden),
-                                ("figures", "图件契约", check_figures_refs)):
+                                ("figures", "图件契约", check_figures_refs),
+                                ("percent", "百分号转义", check_escaped_percent)):
             if name in skip:
                 continue
             code, lines = fn(project)

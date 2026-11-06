@@ -58,7 +58,7 @@
 
 ### 2. 机理图（路线 ②）
 
-- **读取顺序**：`tools/mechanism-diagram/SKILL.md` → `references/diagram-taxonomy.md`（选图型 + 数据红线）→ `references/tikz_rules.md`（配色铁律 + 自检 6 条）→ `references/mechanism-templates.tex`（抄构造）→ 写 `figures/mech_*.tex`；
+- **读取顺序**：`tools/mechanism-diagram/SKILL.md` → `tools/mechanism-diagram/references/diagram-taxonomy.md`（选图型 + 数据红线）→ `tools/mechanism-diagram/references/tikz_rules.md`（配色铁律 + 自检 6 条）→ `tools/mechanism-diagram/references/mechanism-templates.tex`（抄构造）→ 写 `figures/mech_*.tex`；
 - 产出 `.tex` + `.pdf` + `.png`：`xelatex -interaction=nonstopmode -halt-on-error` → `pdfcrop`（缺 perl 会报 `script engine` 错，**直接跳过**，`standalone` 的 `border=3pt` 已紧裁）→ `pdftoppm -r 300 -png -singlefile`；
 - 编译 0 error / 0 overfull（`grep -c "Overfull\|Underfull" *.log` 必须 0）；PNG 必须 `read_image` 目检；
 - 图内不写求解结果数值。

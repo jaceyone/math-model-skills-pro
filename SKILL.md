@@ -3,9 +3,35 @@ name: math-modeling-pro
 description: 数学建模竞赛与项目工作流。用于“数学建模 / 建模比赛 / 数模论文 / 数学建模竞赛 / 建模分析 / 建模求解 / CUMCM / MCM / ICM / 画流程图 / 画机理图 / 技术路线图 / LaTeX 论文 / PDF 论文 / LaTeX 导出 Word / Word 数据分析报告 / 章节写作提示词 / 论文图片风格 / 得分点 / 论文搜索 / 论文评审 / 能拿多少分 / 怎么提分”等任务。主链路默认 LaTeX → PDF，默认模板为 default 中文论文模板（ctexart：摘要/目录/8 章/参考文献/附录，含 \fig/\tabcaption 排版宏）；赛题强制 Word 时走 Word 原生分支。内置数据图（plot_style 统一版式 + 出图闸门）、机理图、论文主图、流程图四路图件，S0–S4 阶段门禁、得分点驱动验证与评委式评审。
 ---
 
-# 数学建模 Pro v2.3.19
+# 数学建模 Pro v2.3.22
 
 本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
+
+## 铁律 0：报告先行、文件驱动（不是任务驱动）
+
+**流程由文件推进，不由"我要交付一份 PDF"推进。** 上一阶段的 md 产物没落盘、没过质检，就不许进下一阶段；跳过它去写代码或画图，等于用结果倒推模型，最后一定对不上。
+
+```
+plan.md → ANALYSIS_MODELING_REPORT.md → 【S1 质检 ≥3 轮】 → code/ + results.json
+        → FIGURE_REPORT.md + manifest.json → 论文逐章 → check_paper 退出码 0
+```
+
+三条硬约束：
+
+1. **写代码前**，`reports/ANALYSIS_MODELING_REPORT.md` 必须已存在、已写完「每问的目标/变量/假设/目标函数或约束/算法/输入输出/校验方法」七件套——代码只是把这份报告翻译成可执行的形式；报告里没有的公式，代码里不许出现。
+2. **建模报告必须多轮质检**：写完立刻过 `references/checklists/G1-analysis.md`，**至少 3 轮**（结构 → 一致性 → 可执行性），每轮留痕 `reports/QC_S1_ROUND{.1,.2,.3}.md`。这是全流程影响最大的一步，省下来的时间会在 S2/S4 加倍还回去。
+3. **质检不过不进 S2**；S2 期间发现模型要改，先改报告再改代码（报告是唯一口径），改完重跑质检。
+
+## 二选一消除表（不留模糊选择，只留判据）
+
+| 曾经可以"二选一" | 现在怎么定 |
+|---|---|
+| 先写报告还是先跑代码 | **先报告**。代码只允许在报告通过 G1 之后写；"先跑个数出来再补报告"= 违规，必须先补报告 |
+| 总览图走 ③ 论文主图还是 ④B 总流程图 | **默认 ④B**（回答"题怎么解、任务怎么分组"，评委最先看）；只有需要展示**模型内部技术栈**（数据→模型→验证的层级流）时才加 ③，一张论文里两者各自最多一张，**不许互相替代** |
+| 流程图走 ④B（SVG）还是 ④A（TikZ） | 判据只有一条：**步骤/判定/回边** → ④A；**任务分组/问题拆解** → ④B。两者都不许画成另一条路线的样子 |
+| 机理图内写中文还是英文 | 不设二选一：**图内语言 = 论文语言**。英文稿 `MH_FIG_LANG=en`（去掉 ctex，可额外出 SVG）；中文稿 `zh` |
+| 数据图的 `outputs` 登记哪些格式 | 固定登记 **pdf + png**；`.svg` 只作改图中间物，不进 manifest |
+| 模板用哪套 | 由赛事决定：MCM/ICM→`mcm`，华为杯→`huaweibei`，其余→`default`。用户自带模板优先 |
 
 ## 快速开始
 
@@ -15,7 +41,7 @@ description: 数学建模竞赛与项目工作流。用于“数学建模 / 建�
 | “进行建模分析” | 只执行 S1 |
 | “进行代码实现” | 只执行 S2 |
 | “画技术路线图 / 框架图” | S3，路线 ③ `tools/paper-figure` |
-| “画流程图” | S3，路线 ④ 先选路：总流程图/问题分析 → ④B `tools/flowchart/scripts/svg_flow.py`（SVG→HTML/PNG）；算法/判定 → ④A `flowchart.py`（JSON→TikZ） |
+| “画流程图” | S3，路线 ④ 先选路：总流程图/问题分析 → ④B `tools/flowchart/scripts/svg_flow.py`（SVG→HTML/PNG）；算法/判定 → ④A `tools/flowchart/scripts/flowchart.py`（JSON→TikZ） |
 | “画可行域 / 相平面 / 受力图” | S3，路线 ② `tools/mechanism-diagram` |
 | “写论文 / 编译 PDF” | S4 LaTeX 分支，默认 `assets/templates/latex/default/` |
 | “这一章怎么写 / 摘要怎么写” | 读 `references/knowledge/10-chapter-writing-prompts.md` 对应节 |
@@ -28,8 +54,8 @@ description: 数学建模竞赛与项目工作流。用于“数学建模 / 建�
 | 阶段 | 职责别名 | 输入 | 必须产出 | 门禁 | 下一阶段 |
 |---|---|---|---|---|---|
 | S0 启动 | 总控 | 题面、附件、偏好 | `plan.md`、`todo.md`、项目骨架 + 工程资产、环境报告 | G0 | S1 |
-| S1 建模分析 | 建模手 | 题面、附件、`plan.md` | `reports/ANALYSIS_MODELING_REPORT.md`（含得分点表与证据链）、术语表、图件规划、代码任务清单 | G1 | S2 |
-| S2 代码实现 | 编程手 | 分析报告 | `code/`、`results/results.json`、`RESULTS_REPORT.md`、`journal_problemN.md`、数据图 + 出图闸门 | G2 | S3 |
+| S1 建模分析 | 建模手 | 题面、附件、`plan.md` | `reports/ANALYSIS_MODELING_REPORT.md`（七件套 + 得分点表 + 证据链）、`symbols.md`、`图件规划.md`、`SCORE_MAP.md`、代码任务清单 | **G1 + S1 质检 ≥3 轮** | S2 |
+| S2 代码实现 | 编程手 | 分析报告（**已过 G1**） | `code/`、`results/results.json`、`RESULTS_REPORT.md`、`journal_problemN.md`、数据图 + 出图闸门 | G2 | S3 |
 | S3 图件制作 | 图件手 | 分析 + 结果 + 图件规划 | 机理图、论文主图、流程图、`FIGURE_REPORT.md`、`figures/manifest.json` | G3 | S4 |
 | S4 论文撰写 | 论文手 | 全部报告 + 图 + 结果 | LaTeX：`paper/main.tex` + 各章 `.tex` + `paper/main.pdf`；Word：`report/数据分析报告.docx` | G4 | 完成 |
 
@@ -105,7 +131,7 @@ description: 数学建模竞赛与项目工作流。用于“数学建模 / 建�
 | 适合 | 要交人改、要嵌 HTML/PPT、机器没 MiKTeX、要拖拽微调坐标 | 判定框 + 回边、要与正文公式字体一致、直接进 LaTeX |
 | 改图方式 | 浏览器打开 `.html` 点字直改，或直接改 `.svg` | 改 `.json` 重跑脚本（**别手改生成的 `.tex`**） |
 | 产物 | `flow_*.{svg,html,png,pdf}` | `flow_*.{json,tex,pdf,png}` |
-| manifest | `route=flow`、`spec` 填 `.svg`、`source` 填 `svg_flow.py` | `route=flow`、`spec` 填 `.json`、`source` 填 `flowchart.py` |
+| manifest | `route=flow`、`spec` 填 `.svg`、`source` 填 `tools/flowchart/scripts/svg_flow.py` | `route=flow`、`spec` 填 `.json`、`source` 填 `tools/flowchart/scripts/flowchart.py` |
 
 **B · SVG 路（读取 → 执行）**：`tools/flowchart/SKILL.md` → **总流程图 5 套实例母版** `assets/figures/reference/totalflow/`（`quadrant`／`multi-panel`／`nested`／`pipeline-groups`／`five-steps`，实拍图 + 复刻 SVG + PNG）→ 复制 `tools/flowchart/assets/totalflow/tf_*.svg` 成 `figures/flow_<图名>.svg` → 改字 → 出图：
 
@@ -124,7 +150,16 @@ python tools/flowchart/scripts/flowchart.py figures/flow_q1.json --no-compile  #
 
 SVG 本质是 XML：`figures/flow_total.html` 在浏览器里点文字即可改，改完点「下载 SVG」覆盖源文件，重跑脚本刷新 PNG/PDF；没有 Edge 时该 HTML 也可直接手工截图或交给浏览器「打印为 PDF」。`cairosvg` 若已安装则自动改走它转 PNG，不依赖浏览器。
 
-**选路一句话**：讲「全文怎么分析、任务怎么分组」的总流程图 → B（SVG，母版 5 套）；讲「这个算法怎么跑、判定什么、什么时候回边」的细节 → A（TikZ，母版 8 套）。**几何/物理机理**（可行域、受力、光路）不在这两路，走 ② `mechanism-diagram`。
+### ④A 走向铁律：直来直去
+
+TikZ 流程图**只许正交折线**：`--`（同一列/行直接连）、`-|`（先横后竖）、`|-`（先竖后横）、`-- ++(dx,0) |-`（让开再拐）。`tools/flowchart/scripts/flowchart.py` 已按此实现，改图时不要退回曲线：
+
+- **禁止** `to[out=..,in=..]`、`bend left/right`、`looseness`、`controls` 等任何曲线写法——弧线在流程图里既难读又容易压住别的框。
+- **回边**只从外侧走（TB 从东/西侧 `-- ++(0.9,0) |-`，LR 从南/北侧 `-- ++(0,-0.9) -|`），不许从框内穿过，不许横穿节点。
+- **判定框的两个分支**不许都从 `south` 出：左分支走 `(d.west) -|`，右分支走 `(d.east) -|`。
+- **验收**：编译后在 PNG 上目检「全是直角、无曲线、无斜线穿框、箭头落在框边上」，四条都过才算完；发现曲线说明 spec 里写了个非法 route 字段，改 spec 不改脚本。
+
+**选路一句话**：讲「全文怎么分析、任务怎么分组」的总流程图 → B（SVG，母版 5 套）；讲「这个算法怎么跑、判定什么、什么时候回边」的细节 → A（TikZ，母版 8 套，正交布线）。**几何/物理机理**（可行域、受力、光路）不在这两路，走 ② `mechanism-diagram`。
 
 ## 项目骨架
 
@@ -177,7 +212,7 @@ SVG 本质是 XML：`figures/flow_total.html` 在浏览器里点文字即可改�
 | 门禁 | 一句话 |
 |---|---|
 | G0 启动 | 赛事/语言/子问题数已定（可默认 + 写假设），`plan.md`/`todo.md` 存在，工程资产已铺，环境检查完成 |
-| G1 建模 | 每问目标、变量、假设、目标函数/约束、算法、输入输出、校验方法齐全；**得分点表与证据链表已写** |
+| G1 建模 + 质检 | 七件套齐全（目标/变量/假设/目标函数与约束/算法/输入输出/校验方法）；**得分点表与证据链表已写**；**建模报告已跑满 3 轮质检并留痕**（`reports/QC_S1_ROUND.1..3.md`，见 `references/checklists/G1-analysis.md`）——不过不许进 S2 |
 | G2 代码 | 代码从头跑通，结果写入 `results.json`，约束校验通过，种子固定；出图闸门 0 硬伤；得分点逐条核账 |
 | G3 图件 | 四路不混用，每图有来源，数据图过闸门 + 目检，机理图/流程图编译 0 error，manifest 完整 |
 | G4 论文 | 章节齐全、逐章对照写作提示词自查，数值来自 `results.json`，图表按节插入，无占位符/内部文件名，AI 声明已填；LaTeX 与 Word 分支分别过 G4 |
@@ -198,6 +233,7 @@ SVG 本质是 XML：`figures/flow_total.html` 在浏览器里点文字即可改�
 
 ## 关键规则
 
+0. **报告先行、文件驱动**：`ANALYSIS_MODELING_REPORT.md` 未过 G1（含 ≥3 轮质检、留痕 `reports/QC_S1_ROUND*.md`）之前，不许写模型代码、不许出数据图、不许进 S3/S4。报告是唯一口径；S2/S4 期间要改模型，先改报告再改代码再重跑质检。
 1. **数值单一事实源**：论文中的关键数值只能来自 `results/results.json`；不得凭记忆写数。
 2. **图件单一来源**：正文只引用 `figures/manifest.json` 中登记的图。
 3. **权威版本按交付形态定**：LaTeX 模式以 PDF 为准，Word 只作改稿副本；Word 模式以 DOCX 为准，PDF 只作预览。
@@ -221,7 +257,7 @@ SVG 本质是 XML：`figures/flow_total.html` 在浏览器里点文字即可改�
 | 得分点、证据链、验证强度、学术分寸 | `references/knowledge/12-scoring-validation.md` |
 | 摘要句链、推导三段式、一致性、表格、统计、引用 | `references/knowledge/13-writing-injection.md` |
 | 数据图版式、防乱码、出图闸门、plot_style API | `references/knowledge/14-figure-contract.md` |
-| 题面拆解 / 选型 / 题型防错 / 图种 / 写作底线 / 评审 | `references/knowledge/01`–`09`（见 `00-index.md`） |
+| 题面拆解 / 选型 / 题型防错 / 图种 / 写作底线 / 评审 | `references/knowledge/01`–`06`、`10`–`14`（见 `00-index.md`；`07`–`09` 已随模板移除，编号不重排） |
 
 ## 工具索引
 
@@ -233,7 +269,7 @@ SVG 本质是 XML：`figures/flow_total.html` 在浏览器里点文字即可改�
 | `tools/paper-search` | Crossref + arXiv 论文搜索 |
 | `tools/mechanism-diagram` | 机理图（TikZ） |
 | `tools/paper-figure` | 路线图/框架图（SVG → PDF/PNG） |
-| `tools/flowchart` | 流程图：A 路 `scripts/flowchart.py`（JSON → TikZ → PDF/PNG）、B 路 `scripts/svg_flow.py`（SVG → 可编辑 HTML → PNG/PDF） |
+| `tools/flowchart` | 流程图：A 路 `tools/flowchart/scripts/flowchart.py`（JSON → TikZ → PDF/PNG）、B 路 `tools/flowchart/scripts/svg_flow.py`（SVG → 可编辑 HTML → PNG/PDF） |
 | `tools/figure-templates` | 11 个科研数据图模板 |
 | `tools/review` | 评委式评审：100 分评分、格式系数、P0–P3 问题、提分建议 |
 
@@ -245,7 +281,7 @@ SVG 本质是 XML：`figures/flow_total.html` 在浏览器里点文字即可改�
 |---|---|
 | `scripts/doctor.py` | 环境检查（xelatex 必选；pandoc / pdftoppm 可选） |
 | `scripts/build_paper.py` | xelatex 编译 + PDF 页检查（退出码 0=PASS / 1=FAIL / 2=WARN） |
-| `scripts/check_paper.py` | 论文自检 6 项：数字↔`results.json`、文献↔`\cite`、章节结构（符号说明独立且前置）、产物闭环（含 SCORE_MAP 落点）、内部文件名、图件↔`manifest.json`（G4 前必跑，退出码 0 才算过） |
+| `scripts/check_paper.py` | 论文自检 7 项：数字↔`results.json`、文献↔`\cite`、章节结构（符号说明独立且前置）、产物闭环（含 SCORE_MAP 落点）、内部文件名、图件↔`manifest.json`、满载百分号转义（正文写 `35.7 %` 会被当注释吞掉整行后半句，编译却是 0 error）（G4 前必跑，退出码 0 才算过） |
 | `scripts/latex2docx.py` | LaTeX → Word 旁路导出 |
 | `scripts/make_manifest.py` | 扫描 `figures/` 生成 manifest（自动从 `paper/` 抓 caption/section；`flow_*` 按实存的 `.svg`/`.json` 推断 `spec`） |
 | `tools/flowchart/scripts/svg_flow.py` | 流程图 B 路：`--html`（可编辑页）/ `--png` / `--pdf`，Edge 无头渲染，`cairosvg` 可选 |

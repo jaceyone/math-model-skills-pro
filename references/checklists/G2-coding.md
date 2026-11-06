@@ -15,7 +15,7 @@
 - [ ] 中间数据保存到 `code/outputs/` 或 `results/tables/`
 - [ ] 路径用 `ROOT = Path(__file__).resolve().parents[1]`，无 `../figures/`
 - [ ] 数据图输出到 `figures/data_*.png/.pdf`，≥260 dpi
-- [ ] `python check_figures.py` 退出码 0（压字/空面板/平线/乱码为 0）
+- [ ] 在**项目根**跑 `python check_figures.py` 退出码 0（压字/空面板/平线/乱码为 0）；退出码 2 表示「没找到 figures/、没体检任何图」，等于没过，别当通过
 - [ ] 数据图与 `results.json` 数值一致
 - [ ] 灵敏度分析已真实重跑并写入 `sensitivity`
 - [ ] 得分点逐条核账无 missing/unbacked

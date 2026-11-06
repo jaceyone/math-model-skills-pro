@@ -17,7 +17,51 @@ import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+# 闸门自身的版本戳。项目里的副本是从技能 assets/style/ 复制过去的,**复制之后不会自动更新**;
+# 旧版(≤2.3.21 早期)在找不到 figures/ 时只打印一句「没有需要体检的结果图」就 exit 0,
+# 等于闸门静默放行。`python check_figures.py --version` 可核对手上这份是不是新版。
+GATE_VERSION = "2.3.22"
+
+# 工程根怎么定:脚本会被复制到工程根、也可能躺在 code/ 里。按「脚本所在目录」找
+# figures/ 会让 code/check_figures.py 去读 code/figures/(不存在),什么都不查就退出码 0
+# ——闸门形同虚设。所以按 当前目录 → 脚本目录 的顺序向上找「含 figures/ 的工程根」。
+_PROJECT_MARKERS = ("code", "paper", "reports", "results",
+                    "meta.json", "research_plan.json")
+
+
+def _looks_like_project(d: str) -> bool:
+    """只有 figures/ 还不够:上层目录里可能躺着别人的 figures/。要像工程才认。"""
+    if not os.path.isdir(d):
+        return False
+    if not os.path.isdir(os.path.join(d, "figures")):
+        return False
+    return any(os.path.exists(os.path.join(d, m)) for m in _PROJECT_MARKERS)
+
+
+def _walk_up(start: str, depth: int = 6) -> str:
+    """从 start 向上最多 depth 层找工程根;找不到返回空串。"""
+    cur = os.path.abspath(start)
+    for _ in range(depth + 1):
+        if _looks_like_project(cur):
+            return cur
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            break
+        cur = parent
+    return ""
+
+
+def resolve_root(explicit: str = "") -> str:
+    """工程根 = 含 figures/ 的那一层。显式 > 环境变量 > 当前目录向上 > 脚本目录向上 2 层。"""
+    for cand in (explicit, os.environ.get("MS_PROJECT_ROOT", ""), os.getcwd()):
+        if cand and os.path.isdir(cand):
+            hit = _walk_up(cand)
+            if hit:
+                return hit
+    return _walk_up(os.path.dirname(os.path.abspath(__file__)), depth=2)
+
+
+ROOT = resolve_root() or os.path.dirname(os.path.abspath(__file__))
 FIGDIR = os.path.join(ROOT, "figures")
 LINT = os.path.join(FIGDIR, "_figure_lint.json")
 EXTS = (".png", ".svg", ".pdf")
@@ -356,7 +400,34 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="结果图闸门")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
     ap.add_argument("--final", action="store_true", help="终审口径:全部 error 都算硬伤")
+    ap.add_argument("--version", action="version",
+                    version=f"check_figures {GATE_VERSION}")
+    ap.add_argument("--root", default="",
+                    help="工程根(含 figures/ 的那一层);默认按当前目录向上自动找")
     args = ap.parse_args()
+    global ROOT, FIGDIR, LINT
+    if args.root:
+        ROOT = os.path.abspath(args.root)
+        FIGDIR = os.path.join(ROOT, "figures")
+        LINT = os.path.join(FIGDIR, "_figure_lint.json")
+
+    def _die(msg: str, code: int = 2) -> int:
+        """体检不到任何东西 ≠ 通过:闸门必须打出来,否则等于没跑。"""
+        if args.json:
+            print(json.dumps({"ok": False, "reason": msg, "root": ROOT, "figdir": FIGDIR,
+                              "cwd": os.getcwd()}, ensure_ascii=False, indent=1))
+        else:
+            print(f"[闸门未执行] {msg}", file=sys.stderr)
+            print(f"    工程根：{ROOT}", file=sys.stderr)
+            print(f"    体检目录：{FIGDIR}", file=sys.stderr)
+            print(f"    当前目录：{os.getcwd()}", file=sys.stderr)
+            print("    在工程根（含 figures/ 的那一层）下运行，或用 --root 指定。", file=sys.stderr)
+        return code
+
+    if not os.path.isdir(ROOT):
+        return _die(f"工程根不存在：{ROOT}")
+    if not os.path.isdir(FIGDIR):
+        return _die("找不到 figures/ 目录——这次没体检任何图，不能算通过")
     final = (args.final or os.environ.get("MS_FIG_STAGE", "").strip().lower() == "final"
              or os.path.isfile(os.path.join(FIGDIR, ".final_stage")))
 
@@ -405,7 +476,9 @@ def main() -> int:
     warns += len(missing_plan)
 
     if args.json:
-        print(json.dumps({"ok": errors == 0 and not unchecked,
+        print(json.dumps({"ok": errors == 0 and not unchecked and bool(figs),
+                          "reason": "" if figs else "figures/ 下没有需要体检的结果图",
+                          "root": ROOT, "figdir": FIGDIR,
                           "errors": errors, "warns": warns, "deferred": deferred,
                           "stage": "final" if final else "design",
                           "unchecked": unchecked, "duplicates": dups,
@@ -416,11 +489,15 @@ def main() -> int:
                           "unused_plan_kinds": [{"task": t, "kinds": ks} for t, ks in missing_plan],
                           "figures": figs},
                          ensure_ascii=False, indent=1))
+        if not figs:
+            return 2
         return 0 if (errors == 0 and not unchecked) else 1
 
     if not figs:
-        print("figures/ 下没有需要体检的结果图。")
-        return 0
+        return _die("figures/ 下没有需要体检的结果图——这次没体检到任何图，不能算通过"
+                    "（还没出图属正常，出图后再跑；目录不对见上面的「体检目录」）")
+    # 先亮明这次到底看了哪个目录:路径报错时人一眼能看出脚本在替谁体检
+    print(f"体检目录:{FIGDIR}")
     # 标记只用 GBK 也能编码的字符:控制台不是 UTF-8 时,✓/✗ 会让整个脚本崩在 print 上
     order = {"硬伤": 0, "终审": 1, "提醒": 2}
     for stem, item in figs.items():

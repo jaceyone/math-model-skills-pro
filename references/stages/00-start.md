@@ -27,7 +27,8 @@
 1. 创建项目目录 `项目N/`（已有项目则递增编号）。
 2. 建骨架：`input/`、`reports/`、`code/outputs/`、`results/tables/`、`results/logs/`、`figures/`；LaTeX 模式另建 `paper/sections/`，Word 模式另建 `report/`。
 3. **把工程资产复制进项目**（一次到位，后面不再折腾环境）：
-   - `assets/style/plot_style.py`、`assets/style/check_figures.py` → 项目 `code/`（`check_figures.py` 再复制一份到项目根）；
+   - `assets/style/plot_style.py` → 项目 `code/`（脚本要 `from plot_style import ...`）；
+   - `assets/style/check_figures.py` → **只放项目根，不要复制到 `code/`**。闸门按「含 `figures/` 的工程根」找图：放 `code/` 那份会在 `code/figures/` 下找不到图，旧版还会打印「没有需要体检的结果图」并 **exit 0**——闸门形同虚设。项目里发现两份就删掉 `code/` 那份；
    - `assets/scaffold/run_all.py` → 项目根；
    - LaTeX 模式：`assets/templates/latex/default/` 整目录 → `paper/`（`main.tex` + `sections/` + `references.tex`）；
    - Word 模式：`assets/templates/docx/reference.docx` + `report_kit.py` → `report/`。

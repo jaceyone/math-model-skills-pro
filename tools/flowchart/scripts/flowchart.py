@@ -185,32 +185,56 @@ def build_tex(spec: dict) -> tuple[str, list[str]]:
         text = escape(str(node.get("text", ""))).replace("\n", r"\\")
         lines.append(rf"\node[{style}] ({nid}) at ({x:.2f},{y:.2f}) {{{text}}};")
 
+    def _xy(nid: str) -> tuple[float, float]:
+        node = node_by_id[nid]
+        if isinstance(node.get("pos"), (list, tuple)) and len(node["pos"]) == 2:
+            return float(node["pos"][0]), float(node["pos"][1])
+        return positions[nid]
+
+    # 走向铁律：直来直去。所有连线必须是正交折线（-- / -| / |-），
+    # 不许 to[out=..,in=..]、bend left/right 这类曲线，也不许斜线横穿别的框。
     for edge in valid_edges:
         u, v = edge[0], edge[1]
         label = str(edge[2]) if len(edge) >= 3 else ""
         route = str(edge[3]) if len(edge) >= 4 else ""
-        label_tex = rf" node[midway, above, font=\scriptsize] {{{escape(label)}}}" if label else ""
+        lab = rf" node[midway, above, font=\scriptsize] {{{escape(label)}}}" if label else ""
+        ux, _uy = _xy(u)
+        vx, _vy = _xy(v)
+        aligned = abs(ux - vx) < 0.05 if direction == "TB" else abs(_uy - _vy) < 0.05
         if route in {"left", "right"}:
             if direction == "LR":
                 anchor = "south" if route == "left" else "north"
-                angle = -90 if route == "left" else 90
+                off = -0.9 if route == "left" else 0.9
+                lines.append(rf"\draw[edge] ({u}.{anchor}) -- ++(0,{off}){lab} -| ({v}.{anchor});")
             else:
                 anchor = "west" if route == "left" else "east"
-                angle = 180 if route == "left" else 0
-            lines.append(
-                rf"\draw[edge] ({u}.{anchor}) to[out={angle},in={angle},looseness=1.25]{label_tex} ({v}.{anchor});"
-            )
+                off = -0.9 if route == "left" else 0.9
+                lines.append(rf"\draw[edge] ({u}.{anchor}) -- ++({off},0){lab} |- ({v}.{anchor});")
         elif (u, v) in back_edges:
-            if direction == "LR":
-                lines.append(
-                    rf"\draw[edge] ({u}.south) to[out=-90,in=-90,looseness=1.25]{label_tex} ({v}.south);"
-                )
+            # 回边绕外侧走，绝不从框内穿过
+            if direction == "TB":
+                if ux <= vx:
+                    lines.append(rf"\draw[edge] ({u}.west) -- ++(-0.9,0){lab} |- ({v}.west);")
+                else:
+                    lines.append(rf"\draw[edge] ({u}.east) -- ++(0.9,0){lab} |- ({v}.east);")
             else:
-                lines.append(
-                    rf"\draw[edge] ({u}.east) to[out=0,in=0,looseness=1.25]{label_tex} ({v}.east);"
-                )
+                if _uy <= _vy:
+                    lines.append(rf"\draw[edge] ({u}.south) -- ++(0,-0.9){lab} -| ({v}.south);")
+                else:
+                    lines.append(rf"\draw[edge] ({u}.north) -- ++(0,0.9){lab} -| ({v}.north);")
+        elif aligned:
+            lines.append(rf"\draw[edge] ({u}) --{lab} ({v});")
+        elif abs(_uy - _vy) < 0.05:
+            # 同一行：直接横向连，别用 -| (否则横段会从框内部穿过去)
+            a_u, a_v = ("east", "west") if vx > ux else ("west", "east")
+            lines.append(rf"\draw[edge] ({u}.{a_u}) --{lab} ({v}.{a_v});")
+        elif direction == "TB":
+            # 两个分支不能都从 south 出，否则竖段重叠成一团
+            anchor = "west" if vx < ux - 0.05 else "east"
+            lines.append(rf"\draw[edge] ({u}.{anchor}) -|{lab} ({v}.north);")
         else:
-            lines.append(rf"\draw[edge] ({u}) --{label_tex} ({v});")
+            anchor = "south" if _vy < _uy - 0.05 else "north"
+            lines.append(rf"\draw[edge] ({u}.{anchor}) -|{lab} ({v}.west);")
 
     lines += [r"\end{tikzpicture}", r"\end{document}", ""]
     return "\n".join(lines), warnings

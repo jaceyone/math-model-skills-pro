@@ -10,13 +10,23 @@ import subprocess
 import sys
 from pathlib import Path
 
-from office.soffice import get_soffice_env
+from office.soffice import find_soffice, get_soffice_env
 
 from openpyxl import load_workbook
 
 MACRO_DIR_MACOS = "~/Library/Application Support/LibreOffice/4/user/basic/Standard"
 MACRO_DIR_LINUX = "~/.config/libreoffice/4/user/basic/Standard"
+MACRO_DIR_WINDOWS = "~/AppData/Roaming/LibreOffice/4/user/basic/Standard"
 MACRO_FILENAME = "Module1.xba"
+
+
+def macro_dir() -> str:
+    sysname = platform.system()
+    if sysname == "Windows":
+        return os.path.expanduser(MACRO_DIR_WINDOWS)
+    if sysname == "Darwin":
+        return os.path.expanduser(MACRO_DIR_MACOS)
+    return os.path.expanduser(MACRO_DIR_LINUX)
 
 RECALCULATE_MACRO = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
@@ -40,28 +50,26 @@ def has_gtimeout():
 
 
 def setup_libreoffice_macro():
-    macro_dir = os.path.expanduser(
-        MACRO_DIR_MACOS if platform.system() == "Darwin" else MACRO_DIR_LINUX
-    )
-    macro_file = os.path.join(macro_dir, MACRO_FILENAME)
+    mdir = macro_dir()
+    macro_file = os.path.join(mdir, MACRO_FILENAME)
 
     if (
         os.path.exists(macro_file)
-        and "RecalculateAndSave" in Path(macro_file).read_text()
+        and "RecalculateAndSave" in Path(macro_file).read_text(encoding="utf-8", errors="replace")
     ):
         return True
 
-    if not os.path.exists(macro_dir):
+    if not os.path.exists(mdir):
         subprocess.run(
-            ["soffice", "--headless", "--terminate_after_init"],
+            [find_soffice(), "--headless", "--terminate_after_init"],
             capture_output=True,
             timeout=10,
             env=get_soffice_env(),
         )
-        os.makedirs(macro_dir, exist_ok=True)
+        os.makedirs(mdir, exist_ok=True)
 
     try:
-        Path(macro_file).write_text(RECALCULATE_MACRO)
+        Path(macro_file).write_text(RECALCULATE_MACRO, encoding="utf-8")
         return True
     except Exception:
         return False
@@ -77,7 +85,7 @@ def recalc(filename, timeout=30):
         return {"error": "Failed to setup LibreOffice macro"}
 
     cmd = [
-        "soffice",
+        find_soffice(),
         "--headless",
         "--norestore",
         "vnd.sun.star.script:Standard.Module1.RecalculateAndSave?language=Basic&location=application",
@@ -86,10 +94,17 @@ def recalc(filename, timeout=30):
 
     if platform.system() == "Linux":
         cmd = ["timeout", str(timeout)] + cmd
+        result = subprocess.run(cmd, capture_output=True, text=True, env=get_soffice_env())
     elif platform.system() == "Darwin" and has_gtimeout():
         cmd = ["gtimeout", str(timeout)] + cmd
-
-    result = subprocess.run(cmd, capture_output=True, text=True, env=get_soffice_env())
+        result = subprocess.run(cmd, capture_output=True, text=True, env=get_soffice_env())
+    else:
+        # Windows 没有 timeout/gtimeout:用 subprocess 自己的 timeout 参数
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True,
+                                    env=get_soffice_env(), timeout=timeout)
+        except subprocess.TimeoutExpired:
+            return {"error": f"LibreOffice 超过 {timeout}s 未返回（宏没跑起来？）"}
 
     if result.returncode != 0 and result.returncode != 124:  
         error_msg = result.stderr or "Unknown error during recalculation"

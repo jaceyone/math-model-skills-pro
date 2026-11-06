@@ -15,10 +15,30 @@ Usage:
 """
 
 import os
+import shutil
 import socket
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
+
+# Windows 上 soffice 常不在 PATH:找几个默认安装位置兜底
+_WIN_SOFFICE = (
+    r"C:\Program Files\LibreOffice\program\soffice.exe",
+    r"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
+)
+
+
+def find_soffice() -> str:
+    """返回可执行的 soffice 路径;找不到就抛 SystemExit 并说清怎么办。"""
+    exe = shutil.which("soffice") or shutil.which("soffice.exe") or shutil.which("libreoffice")
+    if exe:
+        return exe
+    for p in _WIN_SOFFICE:
+        if os.path.isfile(p):
+            return p
+    raise SystemExit("找不到 LibreOffice（soffice）。装一个或用到的命令换成 openpyxl 直接读写；"
+                     "Windows 默认装在 C:\\Program Files\\LibreOffice\\。")
 
 
 def get_soffice_env() -> dict:
@@ -34,7 +54,7 @@ def get_soffice_env() -> dict:
 
 def run_soffice(args: list[str], **kwargs) -> subprocess.CompletedProcess:
     env = get_soffice_env()
-    return subprocess.run(["soffice"] + args, env=env, **kwargs)
+    return subprocess.run([find_soffice()] + args, env=env, **kwargs)
 
 
 
@@ -42,11 +62,15 @@ _SHIM_SO = Path(tempfile.gettempdir()) / "lo_socket_shim.so"
 
 
 def _needs_shim() -> bool:
+    # LD_PRELOAD 是 Linux 的东西;Windows / 没编 AF_UNIX 的 Python 连常量都没有,
+    # 旧代码直接 socket.AF_UNIX 抛 AttributeError,import 本模块即崩。
+    if sys.platform.startswith("win") or not hasattr(socket, "AF_UNIX"):
+        return False
     try:
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         s.close()
         return False
-    except OSError:
+    except (OSError, AttributeError):
         return True
 
 
@@ -179,5 +203,21 @@ int close(int fd) {
 
 if __name__ == "__main__":
     import sys
+
+    # 本文件主要被 recalc.py / docx 转换内部 import;偶尔被当 CLI 直接跑。
+    # 以前 `--help` 会被原样透传给 soffice,没装 LibreOffice 就报「找不到 soffice」,
+    # 体检脚本逐个跑 `--help` 时会误判成"脚本自己崩了"。
+    if any(a in ("-h", "--help") for a in sys.argv[1:]) or len(sys.argv) == 1:
+        print(
+            "soffice.py —— LibreOffice 无头调用封装(通常由 recalc.py 等内部 import)\n"
+            "\n"
+            "用法:\n"
+            "  python soffice.py <soffice 参数...>   原样透传给 soffice 二进制\n"
+            "  python soffice.py --help              显示本说明\n"
+            "\n"
+            "本机没装 LibreOffice 时只打印安装提示,不影响用 openpyxl 直读直写。\n"
+            "Windows 默认安装位置:C:\\Program Files\\LibreOffice\\program\\soffice.exe"
+        )
+        sys.exit(0)
     result = run_soffice(sys.argv[1:])
     sys.exit(result.returncode)

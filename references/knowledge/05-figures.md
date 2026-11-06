@@ -18,7 +18,8 @@
 | 要画什么 | 走哪一路 |
 |---|---|
 | 技术路线图、方法框架图、总览图、分类图 | `tools/paper-figure`（5 张母版 → SVG → PDF/PNG） |
-| 问题分析总流程、任务分组、总体思路（总流程图） | `tools/flowchart` **B 路** `scripts/svg_flow.py`（SVG → 可编辑 HTML → PNG/PDF；母版 5 套在 `assets/figures/reference/totalflow/`） |\n| 算法流程、判定分支、循环迭代、多阶段流水线 | `tools/flowchart` **A 路** `scripts/flowchart.py`（JSON → TikZ → PDF/PNG；母版 8 套） |
+| 问题分析总流程、任务分组、总体思路（总流程图） | `tools/flowchart` **B 路** `tools/flowchart/scripts/svg_flow.py`（SVG → 可编辑 HTML → PNG/PDF；母版 5 套在 `assets/figures/reference/totalflow/`） |
+| 算法流程、判定分支、循环迭代、多阶段流水线 | `tools/flowchart` **A 路** `tools/flowchart/scripts/flowchart.py`（JSON → TikZ → PDF/PNG；母版 8 套） |
 | 可行域、相平面、受力、光路、状态转移、控制体 | `tools/mechanism-diagram`（TikZ） |
 | 折线/散点/柱状/热图/ROC/Taylor 等 | matplotlib + `assets/style/plot_style.py` |
 
@@ -35,7 +36,7 @@
 | 图论语义 | 分组树 / 多面板：任务或模块并列，箭头表示先后与派生，**通常无判定、无回边** | 有向图：◇ 判定双出口、loop 回边、parallel 汇合 |
 | 回答什么 | 全文怎么分析、任务怎么分工 | 某个算法怎么跑（先算什么、判断什么、不满足怎么回去） |
 | 母版 | `assets/figures/reference/totalflow/` 5 套（quadrant / multi-panel / nested / pipeline-groups / five-steps） | `assets/figures/reference/flowchart/` 8 套 JSON |
-| 载体 | `flow_*.svg` → `svg_flow.py` → 可编辑 HTML / PNG / PDF，登记 `manifest.json`（route=`flow`，spec=.svg） | `flow_*.json` → `flow_*.tex` → xelatex → PDF/PNG，登记 route=`flow`，spec=.json |
+| 载体 | `flow_*.svg` → `tools/flowchart/scripts/svg_flow.py` → 可编辑 HTML / PNG / PDF，登记 `manifest.json`（route=`flow`，spec=.svg） | `flow_*.json` → `flow_*.tex` → xelatex → PDF/PNG，登记 route=`flow`，spec=.json |
 | 位置与数量 | 问题分析/总体思路处，全文 1 张 | 各问「模型求解」小节，每问 ≤1、全文 ≤3 |
 | 改法 | 浏览器打开 `.html` 点字直改，或改 SVG 坐标 | 改 JSON 重跑脚本，别手改生成的 `.tex` |
 

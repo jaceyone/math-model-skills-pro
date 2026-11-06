@@ -10,6 +10,7 @@
 | `plan.md` | S0 | S1 拆题、S2 子问题数/语言、S3 图数档位、S4 模板与语言/AI 声明、G4 | G0 | 语言/模板/页数口径各写各的；AI 声明只能凭记忆编 |
 | `todo.md` | S0 | S0–S4 全程 | G0 | 卡在哪个阶段说不清 |
 | `reports/ENV_REPORT.md` | S0 `scripts/doctor.py` | 报错时回查，不阻塞 | G0 | — |
+| `reports/QC_S1_ROUND.1..3.md` | S1（三轮回质检） | S2 开工前的准入、S4 回改时查"这条结论当初怎么过的" | **G1（硬门禁：缺一轮不许进 S2）** | 报告没验就用，S2 与 S4 两张皮 |
 | `reports/ANALYSIS_MODELING_REPORT.md` | S1 | S2 实现口径、S3 图件规划、S4 章节骨架 | G1 | 代码与论文模型不一致 |
 | `reports/symbols.md` | S1 | S2 变量名、S3 图内标注、S4 符号说明章 | G1 | 代码/图/正文三套符号 |
 | `reports/术语表格.md` | S1 | S2 变量命名与注释、S4 中英对照 | G1 | 中英稿术语漂移 |

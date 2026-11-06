@@ -1,5 +1,58 @@
-# CHANGELOG
+# 变更记录
 
+> **读法**：本文件按时间倒序记「当时改了什么」，条目里的路径写的是**改动发生时的目录结构**。
+> 其后被改名、合并或删除的路径（`workshop/`、`cumcmthesis/`、`scripts/build_prompts.py`、
+> `scripts/verify_paper.py`、`references/roles/`、旧的 `knowledge/06`–`09` 编号等）**不会回改**——
+> 想核对某个路径现在在哪，看 `SKILL.md` 的索引，不要照本文件的历史条目去找。
+> 自动核对：`python scripts/check_links.py`（只看现役文档）；加 `--all` 会连本文件一起查，
+> 历史条目报失联属预期。
+
+## 2.3.22 — 修三类「工具静默失效」+ 路径写法归一
+
+> 本轮由一次外部实测审计触发：61 个 md、31 个 py、36 个 tex、347 条内部路径引用、19 个脚本逐个跑 `--help`。
+> 审计共报 P0 2 条 / P1 2 条 / P2 2 条，逐条复核后**多数已在 2.3.21 前后修掉**（PDF 工具已改惰性导入
+> 三级兜底、`soffice.py` 已加 Windows 守卫、闸门已能报「未体检」），真正遗留的是下面四类——都已落地。
+
+- **修（P0·闸门静默放行）**：`assets/style/check_figures.py` 加 `GATE_VERSION = "2.3.22"` 与 `--version`。
+  闸门是**复制**进项目的，技能升级后副本不会自己变；旧副本在 `figures/` 不存在时只打印一句
+  「没有需要体检的结果图」就 `exit 0`，两次实测都被骗过。现在三条路都堵死：找不到 `figures/` → `exit 2` 并打印
+  工程根/体检目录/当前目录；`--version` 可核对手上这份是不是新的；`doctor.py --project` 新增
+  「项目内的出图闸门副本」节，按字节比对技能原件，不一致或 `code/` 下多铺一份即点名 `STALE`。
+- **修（P0·副本根源在 S0）**：`stages/00-start.md` 第 3 步原来是「`plot_style.py` + `check_figures.py` → `code/`，
+  闸门再复制一份到项目根」，两份一模一样正是静默放行的来源。改为 **`plot_style.py` → `code/`（供 import）、
+  `check_figures.py` 只放项目根**；`knowledge/14-figure-contract.md` 三件套表、`checklists/G2-coding.md`
+  同步写清「退出码 2 = 没体检任何图 = 没过」。
+- **修（P1·`--help` 打不开）**：`tools/pdf/scripts/convert_pdf_to_images.py` 改 argparse，支持 `--help` /
+  `--dpi`，缺参时打印用法并 `exit 1`（原来只认 `sys.argv`，`--help` 会被当成 PDF 路径去打开）。实测四个后端
+  兜底链在没装 pdf2image 的机器上仍能出图（`pdftoppm → pdf2image → PyMuPDF`）。
+- **修（P0·文档路径失联）**：7 处裸文件名补全为可定位路径——`SKILL.md`(④A 命令、manifest `source` 字段、
+  正交铁律)、`README.md`、`knowledge/05-figures.md`、`checklists/G3-figures.md`、`assets/templates/README.md`
+  里的 `flowchart.py` / `svg_flow.py` 统一写 `tools/flowchart/scripts/…`；`SKILL.md` G1 行的
+  `checklists/G1-analysis.md` 补成 `references/checklists/G1-analysis.md`。其中 manifest `source` 一处是**真不一致**
+  ——`make_manifest.py` 实际写入的就是全路径，文档却写裸名。
+- **修（P2·自检器自相矛盾）**：`scripts/check_links.py --all` 原本把 CHANGELOG 的 19 条历史路径计入失败、
+  退出码 1，与文件头写的「历史条目报失联属预期」打架。改为：现役文档失联才算失败；CHANGELOG 历史条目只在一行里
+  报数量（`CHANGELOG 历史条目 19 条（预期，不计失败）`），要逐条看用新增的 `--strict-history`。
+- **修（P1·`soffice.py --help`）**：`tools/xlsx/scripts/office/soffice.py` 原来把 `--help` 原样透传给 soffice
+  二进制，没装 LibreOffice 就报「找不到 soffice」，逐脚本体检会误判成脚本自己崩了。现在 `--help` / 无参时打印用途，
+  退出码 0。
+- **改（P2·版本号三处不一）**：`VERSION` / `SKILL.md` 标题 / `README.md` 标题统一到 **2.3.22**
+  （此前分别是 2.3.21 / 2.3.20 / 2.3.19）。
+- **验证**：`python scripts/check_links.py` → 60 个 md / 201 条内部路径 / 失联 0（`exit 0`）；
+  20 个入口脚本 `--help` 全部可起（`plot_style.py` 是 import 用的模块库、`soffice.py` 无 LibreOffice 时给安装提示，
+  两者非 CLI 入口，属预期）；闸门在「`code/` 下无 `figures/`」场景实测 `exit 2`。
+
+## 2.3.21 — 论文自检加第 7 项：百分号转义
+
+- **加**：`scripts/check_paper.py` 新增 `check_escaped_percent`——正文里 `35.7 %` 这种「数字 + 裸 `%`」会被 LaTeX 当注释，**吞掉整行后半句**；而 build 仍是 PASS、0 Overfull，数字检查也照样通过（`35.7` 还在）。这是唯一一类"门禁全绿、论文却是残句"的缺陷，必须由机器兜住：命中即退出码 1，改法是把 `%` 写成 `\%`。`lstlisting` 内的代码与整行注释不算命中。
+- **改**：`check_paper.py` 从 6 项变 7 项；`SKILL.md` 脚本索引与 `stages/04-writing.md` 的验收集合同步。
+- **背景**：实测中一篇 23 页稿件摘要里有 8 处裸 `%`，四道门禁（build / check_paper / 图件闸门 / 逐页目检以外的自动检查）全部放行，人工读 PDF 才发现句子被吃断。此类缺陷只能靠新增的这一项查出。
+## 2.3.20 — 报告先行 + S1 三轮回质检 + 流程图正交约束
+
+- **流程改为文件驱动**：新增「铁律 0：报告先行」，`ANALYSIS_MODELING_REPORT.md` 未过 G1 之前不许写模型代码 / 出数据图 / 进 S3、S4；S2 期间改模型必须先改报告。
+- **S1 增加三轮回质检**：G1 从"清单打勾"升级为"清单 + 3 轮留痕"（结构覆盖 → 一致性冲突 → 可执行性与校验），产物 `reports/QC_S1_ROUND.1..3.md`，三份结论行必须都是 `结论：PASS`；`stages/01-analysis.md`、`checklists/G1-analysis.md`、`stages/02-coding.md`（进入条件）、`contracts/pipeline.md`（闭环表登记 QC 产物）同步改写。
+- **新增「二选一消除表」**：把 6 处含糊选择落成判据——报告 vs 代码、③ 主图 vs ④B 总流程图、④A vs ④B、机理图语言、数据图 outputs 登记格式、模板选择。
+- **④A TikZ 流程图走向铁律：直来直去**：`tools/flowchart/scripts/flowchart.py` 改为全正交布线（`--` / `-|` / `|-` / `-- ++`），回边只从外侧绕、判定框两分支不再共用 `south` 锚点；`tools/flowchart/SKILL.md` 增补禁用列表与四条目检验收。
 ## 2.3.19（2026-11-04）
 
 ### 流程图路线纠正：总流程图 = SVG（④B），算法细节 = TikZ（④A）；新增 5 套总流程图实例母版

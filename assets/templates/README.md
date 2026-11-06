@@ -45,11 +45,11 @@ Word 原生分支（赛题强制 Word 时）用它生成 `report/数据分析报
 
 | 路线 | 母版位置 | 数量 | 用法 |
 |---|---|---|---|
-| ① 数据图 | `tools/figure-templates/scripts/templates/` | 11 个 matplotlib 脚本 | `render_template.py --id <id>`，id 见 `references/figure-catalog.md`：多分类 SHAP 组合、配对云雨、CV-ROC 置信区间、Taylor、相关矩阵组合、预测边缘分布、RF-TPE 3D 曲面、分组相关+半边小提琴、分组环形热图、城市降温组合、Nature 和弦图 |
+| ① 数据图 | `tools/figure-templates/scripts/templates/` | 11 个 matplotlib 脚本 | `render_template.py --id <id>`，id 见 `tools/figure-templates/references/figure-catalog.md`：多分类 SHAP 组合、配对云雨、CV-ROC 置信区间、Taylor、相关矩阵组合、预测边缘分布、RF-TPE 3D 曲面、分组相关+半边小提琴、分组环形热图、城市降温组合、Nature 和弦图 |
 | ② 机理图 | `tools/mechanism-diagram/references/mechanism-templates.tex` | 12 类 TikZ 骨架 | 可行域、相平面/向量场、自由体受力、光路、几何推导（旗舰）、SEIR 仓室、控制体微元、马尔可夫状态转移、PINN 内部机理、指标层次、元胞自动机邻域、临界双态对比 |
 | ③ 论文主图 | `assets/figures/reference/roadmap/src/` | 5 张实拍母版（jpg）+ `index.json` + `README.md` | `grouped-tasks` / `nested-cluster` / `quad-matrix` / `multi-panel` / `staged-steps`；`select_reference.py --list` |
 | ④A 流程图（TikZ） | `assets/figures/reference/flowchart/` | 8 套 JSON + 对应 PDF/PNG | `linear` / `decision` / `loop` / `pipeline` / `parallel` / `layered` / `algorithm` / `multi_question` |
-| ④B 总流程图（SVG） | `assets/figures/reference/totalflow/`（实拍 + 复刻 PNG）、`tools/flowchart/assets/totalflow/`（可编辑 SVG） | **5 套 + 1 骨架** | 任务分组 / 多面板 / 议题嵌套 / 左入右出 / 五步骤；`svg_flow.py` 出 HTML/PNG/PDF，`build_totalflow.py` 可重生 |
+| ④B 总流程图（SVG） | `assets/figures/reference/totalflow/`（实拍 + 复刻 PNG）、`tools/flowchart/assets/totalflow/`（可编辑 SVG） | **5 套 + 1 骨架** | 任务分组 / 多面板 / 议题嵌套 / 左入右出 / 五步骤；`tools/flowchart/scripts/svg_flow.py` 出 HTML/PNG/PDF，`tools/flowchart/scripts/build_totalflow.py` 可重生 |
 
 > 四路的路径与执行顺序以 `SKILL.md`「四路图件：路径 / 读取顺序 / 执行顺序」为唯一权威；本文件只回答“有哪些模板、各自适合什么”。
 

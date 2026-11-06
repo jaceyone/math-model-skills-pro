@@ -159,7 +159,7 @@ paper/
   python <skill-root>/scripts/check_paper.py --project 项目1
   ```
 
-  六项都要退出码 0：① 正文每个数字都能在 `results.json` 里找到同值（四舍五入、百分比、kN 换算都算命中）；命中不了的，要么是常数/派生量 → 写进 `results/numbers_allow.txt` 并注明来源，要么是凭记忆写的 → 改掉。② `references.tex` 的 `\bibitem` 键与正文 `\cite` 一一对应，且不能是 `enumerate` 手写条目（手写等于没有引用）。③ 符号说明独立成章且排在模型章之前，表里符号要在正文出现过。④ 必产文件齐全、`SCORE_MAP.md` 落点列填满——**落点写法**：`\ref{key}`（key 必须真在全文 `\label` 里）或 `图 N / 表 N / 式(N) / §N`（N 不超过论文里实际的图/表/公式/节数）。⑤ 正文无内部文件名与占位符（会先做宏展开与 `%` 续行拼接）。⑥ 正文 `\includegraphics` 的图都登记在 `figures/manifest.json`，且 `id` 与文件名一致、`outputs` 里的文件真实可打开。
+  七项都要退出码 0：① 正文每个数字都能在 `results.json` 里找到同值（四舍五入、百分比、kN 换算都算命中）；命中不了的，要么是常数/派生量 → 写进 `results/numbers_allow.txt` 并注明来源，要么是凭记忆写的 → 改掉。② `references.tex` 的 `\bibitem` 键与正文 `\cite` 一一对应，且不能是 `enumerate` 手写条目（手写等于没有引用）。③ 符号说明独立成章且排在模型章之前，表里符号要在正文出现过。④ 必产文件齐全、`SCORE_MAP.md` 落点列填满——**落点写法**：`\ref{key}`（key 必须真在全文 `\label` 里）或 `图 N / 表 N / 式(N) / §N`（N 不超过论文里实际的图/表/公式/节数）。⑤ 正文无内部文件名与占位符（会先做宏展开与 `%` 续行拼接）。⑥ 正文 `\includegraphics` 的图都登记在 `figures/manifest.json`，且 `id` 与文件名一致、`outputs` 里的文件真实可打开。⑦ **百分号一律写 `\%`**：正文里写 `35.7 %` 会被 LaTeX 当注释，吞掉整行后半句，而编译仍是 0 error / 0 Overfull、数字检查也照样通过——这是唯一一类"门禁全绿、论文却是残句"的缺陷，只能靠这一项机器检查兜住。
 
 ### 6. 编译与验收
 
