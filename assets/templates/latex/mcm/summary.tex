@@ -1,7 +1,9 @@
-% 摘要正文：直接写段落，随便分段。
+% 摘要正文：直接写段落，随便分段（一段一个问题，段与段之间空行分隔）。
 % 不要塞回 main.tex 的 \newcommand —— 宏不是 \long，一分段就报
 % 「Paragraph ended before \new@command was complete」，且日志不指向摘要。
+% 注意：本模板是 article + fontspec，正文里不能出现中文——会静默缺字
+% （日志只有 Missing character，PDF 上那一格直接空着）。中文说明一律写在 % 后面。
 
 [Summary: problem overview + the method used for each sub-problem + key numerical
 results with units + the conclusions that follow. 300-500 words, no formulas,
-no figures. 一段一个问题，段与段之间空行分隔即可。]
+no figures.]

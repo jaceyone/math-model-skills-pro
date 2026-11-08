@@ -1,4 +1,4 @@
-# 数学建模 Pro v2.5.5
+# 数学建模 Pro v2.5.6
 
 数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**，主线是 **「先立结果键 → 写表格骨架 → 解题填数 → 出图 → 写文」**。默认主链路 **LaTeX → PDF**（默认模板 `default`，`ctexart`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -139,4 +139,4 @@ python scripts/latex2docx.py --project 项目1
 
 ## 版本
 
-当前 `2.5.5`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。
+当前 `2.5.6`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。

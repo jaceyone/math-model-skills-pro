@@ -17,6 +17,7 @@
   S8  evals/evals.json 存在且结构合法
   S9  没有任何 .md 完全无人引用（WARN，不判失败）
   S10 没有 .bak / .orig / .rej / .swp / ~ 这类残留备份
+  S11 英文模板（article + fontspec）正文里没有中文——会静默缺字
 
 用法：
   python scripts/check_skill.py
@@ -193,6 +194,24 @@ def main() -> int:
             junk.append(p.relative_to(root).as_posix())
     rep.check(not junk, "没有 .bak / .orig / .rej / .swp / ~ 残留",
               ", ".join(junk[:6]) if junk else "")
+
+    print("\nS11 英文模板正文无中文（会静默缺字）")
+    # article + fontspec 的模板没有 CJK 字体，正文里出现中文不会报错——
+    # 日志只有 Missing character，PDF 上那一格直接空着。中文说明只能写在 % 后面。
+    latin_bad = []
+    for main_tex in sorted((root / "assets" / "templates" / "latex").glob("*/main.tex")):
+        full = io.open(main_tex, encoding="utf-8", errors="replace").read()
+        m = re.search(r"\\documentclass(?:\[[^\]]*\])?\{([^}]*)\}", full)
+        cls = m.group(1) if m else ""
+        if "ctex" in cls or "\\usepackage{ctex}" in full:
+            continue                     # 中文模板，不查
+        for tex in sorted(main_tex.parent.rglob("*.tex")):
+            for i, line in enumerate(io.open(tex, encoding="utf-8", errors="replace"), 1):
+                body = re.sub(r"(?<!\\)%.*$", "", line)      # 去掉行内注释
+                if re.search(r"[\u4e00-\u9fff]", body):
+                    latin_bad.append(f"{tex.relative_to(root).as_posix()}:{i}")
+    rep.check(not latin_bad, "英文模板正文无中文（中文只写在 % 注释里）",
+              ", ".join(latin_bad[:6]))
 
     print("\n" + "=" * 60)
     if rep.fails:

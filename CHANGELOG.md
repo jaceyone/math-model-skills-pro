@@ -7,6 +7,42 @@
 > 自动核对：`python scripts/check_links.py`（只看现役文档）；加 `--all` 会连本文件一起查，
 > 历史条目报失联属预期。
 
+## 2.5.6 — 发布体检：mcm 模板 38 处静默缺字，自检补 S11
+
+> 触发：从 GitHub 重新 clone 一份，在干净副本上跑门禁并编译全部五个模板。
+> 这一步抓到一个从 2.3.x 就带着的问题。
+
+### 1. `mcm/summary.tex` 正文混了中文
+
+- 现象：`[Summary: ... 一段一个问题，段与段之间空行分隔即可。]` —— 中文字符落进
+  Times New Roman。编译 **0 error**，但日志有 38 条 `Missing character`，
+  PDF 上那两行直接是空白。
+- 原因：`mcm` 是 `article + fontspec`，没有 CJK 字体；中文只能写在 `%` 注释里。
+  这个坑我在 `shuweicup` 上踩过一次（2.5.5 修），没想到 `mcm` 早就带着。
+- 改法：中文说明移进注释，正文占位改纯英文；文件头写明这条禁令。
+
+### 2. `check_skill.py` 加 S11：英文模板正文不得出现中文
+
+- 静态判断：`\documentclass` 不含 `ctex` 的模板，扫 `main.tex` / `summary.tex` /
+  `sections/*.tex` 的**非注释行**，命中 CJK 即 FAIL 并报「文件:行号」。
+- 反向验过：往 `mcm/summary.tex` 塞一行中文，S11 精确报 `mcm/summary.tex:10`；
+  移除后回到 0 失败。
+- 为什么值得加：这类错误编译不报错、PDF 只是少字，没有门禁就只能靠人眼。
+
+### 3. 发布体检结论（干净 clone）
+
+| 项 | 结果 |
+|---|---|
+| `check_skill.py` | 0 失败 0 警告 |
+| `check_links.py` | 63 份 md / 239 条路径，失联 0 |
+| `gen_ref_toc.py` | 9 份长文档目录均为最新 |
+| `default` | 8 页 / 0 error / 0 Overfull / 0 缺字 |
+| `mcm` | 11 页 / 0 error / 0 Overfull / 0 缺字（修前 38 处） |
+| `huaweibei` | 10 页 / 0 error / 0 Overfull / 0 缺字 |
+| `shuweicup` | 8 页 / 0 error / 0 Overfull / 0 缺字 |
+| `problem` | 4 页 / 0 error / 0 Overfull / 0 缺字 |
+| 文件数 | clone 213 = 本地 213 |
+
 ## 2.5.5 — shuweicup 按房子风格瘦身：从"写满的示例稿"改回"骨架"
 
 > 触发：把四套模板的 sections 逐文件量了一遍。房子风格是「正文只留通用占位句、
