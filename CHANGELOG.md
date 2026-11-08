@@ -7,6 +7,83 @@
 > 自动核对：`python scripts/check_links.py`（只看现役文档）；加 `--all` 会连本文件一起查，
 > 历史条目报失联属预期。
 
+## 2.4.0 — 流程改向：契约先行（表格 → 数值 → 图 → 论文）
+
+> 触发：数维杯 Problem A 全流程实测的复盘。步骤本身没错，**顺序错了**——报告、数据表、得分点是
+> 后来才补的，`results.json` 成了"跑完看哪个数好写"的仓库，表格是照结果拼的。于是看着一步没落，
+> 实际上是"为了完成任务而完成任务"：报告在追认结果，表在迁就结果，论文再抄一遍表。
+> 本次把「先写表 → 再解题 → 表与正文同源」变成可执行的门禁，而不是一句倡议。
+
+### 1. 新增 `scripts/check_contract.py`（G1 契约门禁）
+
+- 查 `results/schema.json`：每个键必须有 `label` / `unit` / `producer` / `consumers`，键名至少两级
+  snake_case，`consumers` 只认 `table:` / `figure:` / `paper:` / `check:` 四种写法，无消费者的键判 ERROR。
+- 查 `reports/tables/*.tpl.md`：必须带 `<!-- table: … | caption: … | label: … -->` 前置注释；
+  占位符里的每个键必须在 schema 声明；**结果格里写死的数值判 ERROR**（题面常数走列头或格尾 `*` 显式声明）。
+- 查 `reports/图件规划.md`：每张 `data_*` 必须声明 `reads:`，且 reads 里的键都已声明
+  （历史工程回填用 `--tolerate-plan` 降级为 WARN）。
+- 查 `reports/SCORE_MAP.md`：标了"已证/√"的得分点却指不到键/图/表/式/节的判 ERROR；未证但无锚点的 WARN。
+- 查 `reports/symbols.md` 与三份 `QC_S1_ROUND.{1,2,3}.md` 的 `结论：PASS`。
+- 退出码：0 通过 / 1 有 ERROR / **2 = 契约尚未建立**（schema 不存在），与"通过"区分开。
+
+### 2. 新增 `scripts/fill_tables.py`（表格渲染）
+
+- `reports/tables/*.tpl.md` + `results.json` → `results/tables/<名>.md|.tex`，并写 `_render.json`
+  （行/列/用到哪些键/模板 sha/渲染时间）。
+- 占位语法：`{{key}}`（按 schema 的 `digits`）、`{{key:.3f}}`（Python 格式串）、
+  `{{key:pct}}`（×100 加 `%`，tex 自动写 `\%`）、`{{key:si}}`（千分位，tex 用 `\,`）。
+- 键名解析同时支持扁平点号键与嵌套对象；键名写错时该格渲染成 `??` 并 ERROR 退出，不静默变空。
+- 生成的 tex 自带 `\caption`/`\label`/`toprule`；`format: fixed` 按【列宽记账】`1.04 − 0.04N`
+  分配 `p{}` 列宽并把舍入差额塞进最后一列（实测 5 列 0.21+0.16×4=0.85→修正为合计 0.84）。
+- `--check` 逐字比对磁盘上的生成物与当前 `results.json` 的重渲染结果：**过期即失败**。
+
+### 3. 新增 `scripts/check_results.py`（G2 结果门禁）
+
+- 键覆盖：schema 里每个键在 `results.json` 里必须有值（缺一个即 ERROR，不再出现"以为算了"）。
+- 生产者：`producer` 脚本必须存在（ERROR），脚本里查不到该键名则 WARN（兼容 dict 动态组装）。
+- 消费者：`figure:data_*` 必须已有对应图（ERROR），`table:*` 必须有同名模板（ERROR）。
+- 未申报键：`results.json` 里没立过键的数值列出来（默认 WARN，`--strict` 升为 ERROR），
+  并识别"父级键覆盖子路径"（声明 `p2.params` 即覆盖 `p2.params.cadd`）。
+- 表新鲜度：复用 `fill_tables` 的渲染逻辑逐字比对；顺带校验 `numbers_allow.txt` 的正则合法性
+  （非法正则会让 `check_paper.py` 直接崩）。
+
+### 4. 文档与门禁同步（顺序写进流程，不是写进口号）
+
+- `SKILL.md`：铁律 0 从「报告先行、文件驱动」改写为「**契约先行（先写表 → 再解题 → 最后写文）**」，
+  给出 7 步链路与四条机器命令；阶段表 S1 产出加 `results/schema.json` + `reports/tables/*.tpl.md`，
+  S2 产出加 `results/tables/*`，G1/G2/G4 门禁各自挂上对应脚本；二选一表新增
+  「先立键还是先跑代码」「表格手抄还是生成」「键名怎么起」三行；关键规则 0–2 重写（契约先行／
+  数值单一事实源／表格是生成物）。
+- `references/stages/01-analysis.md`：步骤重排为「拆题立得分点 → **契约三件套** → 假设预检 → 数据理解 →
+  模型与算法 → 证据链 → 代码任务清单（= 谁来填哪些键）」；新增"为什么表要在写模型前定"一段；
+  三轮回质检的第 1/2/3 轮判据分别加上契约在不在、`{{key}}` 是否都在 schema、每个键是否有 producer。
+- `references/stages/02-coding.md`：进入条件从 3 条变 4 条（含 `check_contract.py` 退出码 0）；
+  新增第 3 步"按契约填键"（含只更新自己那几键的写法）、第 4 步"生成表格"；门禁加两条命令。
+- `references/stages/04-writing.md`：§4 图表插入改为「数值表一律 `\input` 生成物」+ 改表改模板的路径；
+  §5 机器校验先跑 `fill_tables.py --check` 与 `check_results.py`，并说明 `check_paper.py` 管不到表过期。
+- `references/contracts/results-schema.md`：重写为**两步契约**（schema 先立键 → results 填值），
+  补 `digits` 字段、消费者语法、键名规则（= `results.json` 路径）、派生量也立键。
+- 新增 `references/contracts/table-template.md`：模板写法、占位语法、`*` 字面值规则、
+  `format: fixed` 列宽、论文 `\input` 用法、六类反例。
+- `references/contracts/pipeline.md`：闭环表新增 schema / 表骨架 / 生成物 / `_render.json` 四行，
+  各自的生产者-消费者-门禁-断链后果；口径表加"表格骨架与生成"一行；自检从四条变五条。
+- `references/contracts/project-layout.md`、`stages/00-start.md`：骨架加 `results/schema.json`
+  （S0 先写空壳）与 `reports/tables/`，命名表加结果键与表模板两条。
+- 清单：`G1-analysis.md` 新增第〇节契约三件套 9 条（含退出码 0），`G2-coding.md` 新增第〇节
+  契约兑现 7 条（含 `--check`），`G4-writing.md` 新增"数值表是生成物"两条。
+- `knowledge/04-coding-and-results.md` 补"先看契约再动手"；`knowledge/14-figure-contract.md`
+  红线加第 7 条"`data_*` 只读 `reads:` 声明的键，图内关键数值同样取自这些键"。
+
+### 5. 自测（本地夹具，不进库）
+
+- 用真实结果值（97.4432 / 379.8121 / 5.1102 / 0.9766 / 13.2891）建了一个最小工程：
+  `check_contract` 0（1 WARN：未证得分点无锚点）→ `fill_tables` 0（2 张表，扁平键与嵌套键都命中）
+  → `check_results` 0（键覆盖 6/6，表新鲜）→ 负向各打一次：表里写死 `97.44`、`{{p1.rati0}}` 键名错、
+  `reads` 指向未声明键、QC 结论改 FAIL，四条 ERROR 全部被拦下。
+- 生成的 `p_index.tex` 与 `q_param.tex`（含 `pct`、`si`、`fixed` 列宽、`*` 字面值）
+  在 `ctexart + booktabs + array` 下编译：**0 error / 0 Overfull**。
+- `scripts/check_links.py` 与三份 `*_ROUND` 之外的现役文档路径复核通过。
+
 ## 2.3.23 — 修三处「门禁误杀合规稿」
 
 > 触发：2026 HMCM Problem A 全流程实测（英文稿、16 城评价模型、5 张数据图 + 1 张 TikZ 流程图）。

@@ -13,7 +13,7 @@
 - `reports/journal_problemN.md`（图表结论优先摘抄纪要，不凭记忆写图注）
 - `reports/SCORE_MAP.md`（得分点落点表；本章负责把公式号/图号/表号补齐）
 - `plan.md`（语言、模板、交付形态、页数档位）
-- `results/results.json`、`results/tables/*.csv`
+- `results/results.json`、`results/schema.json`（键名与单位照抄）、`results/tables/*.tex`（表直接用 `\input`）
 - `figures/manifest.json`
 - `references/knowledge/10-chapter-writing-prompts.md`（**逐章写作提示词，写哪章读哪节**）
 - `references/knowledge/13-writing-injection.md`（摘要句链、推导三段式、一致性、表格、统计、引用）
@@ -92,7 +92,19 @@ paper/
 
 ### 4. 图表插入
 
-`default` 模板自带两个排版宏，直接调用，不要手写 `figure`/`table` 环境：
+**数值表一律引生成物，不要手写。** 表骨架在 S1 就写好了（`reports/tables/*.tpl.md`），S2 用 `fill_tables.py` 渲染成 `results/tables/*.tex`，这里只 `\input`：
+
+```latex
+\input{../results/tables/q2_index.tex}     % 表题/标签/toprule 都在里面
+
+如表~\ref{tab:q2_index}，双通道把 $I_h$ 从 217.96 压到 5.11，降幅 97.66\%。
+```
+
+- 想改表：改 `reports/tables/*.tpl.md` 后重跑 `fill_tables.py`，**不要改 `results/tables/*.tex`**（下次 `--check` 会判过期）；
+- 模板里还没有骨架、又临时需要一张表？先补骨架（哪怕三行），再渲染——手打的那张表以后一定会和结果对不上；
+- 跨页长表（符号表、参数表）仍走手写 `longtable`，但表里的数照样从 `results.json` 取。
+
+`default` 模板自带两个排版宏，图与手写表直接调用，不要另写 `figure`/`table` 环境：
 
 ```latex
 \fig{0.75}{../figures/data_q1_fit.png}{问题一模型输出与实测位移对比}{fig:q1_fit}
@@ -153,13 +165,17 @@ paper/
 - 实验预算（样本量、种子、重复次数、超参数）全文只有一套。
 - 正文不出现 `reports/`、`code/`、`results.json`、`plan.md`、`manifest.json` 等内部名字。
 - 图必须被正文引用并解读；连续三张以上图表中间必须有文字。
-- **机器校验**（别靠眼看）：
+- **机器校验**（别靠眼看）——先确认表是新的，再查正文数字：
 
   ```bash
-  python <skill-root>/scripts/check_paper.py --project 项目1
+  python <skill-root>/scripts/fill_tables.py  --project 项目1 --check   # 表与 results.json 一致（退出码 0）
+  python <skill-root>/scripts/check_results.py --project 项目1          # 键覆盖/未申报键（退出码 0）
+  python <skill-root>/scripts/check_paper.py   --project 项目1          # 正文七项（退出码 0）
   ```
 
   七项都要退出码 0：① 正文每个数字都能在 `results.json` 里找到同值（四舍五入、百分比、kN 换算都算命中）；命中不了的，要么是常数/派生量 → 写进 `results/numbers_allow.txt` 并注明来源，要么是凭记忆写的 → 改掉。② `references.tex` 的 `\bibitem` 键与正文 `\cite` 一一对应，且不能是 `enumerate` 手写条目（手写等于没有引用）。③ 符号说明独立成章且排在模型章之前，表里符号要在正文出现过。④ 必产文件齐全、`SCORE_MAP.md` 落点列填满——**落点写法**：`\ref{key}`（key 必须真在全文 `\label` 里）或 `图 N / 表 N / 式(N) / §N`（N 不超过论文里实际的图/表/公式/节数）。⑤ 正文无内部文件名与占位符（会先做宏展开与 `%` 续行拼接）。⑥ 正文 `\includegraphics` 的图都登记在 `figures/manifest.json`，且 `id` 与文件名一致、`outputs` 里的文件真实可打开。⑦ **百分号一律写 `\%`**：正文里写 `35.7 %` 会被 LaTeX 当注释，吞掉整行后半句，而编译仍是 0 error / 0 Overfull、数字检查也照样通过——这是唯一一类"门禁全绿、论文却是残句"的缺陷，只能靠这一项机器检查兜住。
+
+  注意 `check_paper.py` 管不到"表里的数是不是旧的"——那一项由 `fill_tables.py --check` 负责：它拿当前 `results.json` 重渲染一遍，与磁盘逐字比对；两条命令都要跑。
 
 ### 6. 编译与验收
 

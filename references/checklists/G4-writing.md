@@ -14,6 +14,8 @@
 - [ ] 跑过 `tools/review` 的话，`reports/REVIEW_REPORT.md` 的 P0/P1 已逐条回改或写明不采纳理由
 - [ ] 图表题注具体（写清画的是哪些量、在对照什么），不用「结果图/示意图」这类空题注
 - [ ] 表题在上、图题在下；表格里全是数，无整句与长说明列
+- [ ] **数值表是生成物**：每张表用 `\input{../results/tables/*.tex}` 引入，没有手抄数字；`python scripts/fill_tables.py --project 项目N --check` 退出码 0
+- [ ] 表题与 `tab:` 标签沿用模板里 `caption` / `label`，正文 `\ref` 全部有定义
 - [ ] 模型假设 5–8 条、每条 ≤60 字，且每条在正文推导中被引用
 - [ ] 无占位符（TODO / 待补充 / 示例数据）
 - [ ] 正文无内部文件名（reports/code/results.json/manifest.json 等）
@@ -28,7 +30,7 @@
 - [ ] 未在 `paper/main.tex` 临时加包或另写文档类
 - [ ] 章节文件齐全，`\input` 顺序正确；多问题已复制 `5.2.*`、`5.3.*`
 - [ ] 图用标准 `figure`+`\includegraphics[width=...]`（或该模板提供的 helper），宽度按宽高比档位
-- [ ] 表用 longtable 定宽列，**首尾加 `@{}`** 后列宽总和 = 1.04 − 0.04×N（见【列宽记账】），带 `\caption` 与续页表头
+- [ ] 表用 longtable 定宽列，**首尾加 `@{}`** 后列宽总和 = 1.04 − 0.04×N（见【列宽记账】），带 `\caption` 与续页表头；小表改用 `\input{../results/tables/*.tex}` 的生成物（已按该规则算好列宽）
 - [ ] 图片路径 `../figures/xxx.png` 正确（相对 `paper/main.tex`）
 - [ ] 无占位符、无 Overfull 满屏
 - [ ] `xelatex` 两遍编译通过，0 error、0 缺失文件、0 未定义引用

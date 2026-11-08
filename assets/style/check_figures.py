@@ -20,7 +20,7 @@ import sys
 # 闸门自身的版本戳。项目里的副本是从技能 assets/style/ 复制过去的,**复制之后不会自动更新**;
 # 旧版(≤2.3.21 早期)在找不到 figures/ 时只打印一句「没有需要体检的结果图」就 exit 0,
 # 等于闸门静默放行。`python check_figures.py --version` 可核对手上这份是不是新版。
-GATE_VERSION = "2.3.23"
+GATE_VERSION = "2.4.0"
 
 # 工程根怎么定:脚本会被复制到工程根、也可能躺在 code/ 里。按「脚本所在目录」找
 # figures/ 会让 code/check_figures.py 去读 code/figures/(不存在),什么都不查就退出码 0

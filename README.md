@@ -1,10 +1,13 @@
-# 数学建模 Pro v2.3.23
+# 数学建模 Pro v2.4.0
 
-数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**。默认主链路 **LaTeX → PDF**（默认模板 `default`，`ctexart`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
+数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**，主线是 **「先立结果键 → 写表格骨架 → 解题填数 → 出图 → 写文」**。默认主链路 **LaTeX → PDF**（默认模板 `default`，`ctexart`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
 ## 特性
 
-- **5 阶段**：启动 → 建模分析 → 代码实现 → 图件制作 → 论文撰写。
+- **契约先行**：S1 先落 `results/schema.json`（结果键：含义/单位/生产者/消费者）+ `reports/tables/*.tpl.md`（表格骨架，数值格只留 `{{key}}`）+ 图件 `reads:`；`check_contract.py` 退出码 0 才允许写代码——**表格骨架就是"这道题要交什么"的精确写法**，模型推导只剩两个方向：把空格填上，或发现空格问错了。
+- **表是生成物**：`fill_tables.py` 把 `results.json` 填进骨架，产出 `results/tables/*.tex`，论文只 `\input`；不手抄、不改生成物，重跑代码表自动跟着变。
+- **数值单一事实源**：正文数字由 `check_paper.py` 对回 `results.json`，表由 `fill_tables.py --check` 逐字比对，键覆盖与未申报键由 `check_results.py` 把关。
+- **5 阶段**：启动 → 建模分析（含契约三件套）→ 代码实现（填契约）→ 图件制作 → 论文撰写。
 - **5 门禁**：每阶段有可勾选清单，不达标不进入下一阶段。
 - **写作提示词独立成库**：17 节逐章口径在 `references/knowledge/10-chapter-writing-prompts.md`，按「章」组织、不绑定模板文件名；`default/main.tex` 顶部另有 6 条写作提示。模板章节名不同时按 `references/stages/04-writing.md` §2 的映射表落地。
 - **写作口径可追溯**：人称、断句、禁 AI 高频词、去 AI 味 10 条自查，口径参考开源项目 `XiaoMaColtAI/math-modeling-skill` 的《论文手说明》，落地为模板注释块与 `references/knowledge/13-writing-injection.md` 第七节。
@@ -70,6 +73,9 @@ math-modeling-pro/
 │   ├── figure-templates/
 │   └── review/
 ├── scripts/
+│   ├── check_contract.py    # G1 契约门禁（schema / 表骨架 / 图件 reads / 得分点 / 质检）
+│   ├── fill_tables.py       # 表格渲染（模板 + results.json → results/tables/*.tex）
+│   ├── check_results.py     # G2 结果门禁（键覆盖 / 生产者 / 表新鲜度 / 未申报键）
 │   ├── doctor.py
 │   ├── build_paper.py
 │   ├── check_paper.py
@@ -77,6 +83,18 @@ math-modeling-pro/
 │   ├── latex2docx.py
 │   └── make_manifest.py
 ```
+
+## 契约三件套（一句话版）
+
+| 文件 | 谁写 | 作用 | 校验 |
+|---|---|---|---|
+| `results/schema.json` | S1 | 论文里每个数先立键：含义/单位/生产者/消费者 | `check_contract.py` |
+| `reports/tables/*.tpl.md` | S1 | 表骨架，数值格只留 `{{key}}` | `check_contract.py` |
+| `figures/` 数据图的 `reads:` | S1 | 每张数据图读哪些键 | `check_contract.py` |
+| `results/results.json` | S2 | 按 schema 填值（唯一事实源） | `check_results.py` |
+| `results/tables/*.tex` | S2 | 由上面的模板与值渲染出来 | `fill_tables.py --check` |
+
+写法与命令细节见 `references/contracts/results-schema.md` 与 `references/contracts/table-template.md`。
 
 ## 环境
 
@@ -106,4 +124,4 @@ python scripts/latex2docx.py --project 项目1
 
 ## 版本
 
-当前 `2.3.23`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。
+当前 `2.4.0`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。
