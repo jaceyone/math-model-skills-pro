@@ -2,7 +2,6 @@
 
 本目录是技能自带的全部模板/母版：**论文模板 3 套 + Word 一套 + 四类图件母版（含 5 套总流程图实例）**，全部在本机实测编译/渲染通过（2.3.18，2026-11-04，MiKTeX + xelatex）。
 
-> 2.3.18 起 **`workshop/` 与 `cumcmthesis/` 已按用户要求移出本包**，默认模板改为 `default/`；写作提示词不随模板走，统一在 `references/knowledge/10-chapter-writing-prompts.md`。
 
 ## 一、论文模板（LaTeX，`assets/templates/latex/`）
 

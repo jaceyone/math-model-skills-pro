@@ -22,7 +22,6 @@ COMMANDS = [
     ("pdftotext", "PDF 文本提取", False),
     ("pdfinfo", "PDF 页数/尺寸", False),
     ("soffice", "LibreOffice：xlsx 重算 / docx 转换（可选）", False),
-    ("drawio", "drawio 导出（可选）", False),
 ]
 
 PACKAGES = [

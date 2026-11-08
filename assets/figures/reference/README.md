@@ -1,6 +1,6 @@
 # 精选参考图
 
-本目录只保留 **13 张参考版式**（5 张主图母版 + 8 张流程图版式），不包含 1381 张全量图库。
+本目录只有 **13 张参考版式**（5 张主图母版 + 8 张流程图版式）。
 
 ## roadmap/（5 张母版）
 
@@ -38,4 +38,3 @@ python tools/paper-figure/scripts/import_plate.py --src refs/new.jpg --id three-
 
 - roadmap 母版为入库样张，仅作版式参考；最终论文替换为本论文术语与数据。
 - 只用这 5 张，不引入其他图库或其他论文配图。
-- 完整 1381 图库已移出主包，放在 `_archive/paper-figure-gallery-1381/`，不随技能分发。

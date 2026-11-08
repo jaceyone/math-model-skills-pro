@@ -7,6 +7,54 @@
 > 自动核对：`python scripts/check_links.py`（只看现役文档）；加 `--all` 会连本文件一起查，
 > 历史条目报失联属预期。
 
+## 2.5.1 — 删掉没有锚点的幽灵概念
+
+> 触发：用户指着「不把 1381 张图库放进主包」说——这种"整个项目都没提"的条目要清掉。
+> 立个判据：一个词如果只出现在否定句或迁移史里、包里没有对应物，删掉不影响任何操作，
+> 留着反而是给模型提示它本来想不到的东西。
+
+### 1. `## 不做什么`：七条 → 两条
+
+删掉五条：
+
+- 1381 图库——图库早已移出，`_archive/paper-figure-gallery-1381/` 也不在包里；
+- 17 套模板——实际只有 3 套，数字是编的；
+- 不强制 drawio——四路图件里没有这条路；
+- 后端/前端/Docker/RAG/HIL——技能是 LaTeX/Python 管线，一个都不沾；
+- 不做 Typst——正文「禁止用 Typst」已写过一遍。
+
+留下两条真边界：交付物是论文/报告本体（不生成提交压缩包）；排版只用 LaTeX 或 Word。
+
+### 2. 迁移史清出正文
+
+这些句子里的路径，指向的文件都不在包里：
+
+- `workshop/`、`cumcmthesis/`（`assets/templates/README.md`）
+- `build_prompts.py`、「07–09 空档」解释（`00-index.md` + SKILL.md 索引行）
+- `_archive/paper-figure-gallery-1381/`（`assets/figures/reference/` 两份 README）
+- `zh/default/main.typ`、`zh/huaweibei/main.typ`（两套 `main.tex` 头部注释）
+- `10-chapter-writing-prompts.md` 里的 workshop 迁移说明
+
+保留 `VENDORED.md`：那是第三方资产的来源与许可记录，不是操作说明，删了会丢归属。
+
+### 3. 修掉一个真矛盾：机制图指向本包没有的工具
+
+`tools/mechanism-diagram` 多处写着「改用 GPT Image 或 DrawIO」，`scripts/doctor.py` 还在探测 drawio。
+可这个包的图件只有四路（matplotlib / TikZ / SVG 主图 / SVG 流程图），drawio 与 GPT Image 都不在其中
+——模型照着做会去找一个不存在的工具。改为指向真实路线：③ roadmap 母版、④B SVG 流程图；
+写实 3D 与工程实景没有替代方案，就直说「不画写实渲染，用真实照片/素材」。
+`doctor.py` 与 `tools/doctor/SKILL.md` 的 drawio 探测项一并移除。
+
+### 4. 顺带补一个门禁盲区
+
+`check_links.py` 的 `REMOVAL` 关键词（「已移除」「已删除」）会让**整行**跳过校验。
+SKILL.md 那行的 `references/knowledge/01` 此前就是靠行内「已随模板移除」躲过检查的——
+迁移史说明一删，立刻报失联。改为直接写真实路径 `references/knowledge/`，不再依赖豁免词。
+
+- SKILL.md 367 → 364 行。
+- 门禁：`check_skill` 0 失败 0 警告 / `check_links` 82 份 md 失联 0 / `gen_ref_toc` 9-9 同步 /
+  `quick_validate` 通过。
+
 ## 2.5.0 — 技能自检 + 算法库可跳读（按 skill-creator 的包规范体检）
 
 > 触发：拿 anthropics/skills 的 `skill-creator`（SKILL.md + `quick_validate.py`）对技能包做一遍体检。

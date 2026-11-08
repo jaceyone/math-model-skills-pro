@@ -285,7 +285,7 @@ TikZ 流程图**只许正交折线**：`--`（同一列/行直接连）、`-|`�
 | 得分点、证据链、验证强度、学术分寸 | `references/knowledge/12-scoring-validation.md` |
 | 摘要句链、推导三段式、一致性、表格、统计、引用 | `references/knowledge/13-writing-injection.md` |
 | 数据图版式、防乱码、出图闸门、plot_style API | `references/knowledge/14-figure-contract.md` |
-| 题面拆解 / 选型 / 题型防错 / 图种 / 写作底线 / 评审 | `references/knowledge/01`–`06`、`10`–`14`（见 `00-index.md`；`07`–`09` 已随模板移除，编号不重排） |
+| 题面拆解 / 选型 / 题型防错 / 图种 / 写作底线 / 评审 | `references/knowledge/`（01–06 通用方法 + 10–14 现役口径，目录见 `00-index.md`） |
 | **选算法**：题型认了，不知道该上哪个方法 | `references/algorithms/README.md`（题型 × 数据形态 × 赛制三张路由表）→ 再照下一节跳读 |
 
 ## 算法库：先查路由，再按行号跳读
@@ -357,10 +357,7 @@ python scripts/check_links.py     # 现役文档链接
 
 ## 不做什么
 
-- 不做 Typst；
-- 不做 17 套模板全量引入；
-- 不做 docx 主模板（Word 仅原生分支）；
-- 不强制 drawio；
-- 不把 1381 张图库放进主包；
-- 不做自动验收与提交打包，不生成提交用压缩包；
-- 不做后端/前端/Docker/RAG/HIL。
+只列真会踩到的两条，其余边界由四路图件与模板总览表管：
+
+- 交付物是论文或报告本体，不生成提交用压缩包；
+- 排版只用 LaTeX 或 Word。

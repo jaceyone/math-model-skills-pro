@@ -1,7 +1,6 @@
 % !TEX program = xelatex
 % =============================================================================
 %  华为杯（中国研究生数学建模竞赛）LaTeX 模板
-%  对应 Typst 模板 zh/huaweibei/main.typ 的全部功能。
 %
 %  字体依赖（正文宋体 / 标题黑体 / 强调楷体）：
 %    - 规范字体：SimSun（宋体）、SimHei（黑体）、KaiTi（楷体）。
@@ -34,7 +33,7 @@
 \IfFontExistsTF{Menlo}{\setmonofont{Menlo}}{}
 
 % ---------- 正文：12pt，首行缩进 2em，两端对齐 ----------
-% typst leading 1.02em => \linespread ≈ (1+1.02)/1.2 ≈ 1.68
+% 行距：leading 1.02em => \linespread ≈ (1+1.02)/1.2 ≈ 1.68
 \linespread{1.68}
 \setlength{\parindent}{2em}
 
@@ -91,7 +90,7 @@
 % ---------- 页码：底部居中 ----------
 \pagestyle{plain}
 
-% ---------- 自定义命令（对应 Typst 函数） ----------
+% ---------- 自定义命令 ----------
 % \coverpage：封面页，logo + title + 信息表
 \newcommand{\coverpage}{%
   \thispagestyle{empty}%

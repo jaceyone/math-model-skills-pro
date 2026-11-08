@@ -1,7 +1,6 @@
 % !TEX program = xelatex
 % =============================================================================
 %  中文默认数学建模论文 LaTeX 模板
-%  对应 Typst 模板 zh/default/main.typ 的全部功能。
 %
 %  字体依赖（正文宋体 / 标题黑体 / 强调楷体）：
 %    - 规范字体：SimSun（宋体）、SimHei（黑体）、KaiTi（楷体）。
@@ -58,7 +57,7 @@
 }
 
 % ---------- 标题格式（titlesec 配置） ----------
-% 对应 Typst：一级 16pt 居中黑体加粗，二级 14pt 黑体加粗，三级 12pt 黑体加粗
+% 一级 16pt 居中黑体加粗，二级 14pt 黑体加粗，三级 12pt 黑体加粗
 \usepackage{titlesec}
 \titleformat{\section}
   {\centering\fontsize{16pt}{19.2pt}\heiti\bfseries}
@@ -111,7 +110,7 @@
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 
-% ---------- 自定义命令（对应 Typst 函数） ----------
+% ---------- 自定义命令 ----------
 % \papertitle{标题}：居中 22pt 加粗标题
 \newcommand{\papertitle}[1]{%
   \thispagestyle{empty}%
