@@ -1,0 +1,66 @@
+% =============================================================================
+%  Appendix A — Core code
+%
+%  原稿的附录是 51 页代码（正文只有 23 页），同一问题贴了 2–3 份重复 import 的
+%  脚本，没有文件名、没有运行说明——查代码像考古。
+%  这里先给附件说明表，再贴代码，并且只贴"核心"：
+%    - 每问一份可运行脚本，不贴草稿版；
+%    - 附录总页数压在正文的 1/3 以内；
+%    - 表格说明"哪个文件对应哪个问题、产出什么"。
+% =============================================================================
+
+\subsection*{A.1 File list}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Submitted code files.}
+  \label{tab:codefiles}
+  \footnotesize
+  \begin{tabular}{@{}p{0.17\textwidth}p{0.15\textwidth}p{0.40\textwidth}p{0.16\textwidth}@{}}
+    \toprule
+    File & Problem & Purpose & Output \\
+    \midrule
+    \texttt{utils.py}   & all       & parameter set, index evaluation, plotting & -- \\
+    \texttt{p1\_sim.py} & Problem 1 & forward simulation, actuator on / off    & \texttt{p1.json} \\
+    \texttt{p2\_ctrl.py}& Problem 2 & receding-horizon schedule design          & \texttt{p2.json} \\
+    \texttt{p3\_eso.py} & Problem 3 & ESO state / disturbance reconstruction, PID & \texttt{p3.json} \\
+    \texttt{sens.py}    & Section 5 & $\pm 10\%$ perturbation sweep            & \texttt{sens.json} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection*{A.2 Core code}
+
+\begin{lstlisting}[language=Python]
+# p1_sim.py -- forward simulation with the actuator inactive / active
+# run: python p1_sim.py   -> writes p1.json
+import numpy as np
+from utils import params, vibration_index, rk4_step
+
+P = params()                      # M, m, r, k, c, limits
+t = np.arange(0.0, P["T"] + P["dt"], P["dt"])
+
+def solve(theta_deg=None):
+    y, v, out_y, out_a = 0.0, 0.0, [], []
+    for k, tk in enumerate(t):
+        fd = P["Fd"][k]
+        fa = 0.0 if theta_deg is None else actuator_force(theta_deg[k], P)
+        y, v = rk4_step(y, v, fd + fa, P["dt"], P)
+        out_y.append(y)
+        out_a.append((fd + fa - P["c"] * v - P["k"] * y) / P["M"])
+    return np.array(out_y), np.array(out_a)
+
+for tag, theta in (("off", None), ("on", P["schedule"])):
+    x, a = solve(theta)
+    print(tag, vibration_index(a, P["dt"]))
+\end{lstlisting}
+
+% 【Appendix writing prompt】
+% ════════════════════════════════════════════════════════════════════
+% Order:    file-list table first, code second. A reviewer who cannot map a script to a
+%           question will not read the code at all.
+% Length:   keep the appendix under one third of the body. If the code does not fit,
+%           submit the files separately and keep only the core loop in the paper.
+% Content:  one runnable script per question; no draft copies, no repeated import blocks.
+% Comment:  every listing starts with a one-line "run: ... -> output" header.
+% ════════════════════════════════════════════════════════════════════

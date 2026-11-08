@@ -4,7 +4,7 @@ description: 数学建模竞赛与项目工作流：从读题到交稿的完整�
 compatibility: Python 3.10+（数值/绘图需 numpy pandas matplotlib scipy scikit-learn）；LaTeX 分支需 xelatex（MiKTeX 或 TeX Live）+ windows 中文字体，机理图另需 TikZ；论文主图渲染需 Microsoft Edge；Word 分支需 python-docx、comtypes、Pandoc 3.10+、pdftoppm。纯 Python 与论文搜索部分无在线依赖、无 API Key。跑 python scripts/doctor.py 自查环境。
 ---
 
-# 数学建模 Pro v2.5.3
+# 数学建模 Pro v2.5.4
 
 本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -53,7 +53,7 @@ python scripts/check_paper.py    --project 项目N   # G4：正文数字 ↔ res
 | 流程图走 ④B（SVG）还是 ④A（TikZ） | 判据只有一条：**步骤/判定/回边** → ④A；**任务分组/问题拆解** → ④B。两者都不许画成另一条路线的样子 |
 | 机理图内写中文还是英文 | 不设二选一：**图内语言 = 论文语言**。英文稿 `MH_FIG_LANG=en`（去掉 ctex，可额外出 SVG）；中文稿 `zh` |
 | 数据图的 `outputs` 登记哪些格式 | 固定登记 **pdf + png**；`.svg` 只作改图中间物，不进 manifest |
-| 模板用哪套 | 由赛事决定：MCM/ICM→`mcm`，华为杯→`huaweibei`，其余→`default`。用户自带模板优先 |
+| 模板用哪套 | 由赛事决定：MCM/ICM→`mcm`，华为杯→`huaweibei`，数维杯或 MCM 式英文稿→`shuweicup`，其余→`default`。用户自带模板优先 |
 
 ## 快速开始
 
@@ -99,6 +99,9 @@ python scripts/check_paper.py    --project 项目N   # G4：正文数字 ↔ res
 | `assets/style/check_figures.py` | 出图闸门，硬伤退出码 1 | 项目根 |
 | `assets/scaffold/run_all.py` | 批量跑 `code/` 下脚本 | 项目根 |
 | `assets/templates/docx/reference.docx` + `report_kit.py` | Word 报告模板与排版工具箱 | `report/` |
+| `assets/templates/problem/main.tex` | **赛题拆解单**（七张表：题面清点 / 场景×子问题×交付物 / 参数 / 指标 / 结果键 / 图件规划 / 假设与风险） | 项目根 `reports/`（填完再动模型） |
+
+**S1 的第一件事不是选模型，是填这张拆解单。** 七张表填完，`results/schema.json`、`reports/tables/*.tpl.md`、`图件规划.md` 的骨架就已经定了；填不出来说明题面还没读透，不是模型没想好。
 
 ## 四路图件：路径 / 读取顺序 / 执行顺序
 
@@ -254,6 +257,7 @@ TikZ 流程图**只许正交折线**：`--`（同一列/行直接连）、`-|`�
 | **默认**（国赛/省赛/校赛/课程论文，无特殊要求） | `assets/templates/latex/default/`（`ctexart`：摘要/目录/8 章/参考文献/附录，`\fig`/`\tabcaption` 现成） | 11 | 8 页 / 0 error / 0 Overfull |
 | MCM/ICM（英文） | `assets/templates/latex/mcm/`（Summary Sheet + 8 章英文链条） | 12 | 11 页 / 0 error / 0 Overfull |
 | 华为杯 | `assets/templates/latex/huaweibei/`（封面 logo/title PDF 内置） | 14 | 10 页 / 0 error / 0 Overfull |
+| 数维杯 / MCM 式英文稿 | `assets/templates/latex/shuweicup/`（Summary Sheet + **6 章**：Introduction / Question Analysis / Symbols and Assumptions / Model / Sensitivity / Strengths and Weaknesses） | 11 | 11 页 / 0 error / 0 Overfull / 0 Underfull |
 
 模板清单、每套的文件/章节结构、Word 模板与四路图件母版（数据图 11 / 机理 12 / 主图 5 / 流程图 8+1）见 **`assets/templates/README.md`**；选模板先看那张总览表，再看这里的场景列。
 

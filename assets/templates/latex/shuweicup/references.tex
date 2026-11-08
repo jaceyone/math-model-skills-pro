@@ -1,0 +1,47 @@
+% =============================================================================
+%  References
+%
+%  规则（check_paper.py 会机器核）：
+%   1. 正文用 \cite{key}，key 与这里一一对应；没被引用的条目等于装饰品。
+%   2. 条目必须能查到：作者、题名、出处、年、卷期页。写不出完整出版信息就不要写。
+%   3. 引的是"这个方法本身"。原稿的致命错误就在这里：为 MPC 引了
+%      "magnesium phosphate cement (MPC)" 与 "MPC-mediated lactate production"
+%      —— 两篇都不是 Model Predictive Control，评审一眼可见。
+%   4. 8–15 条。少于 8 条说明没读文献，多于 15 条说明没筛。
+% =============================================================================
+
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{9}
+
+\bibitem{ref1}
+[Author A, Author B.] [Title of the paper on the modelling method used in Section 4][J].
+[Journal], [year], [volume]([issue]): [pages].
+
+\bibitem{ref2}
+[Author C.] [Title on the control formulation][J]. [Journal], [year], [volume]([issue]): [pages].
+
+\bibitem{ref3}
+[Author D, Author E.] [Title on the observer / estimation technique][J]. [Journal], [year],
+[volume]([issue]): [pages].
+
+\bibitem{ref4}
+[Author F.] [Title on the physical mechanism of the actuator][J]. [Journal], [year],
+[volume]([issue]): [pages].
+
+\bibitem{ref5}
+[Author G, Author H.] [Title on vibration indices / evaluation of suppression][J].
+[Journal], [year], [volume]([issue]): [pages].
+
+\bibitem{ref6}
+[Author I.] [Title on sensitivity analysis of dynamic systems][J]. [Journal], [year],
+[volume]([issue]): [pages].
+
+\bibitem{ref7}
+[Author J, Author K.] [Title on numerical integration / solver choice][J]. [Journal],
+[year], [volume]([issue]): [pages].
+
+\bibitem{ref8}
+[Author L.] [Title on an application of the same actuator class][J]. [Journal], [year],
+[volume]([issue]): [pages].
+
+\end{thebibliography}

@@ -1,0 +1,188 @@
+\documentclass[a4paper,12pt]{article}
+
+% =============================================================================
+%  数维杯（ShuWei Cup）英文稿模板 · Summary Sheet + 六章骨架
+%
+%  来源：2025 数维杯秋季赛 A 题优秀论文 ASHUWEICUP2518402 的骨架拆解。
+%  只借结构，不借结论：原稿的 10 处硬伤（摘要自相矛盾、引用错配、正文 0 表、
+%  敏感性系数无定义、附录 51 页等）在本模板里逐条改掉，改法见 README.md。
+%
+%  与原稿的差异（都是刻意的）：
+%    - 目录带页码（原稿只有点线，目录等于没用）
+%    - 图题比正文小一号（原稿图题与正文同号）
+%    - 章标题 16pt / 节 13pt（原稿 18/14，标题吃三行）
+%    - 符号表两列、单位写在含义里（原稿列宽截断成 “Descriptio”，且无单位）
+%    - 正文内置 4 张表骨架：参数 / 三问指标对照 / 约束核验 / 敏感性排序
+%    - 附录带附件说明表（原稿 51 页代码，无文件名、无运行说明）
+%    - Summary Sheet 只印一次（原稿重复印了两遍）
+%
+%  编译：xelatex main.tex 连跑两遍（第二遍目录页码才准）
+% =============================================================================
+
+% ======== Packages ========
+\usepackage[top=1in,bottom=1in,left=1in,right=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\hypersetup{hidelinks}   % 不加这句，每个 \ref/\cite 都套红框
+
+% ======== Fonts ========
+\setmainfont{Times New Roman}
+\setsansfont{Arial}
+\setmonofont{Courier New}
+
+% ======== Variables（S0 一次性填好）========
+\newcommand{\ContestYear}{2026}
+\newcommand{\ContestName}{ShuWei Cup}   % 换赛事改这里：ShuWei Cup / MCM/ICM ...
+\newcommand{\TeamNumber}{0000}
+\newcommand{\ProblemChosen}{A}
+\newcommand{\PaperTitle}{[Paper Title: Model and Control Strategy for ...]}
+\newcommand{\KeywordsText}{[Method]; [Object]; [Indicator]; [Strategy]}
+% 摘要正文放 summary.tex：\newcommand 不是 \long，正文里一分段就报
+% 「Paragraph ended before \new@command was complete」，且日志不指向摘要
+\newcommand{\SummaryText}{\input{summary}}
+\newcommand{\TotalPages}{\pageref{LastPage}}
+
+% ======== 正文版式 ========
+\linespread{1.12}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0.2em}
+\captionsetup{font=small,labelsep=quad,skip=6pt}
+\setlength{\tabcolsep}{4pt}   % 默认 6pt，5 列表会顶穿版心   % 图题/表题比正文小一号，且无冒号
+
+% ======== 标题层级（原稿 18/14 太大，收到 16/13）========
+\renewcommand{\thesection}{\arabic{section}.}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\titlespacing*{\section}{0pt}{1.4em}{0.7em}
+\titlespacing*{\subsection}{0pt}{1.0em}{0.45em}
+\titleformat{\section}[block]{\fontsize{16pt}{19pt}\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}[block]{\fontsize{13pt}{16pt}\bfseries}{\thesubsection}{0.5em}{}
+
+% ======== 页眉：Team #0000 ／ Page N of M ========
+% 原稿印成 “Page3of 23”，缺空格；这里用 \thepage\ of 让 TeX 自己管间距
+\setlength{\headheight}{16pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily Team \#\TeamNumber}
+\fancyhead[R]{\sffamily Page \thepage\ of \TotalPages}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ======== 三线表 / 图 / 代码 ========
+% #1 caption  #2 label  #3 colspec  #4 header  #5 body
+\newcommand{\threelinetable}[5]{%
+  \begin{table}[htbp]
+    \centering
+    \caption{#1}
+    \label{#2}
+    \begin{tabular}{#3}
+      \toprule
+      #4 \\
+      \midrule
+      #5 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}%
+}
+% \fig{宽度比例}{图片路径}{图题}{label}
+\newcommand{\fig}[4]{%
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=#1\textwidth]{\detokenize{#2}}
+    \caption{#3}
+    \label{#4}
+  \end{figure}%
+}
+\lstset{
+  frame=topbottom,
+  framerule=0.55pt,
+  framesep=0pt,
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color[gray]{0.97},
+  numbers=none,
+  showstringspaces=false,
+  breaklines=true,
+}
+
+% ======== Document ========
+\begin{document}
+
+% ---------------------------------------------------------------- Summary Sheet
+% 一页装下全部结论：三栏表头 + 标题 + 5 段摘要 + 关键词。
+% 原稿在这里犯的错：问题一 未启动 95.4 → 启动 118.6（更差）却写 "significantly
+% decreases"。摘要的每个数字都必须与结论同向，写完逐段对一遍。
+\thispagestyle{empty}
+\vspace*{-1.2em}
+\noindent
+\begin{minipage}[t]{0.29\textwidth}\centering
+  \textbf{Question Chosen}\\[0.5em]
+  {\fontsize{20pt}{22pt}\selectfont\bfseries\textcolor{red!75!black}{\ProblemChosen}}
+\end{minipage}%
+\begin{minipage}[t]{0.40\textwidth}\centering
+  \textbf{\ContestYear\ \ContestName}\\[0.25em]
+  \textbf{Summary Sheet}
+\end{minipage}%
+\begin{minipage}[t]{0.29\textwidth}\centering
+  \textbf{Team Control Number}\\[0.5em]
+  {\fontsize{16pt}{18pt}\selectfont\bfseries\textcolor{red!75!black}{\TeamNumber}}
+\end{minipage}
+\vspace{0.9em}
+
+\noindent\rule{\textwidth}{0.8pt}
+\vspace{1.6em}
+
+\begin{center}
+  {\fontsize{16pt}{19pt}\selectfont\bfseries \PaperTitle}
+\end{center}
+\vspace{1.2em}
+
+\SummaryText
+
+\vspace{0.8em}
+\noindent\textbf{Keywords:} \KeywordsText
+\newpage
+
+% ---------------------------------------------------------------- Contents
+% 原稿目录只有点线、没有页码（等于没有目录）。这里交给 \tableofcontents，
+% 页码随重建自动正确——不要手写目录。
+\pagenumbering{roman}
+\setcounter{page}{1}
+\begin{center}{\fontsize{16pt}{19pt}\selectfont\bfseries Contents}\end{center}
+\vspace{1.2em}
+\renewcommand{\contentsname}{}
+\tableofcontents
+\newpage
+
+% ---------------------------------------------------------------- Body
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\input{sections/1_introduction}
+\input{sections/2_analysis}
+\input{sections/3_symbols_assumptions}
+\input{sections/4_model}
+\input{sections/5_sensitivity}
+\input{sections/6_strengths_weaknesses}
+
+% ---------------------------------------------------------------- References
+\clearpage
+\input{references}
+
+% ---------------------------------------------------------------- Appendix
+\clearpage
+\section*{Appendix}
+\addcontentsline{toc}{section}{Appendix}
+\input{sections/A_code}
+
+\end{document}

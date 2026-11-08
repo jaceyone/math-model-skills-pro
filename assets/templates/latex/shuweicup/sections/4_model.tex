@@ -1,0 +1,128 @@
+\section{Model}
+
+\subsection{Model of Problem 1}
+
+\paragraph{Force analysis.} The body is acted on by three forces: the lateral disturbance
+$F_d(t)$, the spring--damper constraint force, and the actuator resultant force. Taking
+the lateral direction as positive,
+\begin{equation}
+  F_h(t) = -k\,y(t) - c\,\dot y(t),
+  \label{eq:fh}
+\end{equation}
+with $k$ and $c$ listed in Table~\ref{tab:params}.
+
+\paragraph{Actuator force.} A single eccentric block of radius $r$ rotating at
+$\omega(t)$ exerts $m r \omega^2$ along its radius. The actuator carries two blocks
+rotating in opposite directions at equal speed, so the lateral components add and the
+in-plane components cancel; for two actuators the resultant is
+\begin{equation}
+  F_a(t) = 2mr\left[\omega_i^2\cos\theta_i + \alpha_i\sin\theta_i\right] \quad\text{(per actuator pair)}.
+  \label{eq:fa}
+\end{equation}
+
+\paragraph{Equation of motion.} Substituting \eqref{eq:fh} and \eqref{eq:fa} into Newton's
+second law for the lateral translation gives
+\begin{equation}
+  M\ddot y(t) + c\dot y(t) + k y(t) = F_d(t) + F_a(t),
+  \label{eq:eom}
+\end{equation}
+which is integrated with a fourth-order Runge--Kutta scheme at $\Delta t$, with the
+angular velocity and acceleration obtained from $\theta_i(t)$ by finite differences.
+
+\paragraph{Vibration index.} With $T = 10$\,s,
+\begin{equation}
+  I_h = \frac{1}{T}\int_0^{T} a_y^2(t)\,\mathrm{d}t,
+  \label{eq:index}
+\end{equation}
+evaluated by trapezoidal integration.
+
+% 参数表：一次写清，后面正文不再重复数字。
+\threelinetable{Model parameters.}{tab:params}{@{}p{0.34\textwidth}lrr@{}}
+  {Quantity & Symbol & Value & Unit}
+  {Body mass & $M$ & 2000 & kg \\
+   Eccentric mass & $m$ & 100 & kg \\
+   Eccentric radius & $r$ & 0.2 & m \\
+   Lateral stiffness & $k$ & $7.2252\times10^{6}$ & N/m \\
+   Lateral damping & $c$ & 3600 & N$\cdot$s/m \\
+   Angular velocity limit & $\omega_{\max}$ & 100 & rad/s \\
+   Angular acceleration limit & $\alpha_{\max}$ & 5000 & rad/s$^2$}
+
+\subsection{Result of Problem 1}
+
+% 结果先核约束、再报指标——这是原稿做得最好的一个动作，务必保留。
+% 只报"降了 80 %"却不证明作动器没超限，评委会怀疑方案不可执行。
+With the actuator inactive the index is $I_h^{\text{off}} = [\text{value}]$ [unit]; with the
+actuator driven by the prescribed schedule it is $I_h^{\text{on}} = [\text{value}]$ [unit].
+Table~\ref{tab:limits} confirms the schedule stays inside the actuator's envelope, so the
+comparison is meaningful.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Constraint check and index summary for the three problems.}
+  \label{tab:limits}
+  \small
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Case & $I_h$ off & $I_h$ on & Peak $\omega$ (rad/s) & Peak $\alpha$ (rad/s$^2$) \\
+    \midrule
+    Problem 1 & [ ] & [ ] & [ ] & [ ] \\
+    Problem 2 & [ ] & [ ] & [ ] & [ ] \\
+    Problem 3 & [ ] & [ ] & [ ] & [ ] \\
+    \midrule
+    Limit     & --  & --  & 100 & 5000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Model of Problem 2}
+
+% 与问题一的差别只写"差在哪"，不重抄力分析。原稿这一点做对了。
+The force analysis is unchanged; the difference is that $\theta_i(t)$ is now the decision
+variable. Over a horizon of $N_p$ steps, at each step solve
+\begin{equation}
+  \min_{\{\theta_i\}} \; \hat I_h
+  \quad\text{s.t.}\quad
+  M\ddot y + c\dot y + k y = F_d + F_a(\theta,\omega,\alpha),\;\;
+  |\omega|\le \omega_{\max},\;\; |\alpha|\le \alpha_{\max},
+\end{equation}
+apply the first step, and repeat.
+
+\subsection{Result of Problem 2}
+
+Report the index for both states, the suppression rate, the schedule itself (Figure), and
+the peak $\omega$ / $\alpha$ against their limits.
+
+\subsection{Model of Problem 3}
+
+% 问题三的重点是"少了什么信息、用什么补回来"，不是再推一遍动力学。
+With $F_d$ unmeasurable, only $a_y$ is observed. An extended state observer reconstructs
+$y$, $\dot y$ and the lumped disturbance $z$:
+\begin{equation}
+  \dot{\hat y} = \hat v + \beta_0 (y - \hat y),\quad
+  \dot{\hat v} = a_y + \beta_1 (y - \hat y),\quad
+  \dot{\hat z} = \beta_2 (y - \hat y),
+\end{equation}
+and a PID loop on the reconstructed state drives the angular displacement:
+\begin{equation}
+  \theta(t) = K_p e + K_i\!\int e\,\mathrm{d}t + K_d \dot e .
+\end{equation}
+
+\subsection{Result of Problem 3}
+
+Report the index for both states, the suppression rate, the disturbance estimation error
+after convergence, and the gain sensitivity (Section 5.3).
+
+% ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+% 【Section writing prompt】
+% ════════════════════════════════════════════
+% Position: the body of the paper; it should take about 60 % of the page budget.
+% Five beats per question, identical across questions: force analysis → equations
+%           (numbered) → numerical method → results → index.
+% Results:  check the actuator limits BEFORE quoting the index. A suppression rate with
+%           no feasibility check invites the reader to doubt the scheme.
+% Tables:   at least three — parameters, index summary, constraint check. A paper whose
+%           results exist only as curves cannot be audited.
+% Do not:   re-derive what Problem 1 already derived. State the difference and move on.
+% Units:    one unit per quantity for the whole paper; the index unit must match the
+%           dimension of the defining equation, not a plausible-looking one.
+% ════════════════════════════════════════════

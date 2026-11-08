@@ -1,0 +1,225 @@
+\documentclass[a4paper,11pt]{ctexart}
+
+% =============================================================================
+%  赛题拆解单（Problem Brief）· 数模竞赛 S0 → S1 的第一张表
+%
+%  用途：拿到赛题先填这七张表，不要先想模型。
+%        填完这张单子，results/schema.json、reports/tables/*.tpl.md、图件规划
+%        三件套的骨架就已经出来了——剩下的是把数填进去。
+%
+%  填法：本文件用 2025 数维杯秋季赛 A 题（离心作动器车体横向减振）做示例，
+%        换赛题时逐表替换内容，表结构不要动。
+%
+%  为什么要先填：赛题里"要交什么"是分散的（题面正文 + 三问 + 附件说明）。
+%        不先合并成一张表，就只能等算完了回头找"当初到底要哪几个数"，
+%        那时候模型已经按好看的标准挑过了——这是用结果倒推模型。
+% =============================================================================
+
+\usepackage[top=2.2cm,bottom=2.2cm,left=2.2cm,right=2.2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{caption}
+\pagestyle{plain}   % 只要页码，不要页眉里的节名（跨页时会显示错节）
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=1.4em}
+
+\captionsetup{font=small,labelsep=quad}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.18}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\newcommand{\src}[1]{{\footnotesize\colorbox{black!8}{\,#1\,}}}
+\newcommand{\given}{\src{题面给定}}
+\newcommand{\assumed}{\src{我方假设}}
+\newcommand{\derived}{\src{推导}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries 赛题拆解单}\\[0.5em]
+  {\large 2025 数维杯秋季赛 A 题 · 离心作动器车体横向减振}\\[0.4em]
+  {\small 填表人：\_\_\_\_\_\_ \quad 日期：\_\_\_\_\_\_ \quad 版本：v1（填完不许随手改，改要在 changelog 里记）}
+\end{center}
+
+\vspace{0.6em}
+
+% ---------------------------------------------------------------- 1
+\section{题面清点}
+
+% 逐条把题面要素抄进来，标出"题面给没给"。空着的那一格就是后面必须补的。
+\begin{table}[htbp]\centering\small
+  \caption{题面要素清点}
+  \begin{tabular}{@{}L{0.16\textwidth}L{0.54\textwidth}L{0.16\textwidth}@{}}
+    \toprule
+    要素 & 内容 & 状态 \\
+    \midrule
+    研究对象 & 大型车车体横向（$y$ 向）单自由度振动，四个轮与车体之间按弹簧--阻尼处理 & \given \\
+    作动器   & 离心作动器，双电机带两组偏心块反向等速旋转，横向合力叠加 & \given \\
+    场景     & 场景 1：单扰动；场景 2：多源扰动（多个横向干扰力） & \given \\
+    子问题   & 3 个（见 §2） & \given \\
+    数据     & 附件 \texttt{Data.xlsx}：场景 1 / 场景 2 的横向干扰力时间序列 & \given \\
+    约束     & 角速度 $\omega\le\omega_{\max}$；角加速度 $\alpha\le\alpha_{\max}$ & \given \\
+    交付物   & 每问：0--10\,s 位移与加速度曲线、角位移曲线、振动指数、抑制率 & \given \\
+    未给     & 车体质量分布、轮侧刚度、传感器噪声水平 → 需自行假设并写进 §7 & \textbf{待补} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------- 2
+\section{场景与子问题矩阵}
+
+% 一行一个问题。这张表是后面所有工作量的分配依据：
+% "交付物"列里有几项，§5 的结果键就要有几组。
+\begin{table}[htbp]\centering\small
+  \caption{场景 × 子问题 × 交付物}
+  \begin{tabular}{@{}C{0.06\textwidth}L{0.20\textwidth}L{0.24\textwidth}L{0.26\textwidth}L{0.14\textwidth}@{}}
+    \toprule
+    问 & 场景 & 已知 & 要求决策 / 求解 & 交付物 \\
+    \midrule
+    1 & 场景 1 单扰动 & 干扰力已知；作动器可关、可按给定角位移方案开 &
+      正向仿真：求两态下的位移、加速度与指数 & 曲线 4 张、指数 2 个 \\
+    2 & 场景 2 多扰动 & 干扰力已知；给定 $\omega_{\max}$、$\alpha_{\max}$ &
+      设计角位移曲线 $\theta(t)$ 使指数最小 & 曲线 4 张、$\theta(t)$、
+      指数 2 个、抑制率、约束核验 \\
+    3 & 场景 2 多扰动 & 干扰力\textbf{不可测}；仅横向加速度可测 &
+      在信息受限下设计角位移方案 & 曲线 3 张、指数 2 个、估计误差 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------- 3
+\section{参数表}
+
+% 一次写清，正文后面不再重复数字。来源列必须填：
+% 题面给的值和自己拟合的值混在一起却不标，等于给评审埋雷。
+\begin{table}[htbp]\centering\small
+  \caption{参数（本表是全文唯一数值来源）}
+  \begin{tabular}{@{}L{0.26\textwidth}C{0.10\textwidth}C{0.16\textwidth}C{0.13\textwidth}L{0.16\textwidth}@{}}
+    \toprule
+    含义 & 符号 & 取值 & 单位 & 来源 \\
+    \midrule
+    车体质量 & $M$ & 2000 & kg & \given \\
+    偏心块质量 & $m$ & 100 & kg & \given \\
+    偏心块旋转半径 & $r$ & 0.2 & m & \given \\
+    等效横向刚度 & $k$ & $7.2252\times10^{6}$ & N/m & \given \\
+    等效横向阻尼 & $c$ & 3600 & N$\cdot$s/m & \given \\
+    角速度上限 & $\omega_{\max}$ & 100 & rad/s & \given \\
+    角加速度上限 & $\alpha_{\max}$ & 5000 & rad/s$^2$ & \given \\
+    仿真时长 / 步长 & $T$, $\Delta t$ & 10 / 0.01 & s & \given \\
+    初始位移 / 速度 & $y_0$, $\dot y_0$ & 0.01 / 0 & m, m/s & \assumed \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------- 4
+\section{指标定义}
+
+% 指标是评分锚点：定义式、量纲、单位必须自洽，且要写清"怎么核验"。
+% 一个指标写错单位，后面所有结论都变成非法数字。
+\begin{table}[htbp]\centering\small
+  \caption{指标与约束}
+  \begin{tabular}{@{}L{0.14\textwidth}L{0.30\textwidth}L{0.12\textwidth}L{0.11\textwidth}L{0.24\textwidth}@{}}
+    \toprule
+    指标 & 定义式 & 量纲 & 单位 & 核验方式 \\
+    \midrule
+    振动指数 $I_h$ & $\displaystyle \frac{1}{T}\int_0^{T} a_y^2(t)\,\mathrm{d}t$
+      & $\mathrm{L}^2\mathrm{T}^{-3}$ & m$^2$/s$^3$ & 梯形积分，步长减半看收敛 \\
+    抑制率 $\eta$ & $\displaystyle \frac{I_h^{\text{off}}-I_h^{\text{on}}}{I_h^{\text{off}}}\times100\%$
+      & -- & \% & 用两态指数量纲一致时方可相减 \\
+    峰值角速度 & $\max_t |\omega(t)|$ & $\mathrm{T}^{-1}$ & rad/s & 对 $\omega_{\max}$ 逐时刻比对 \\
+    峰值角加速度 & $\max_t |\alpha(t)|$ & $\mathrm{T}^{-2}$ & rad/s$^2$ & 对 $\alpha_{\max}$ 逐时刻比对 \\
+    估计误差 & $\max_t |\hat z - z| / \max|z|$ & -- & \% & 仅问题三，收敛后取窗 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\noindent\textbf{一致性红线}：定义式的量纲、表里写的单位、正文出现的单位，三处必须相同。
+原优秀论文在这里翻过车（同一指标在问题一写 m$^2$/s$^4$、问题二写 m/s$^2$），是致命的。
+
+% ---------------------------------------------------------------- 5
+\section{结果键清单}
+
+% 这张表就是 results/schema.json 的人工版：一行一个键，
+% 键名 = results.json 里的路径。消费者一列空着的键，说明没人读——直接删。
+\begin{table}[htbp]\centering\small
+  \caption{结果键（下游直接生成 schema.json）}
+  \begin{tabular}{@{}L{0.30\textwidth}L{0.26\textwidth}C{0.10\textwidth}L{0.12\textwidth}L{0.12\textwidth}@{}}
+    \toprule
+    键 & 含义 & 单位 & 生产者 & 消费者 \\
+    \midrule
+    \texttt{problem1.index\_off} & 问题一未开作动器的指数 & m$^2$/s$^3$ & p1.py & 表 1、摘要 \\
+    \texttt{problem1.index\_on}  & 问题一开启后的指数 & m$^2$/s$^3$ & p1.py & 表 1、摘要 \\
+    \texttt{problem1.eta}        & 抑制率 & \% & p1.py & 表 1、摘要 \\
+    \texttt{problem2.index\_off} & 问题二未开 & m$^2$/s$^3$ & p2.py & 表 1、摘要 \\
+    \texttt{problem2.index\_on}  & 问题二开启 & m$^2$/s$^3$ & p2.py & 表 1、摘要 \\
+    \texttt{problem2.eta}        & 抑制率 & \% & p2.py & 表 1、摘要 \\
+    \texttt{problem2.omega\_max} & 峰值角速度 & rad/s & p2.py & 约束表 \\
+    \texttt{problem2.alpha\_max} & 峰值角加速度 & rad/s$^2$ & p2.py & 约束表 \\
+    \texttt{problem3.index\_off} & 问题三未开 & m$^2$/s$^3$ & p3.py & 表 1、摘要 \\
+    \texttt{problem3.index\_on}  & 问题三开启 & m$^2$/s$^3$ & p3.py & 表 1、摘要 \\
+    \texttt{problem3.eta}        & 抑制率 & \% & p3.py & 表 1、摘要 \\
+    \texttt{problem3.est\_err}   & 扰动估计误差 & \% & p3.py & 估计误差图 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------- 6
+\section{图件规划}
+
+% reads 列就是"这张图读哪些键"。没写 reads 的数据图不许画——
+% 否则图上出现了 schema 里没有的数，正文与表就对不上。
+\begin{table}[htbp]\centering\small
+  \caption{图件规划（路线 1 数据图 / 2 机理图 / 3 主图 / 4A 流程 / 4B 总流程）}
+  \begin{tabular}{@{}C{0.06\textwidth}L{0.26\textwidth}C{0.09\textwidth}L{0.30\textwidth}L{0.16\textwidth}@{}}
+    \toprule
+    图 & 内容 & 路线 & \texttt{reads}（仅 1） & 出现位置 \\
+    \midrule
+    1 & 作动器布置与受力示意 & 2 & -- & 4.1 力分析 \\
+    2 & 三力分解与合成 & 2 & -- & 4.1 力分析 \\
+    3 & 问题一 位移/加速度（两态对比，2 面板） & 1 & p1.* & 4.1.1 结果 \\
+    4 & 问题二 角位移曲线 & 1 & p2.theta & 4.2.1 结果 \\
+    5 & 问题二 位移/加速度对比 & 1 & p2.* & 4.2.1 结果 \\
+    6 & 干扰力与控制力对比 & 1 & p2.Fa & 4.2.1 结果 \\
+    7 & 问题三 估计扰动 vs 真值 & 1 & p3.z\_hat & 4.3.1 结果 \\
+    8 & 敏感性三小图（$\pm10\%$，基线虚线） & 1 & sens.* & 第 5 章 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------- 7
+\section{假设与风险}
+
+% 每条假设必须回答两件事：服务哪个问题、若不成立会推翻哪个结论。
+% 回答不了这两问的假设，是套话，删。
+\begin{table}[htbp]\centering\small
+  \caption{假设 → 结论的依赖关系}
+  \begin{tabular}{@{}C{0.05\textwidth}L{0.34\textwidth}C{0.10\textwidth}L{0.34\textwidth}@{}}
+    \toprule
+    \# & 假设 & 服务 & 不成立时影响 \\
+    \midrule
+    1 & 忽略车轮横移与车体转动，仅保留 $y$ 向平移 & 全部 & 自由度增加，指数偏小，抑制率被高估 \\
+    2 & 作动器自重不计入车体质量 & 全部 & $M$ 偏小 → 固有频率偏高 → 共振位置判错 \\
+    3 & 基座固定，约束力只与相对位移/速度有关 & 1,2,3 & 基座运动需另建输入，$F_h$ 少一项 \\
+    4 & 问题二：位移、速度、加速度全可测 & 2 & 退化为问题三的信息条件，抑制率下降 \\
+    5 & 问题三：扰动不可测，仅 $a_y$ 可测 & 3 & 若能动量测扰动，问题三即为问题二 \\
+    6 & 传感与作动时延可忽略（$\Delta t$ 量级） & 2,3 & 闭环相位滞后，增益需下调，抑制率下降 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\vspace{1em}
+\noindent\rule{\textwidth}{0.6pt}
+\vspace{0.4em}
+
+\noindent{\small\textbf{填完之后的三条自检}}\par
+\begin{enumerate}[label=(\arabic*)]
+  \item §3 参数表里的每个值都有来源标注；\given 与 \assumed 混合时没有标错。
+  \item §5 每个键都能在 §6 的 \texttt{reads} 或某张表里找到消费者；找不到的删掉。
+  \item §4 的定义式量纲 = 表里的单位 = 正文将写的单位，三处一致。
+\end{enumerate}
+
+\end{document}

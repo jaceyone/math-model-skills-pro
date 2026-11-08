@@ -1,0 +1,50 @@
+% =============================================================================
+%  Summary Sheet 正文（5 段，一页装下）
+%
+%  ① 背景：现象 → 危害 → 本类方案为什么适用。不写方法。
+%  ②③④ 每题一段：做法一句 → 关键数值 2–3 组 → 结论一句。
+%  ⑤ 收尾：模型与策略的整体价值，两句。
+%
+%  三条铁律（原稿三条全破，这里是被扣分的主因）：
+%   1. 同一指标全文一个量纲；摘要里出现的每个数都要能在正文找到同一个数。
+%   2. 数字方向必须与结论同向：指标变小才写 decreases，变大就解释为什么。
+%   3. 抑制率 = (开 - 关)/关，写的百分比要能被读者用摘要里的两个数复算出来。
+% =============================================================================
+
+Vibration is a common and harmful phenomenon in the operation of large vehicles. It
+accelerates structural fatigue, degrades ride comfort and positioning accuracy, and in
+severe cases shortens the service life of the whole assembly. Among active suppression
+schemes, centrifugal actuators are attractive because the control force can be shaped by
+the angular displacement alone, without extra hydraulic hardware. This paper builds a
+single-degree-of-freedom lateral model of the vehicle body and designs three levels of
+angular-displacement strategies for it.
+
+For Problem 1, a lateral force analysis is carried out and the body is modelled as a
+mass–spring–damper system driven by the disturbance force and the actuator resultant
+force; the angular velocity and acceleration of the eccentric blocks are obtained by
+finite differences, the equation of motion is integrated with a fourth-order
+Runge--Kutta scheme, and the vibration index is evaluated by trapezoidal integration.
+With the actuator inactive the index is [index off] [unit]; with the actuator driven by the
+given schedule it becomes [index on] [unit], a change of [rate]\,\%, and the peak lateral
+displacement drops from [peak off]\,mm to [peak on]\,mm.
+
+For Problem 2, the angular displacement is designed as a receding-horizon problem: at
+each step the control force that minimises the predicted index over a finite window is
+solved, subject to the angular velocity and angular acceleration limits. Under the
+multi-source disturbance of Scenario 2 the index falls from [index off] [unit] to
+[index on] [unit], a suppression rate of [rate]\,\%, while the peak angular velocity
+[peak omega]\,rad/s and peak angular acceleration [peak alpha]\,rad/s$^2$ stay inside the
+[omega limit] / [alpha limit] limits, so the schedule is executable.
+
+For Problem 3, the disturbance is assumed unmeasurable and only the lateral
+acceleration is available, so an extended state observer reconstructs the state and the
+unknown disturbance, and a PID loop drives the angular displacement on top of it. The
+index goes from [index off] [unit] to [index on] [unit], a suppression rate of [rate]\,\%, and
+the estimation error of the disturbance stays below [err]\,\% after the observer
+converges, which shows the strategy does not rely on measuring the disturbance.
+
+The model and the three strategies form a complete chain from mechanism to executable
+schedule: the mechanism fixes which forces matter, the optimisation shows what is
+attainable when the disturbance is known, and the observer-based controller shows what
+survives when it is not. The same structure transfers to other rotating-actuator
+suppression problems once the force map is replaced.

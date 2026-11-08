@@ -1,0 +1,50 @@
+\section{Sensitivity Analysis}
+
+% 逐问做，不套通用模板。定义必须先给出来，否则系数无法解释——
+% 原稿正是缺这一步：正文报 14.25 / 18.29 / 0.47，却没说这些数怎么来的。
+Define the relative sensitivity of the index to parameter $p$ as
+\begin{equation}
+  S_p = \frac{\Delta I_h / I_h^{0}}{\Delta p / p_0},
+  \label{eq:sens}
+\end{equation}
+where $I_h^0$ is the baseline index at the nominal parameter set and every perturbation
+is $\pm 10\,\%$ about it. Table~\ref{tab:sens} ranks the parameters by $|S_p|$.
+
+\subsection{Sensitivity of Problem 1}
+
+% 图这样画：三小图并排，纵轴指数、横轴 Parameter Variation (%)、
+% 一条虚线标 Baseline。基线一画，"相对变化"立刻可读。
+The index is insensitive to the damping coefficient ($S_c$ near zero) and strongly
+sensitive to the stiffness, because $k$ shifts the natural frequency toward the
+disturbance band; the peak at $+8\,\%$ in the middle panel is that crossing, not noise.
+
+\subsection{Sensitivity of Problem 2}
+
+Rank the schedule's parameters (horizon, weighting, gain) the same way.
+
+\subsection{Sensitivity of Problem 3}
+
+Rank the observer gains $\beta_0,\beta_1,\beta_2$ and the PID gains $K_p,K_i,K_d$.
+If a coefficient rounds to zero, say so and draw the conclusion (the controller is
+robust to it) instead of listing five zeros.
+
+\threelinetable{Sensitivity ranking ($\pm 10\,\%$ perturbation).}{tab:sens}{@{}p{0.26\textwidth}p{0.20\textwidth}p{0.14\textwidth}p{0.34\textwidth}@{}}
+  {Parameter & Value & $S_p$ & Remark}
+  {Stiffness $k$ & $7.2252\times10^{6}$ & [ ] & shifts natural frequency \\
+   Body mass $M$ & 2000 & [ ] & \\
+   Eccentric radius $r$ & 0.2 & [ ] & \\
+   Damping $c$ & 3600 & [ ] & insensitive \\
+   Observer gain $\beta_2$ & [ ] & [ ] & Problem 3 only}
+
+% ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+% 【Section writing prompt】
+% ════════════════════════════════════════════
+% One formula first: the sensitivity coefficient must be defined before it is quoted.
+% One perturbation level, stated once (±10 % is the usual default), applied to every
+%           parameter — mixing "average coefficient" for one question and "percentage
+%           change" for another makes the numbers incomparable.
+% One ranking table. A coefficient that rounds to zero is a finding ("robust"), not a
+%           reason to list five zeros.
+% Figures:  three panels, one per question; axis = parameter variation (%), vertical
+%           dashed line = baseline index. The baseline is what makes the panel readable.
+% ════════════════════════════════════════════
