@@ -4,7 +4,7 @@ description: 数学建模竞赛与项目工作流：从读题到交稿的完整�
 compatibility: Python 3.10+（数值/绘图需 numpy pandas matplotlib scipy scikit-learn）；LaTeX 分支需 xelatex（MiKTeX 或 TeX Live）+ windows 中文字体，机理图另需 TikZ；论文主图渲染需 Microsoft Edge；Word 分支需 python-docx、comtypes、Pandoc 3.10+、pdftoppm。纯 Python 与论文搜索部分无在线依赖、无 API Key。跑 python scripts/doctor.py 自查环境。
 ---
 
-# 数学建模 Pro v2.5.2
+# 数学建模 Pro v2.5.3
 
 本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -328,7 +328,7 @@ TikZ 流程图**只许正交折线**：`--`（同一列/行直接连）、`-|`�
 | `scripts/build_paper.py` | xelatex 编译 + PDF 页检查（退出码 0=PASS / 1=FAIL / 2=WARN） |
 | `scripts/check_paper.py` | 论文自检 7 项：数字↔`results.json`、文献↔`\cite`、章节结构（符号说明独立且前置）、产物闭环（含 SCORE_MAP 落点；`\label` 与表数把 `results/tables/*.tex` 一并算入）、内部文件名、图件↔`manifest.json`、满载百分号转义（正文写 `35.7 %` 会被注释吞掉整行后半句，编译却是 0 error）（G4 前必跑，退出码 0 才算过） |
 | `scripts/check_links.py` | 文档链接体检：扫现役 md 里的技能内部路径（`--all` 连 `CHANGELOG.md` 历史条目一起查，历史失联属预期） |
-| `scripts/check_skill.py` | **G-Skill 技能自检**：frontmatter 合法性 / SKILL.md 行数预算 / 内部路径可达 / 长文档目录同步 / 脚本语法 / BOM / `evals` 结构。改完技能本体跑一次，退出码 0 才算过 |
+| `scripts/check_skill.py` | **G-Skill 技能自检**：frontmatter 合法性 / SKILL.md 行数预算 / 内部路径可达 / 长文档目录同步 / 脚本语法 / BOM / `evals` / 残留备份。改完技能本体跑一次，退出码 0 才算过 |
 | `scripts/gen_ref_toc.py` | 长参考文档（>300 行）目录生成：`--write` 写入带行号的目录块，默认只校验；幂等，可重复跑 |
 | `scripts/latex2docx.py` | LaTeX → Word 旁路导出 |
 | `scripts/make_manifest.py` | 扫描 `figures/` 生成 manifest（自动从 `paper/` 抓 caption/section；`flow_*` 按实存的 `.svg`/`.json` 推断 `spec`） |

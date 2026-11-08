@@ -16,6 +16,7 @@
   S7  md/py/tex 无 UTF-8 BOM
   S8  evals/evals.json 存在且结构合法
   S9  没有任何 .md 完全无人引用（WARN，不判失败）
+  S10 没有 .bak / .orig / .rej / .swp / ~ 这类残留备份
 
 用法：
   python scripts/check_skill.py
@@ -181,6 +182,17 @@ def main() -> int:
     orphans = [f for f in md if f != "CHANGELOG.md" and Path(f).name not in corpus
                and f not in ("README.md", "SKILL.md", "VENDORED.md", "LICENSE_NOTICE.md")]
     rep.check(not orphans, "所有 .md 至少被引用一次", ", ".join(orphans[:6]), warn=True)
+
+    print("\nS10 残留备份 / 冲突文件")
+    junk = []
+    for p in root.rglob("*"):
+        if not p.is_file() or (set(p.parts) & SKIP_DIRS):
+            continue
+        n = p.name
+        if n.endswith((".bak", ".orig", ".rej", ".swp", "~")) or n.startswith(".#"):
+            junk.append(p.relative_to(root).as_posix())
+    rep.check(not junk, "没有 .bak / .orig / .rej / .swp / ~ 残留",
+              ", ".join(junk[:6]) if junk else "")
 
     print("\n" + "=" * 60)
     if rep.fails:
