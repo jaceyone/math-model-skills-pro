@@ -1,9 +1,10 @@
 ---
 name: math-modeling-pro
-description: 数学建模竞赛与项目工作流。用于“数学建模 / 建模比赛 / 数模论文 / 数学建模竞赛 / 建模分析 / 建模求解 / 结果键契约 / 数据表生成 / CUMCM / MCM / ICM / 画流程图 / 画机理图 / 技术路线图 / LaTeX 论文 / PDF 论文 / LaTeX 导出 Word / Word 数据分析报告 / 章节写作提示词 / 论文图片风格 / 得分点 / 论文搜索 / 论文评审 / 能拿多少分 / 怎么提分”等任务。主链路“先立结果键 → 写表格骨架 → 解题填数 → 出图 → 写文”，默认 LaTeX → PDF，默认模板为 default 中文论文模板（ctexart：摘要/目录/8 章/参考文献/附录，含 \fig/\tabcaption 排版宏）；赛题强制 Word 时走 Word 原生分支。内置数据图（plot_style 统一版式 + 出图闸门）、机理图、论文主图、流程图四路图件，S0–S4 阶段门禁、契约与数值单一事实源、得分点驱动验证与评委式评审。
+description: 数学建模竞赛与项目工作流：从读题到交稿的完整链路。用于“数学建模 / 建模比赛 / 数模论文 / 建模分析 / 建模求解 / 结果键契约 / 数据表生成 / CUMCM / MCM / ICM / 美赛 / 国赛 / 数维杯 / 华为杯 / 研究生数学建模 / LaTeX 论文 / PDF 论文 / 导出 Word / Word 数据分析报告 / 摘要怎么写 / 章节写作提示词 / 画流程图 / 画机理图 / 画技术路线图 / 论文图片风格 / 排版格式 / 页数超了 / 得分点 / 论文搜索 / 论文评审 / 能拿多少分 / 怎么提分”等任务。**只要涉及数模论文、赛题、建模报告、把表格或结果图放进论文、按赛事格式排版，就该用本技能，即使对方没说"建模"两个字**（含"帮我做这道题"这类只给题面和附件的说法）。主链路“先立结果键 → 写表格骨架 → 解题填数 → 出图 → 写文”，默认 LaTeX → PDF，默认模板为 default 中文论文模板（ctexart：摘要/目录/8 章/参考文献/附录，含 \fig/\tabcaption 排版宏）；赛题强制 Word 时走 Word 原生分支。内置数据图（plot_style 统一版式 + 出图闸门）、机理图、论文主图、流程图四路图件，1.2 万行算法库（带行号目录，按节跳读），S0–S4 阶段门禁 + G-Skill 技能自检，契约与数值单一事实源，得分点驱动验证与评委式评审（100 分结构 + 格式系数）。
+compatibility: Python 3.10+（数值/绘图需 numpy pandas matplotlib scipy scikit-learn）；LaTeX 分支需 xelatex（MiKTeX 或 TeX Live）+ windows 中文字体，机理图另需 TikZ；论文主图渲染需 Microsoft Edge；Word 分支需 python-docx、comtypes、Pandoc 3.10+、pdftoppm。纯 Python 与论文搜索部分无在线依赖、无 API Key。跑 python scripts/doctor.py 自查环境。
 ---
 
-# 数学建模 Pro v2.4.1
+# 数学建模 Pro v2.5.0
 
 本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -285,6 +286,19 @@ TikZ 流程图**只许正交折线**：`--`（同一列/行直接连）、`-|`�
 | 摘要句链、推导三段式、一致性、表格、统计、引用 | `references/knowledge/13-writing-injection.md` |
 | 数据图版式、防乱码、出图闸门、plot_style API | `references/knowledge/14-figure-contract.md` |
 | 题面拆解 / 选型 / 题型防错 / 图种 / 写作底线 / 评审 | `references/knowledge/01`–`06`、`10`–`14`（见 `00-index.md`；`07`–`09` 已随模板移除，编号不重排） |
+| **选算法**：题型认了，不知道该上哪个方法 | `references/algorithms/README.md`（题型 × 数据形态 × 赛制三张路由表）→ 再照下一节跳读 |
+
+## 算法库：先查路由，再按行号跳读
+
+`references/algorithms/` 是 7 份算法说明（合计约 1.2 万行，最长 2590 行），每份按「算法介绍 → 适用范围 → 可视化 → 关键文献 → 代码实现要点」重复组织。**不要整篇 read**——每份开头都有一张带行号的目录（`scripts/gen_ref_toc.py` 生成），按行号取那一段，一次读 150 行足够。
+
+1. 先读 `references/algorithms/README.md` 的三张路由表（按题型 / 按数据形态 / 按赛制），锁定是 01–07 哪一份；
+2. 读那份文档前 40 行（标题 + 目录），找到目标算法的起始行号；
+3. `read(offset=行号, limit=N)` 只取要用的节：建模要「算法介绍 + 适用范围」，写代码再取「代码实现要点」，补文献再取「关键文献」。
+
+例：TOPSIS → `03-评价类算法说明.md` 目录标 893 行 → `read(offset=893, limit=150)` 拿到判定矩阵、标准化、正负理想解与贴近度全过程，2590 行里只读 190 行。
+
+选型在 S1 做完并写进 `reports/ANALYSIS_MODELING_REPORT.md` 的模型选择段（含被否决的候选与理由）；换算法等于换模型，按铁律 0 先改报告与 schema，再改代码。
 
 ## 工具索引
 
@@ -313,9 +327,24 @@ TikZ 流程图**只许正交折线**：`--`（同一列/行直接连）、`-|`�
 | `scripts/build_paper.py` | xelatex 编译 + PDF 页检查（退出码 0=PASS / 1=FAIL / 2=WARN） |
 | `scripts/check_paper.py` | 论文自检 7 项：数字↔`results.json`、文献↔`\cite`、章节结构（符号说明独立且前置）、产物闭环（含 SCORE_MAP 落点；`\label` 与表数把 `results/tables/*.tex` 一并算入）、内部文件名、图件↔`manifest.json`、满载百分号转义（正文写 `35.7 %` 会被注释吞掉整行后半句，编译却是 0 error）（G4 前必跑，退出码 0 才算过） |
 | `scripts/check_links.py` | 文档链接体检：扫现役 md 里的技能内部路径（`--all` 连 `CHANGELOG.md` 历史条目一起查，历史失联属预期） |
+| `scripts/check_skill.py` | **G-Skill 技能自检**：frontmatter 合法性 / SKILL.md 行数预算 / 内部路径可达 / 长文档目录同步 / 脚本语法 / BOM / `evals` 结构。改完技能本体跑一次，退出码 0 才算过 |
+| `scripts/gen_ref_toc.py` | 长参考文档（>300 行）目录生成：`--write` 写入带行号的目录块，默认只校验；幂等，可重复跑 |
 | `scripts/latex2docx.py` | LaTeX → Word 旁路导出 |
 | `scripts/make_manifest.py` | 扫描 `figures/` 生成 manifest（自动从 `paper/` 抓 caption/section；`flow_*` 按实存的 `.svg`/`.json` 推断 `spec`） |
 | `tools/flowchart/scripts/svg_flow.py` | 流程图 B 路：`--html`（可编辑页）/ `--png` / `--pdf`，Edge 无头渲染，`cairosvg` 可选 |
+
+## 技能自检（G-Skill）
+
+项目的 S0–S4 有门禁，技能本体也有。改 `SKILL.md`、改门禁定义、加减参考文件之后：
+
+```bash
+python scripts/check_skill.py     # frontmatter / 行数 / 内部路径 / 目录 / 语法 / BOM / evals
+python scripts/check_links.py     # 现役文档链接
+```
+
+为什么值得单独跑：技能坏掉的方式全是**静默**的。`description` 里少一个触发词，模型就不加载它，报错为零；参考文件改名，模型读到空文件，报错为零；`SKILL.md` 涨到八百行，模型读到一半丢掉后半段，报错为零。这三件事只在"你以为是技能的问题、其实是文档失联"时暴露出来，而那时候往往已经交稿了。
+
+`evals/` 里另有 6 条任务用例（判据是 `check_contract.py` / `fill_tables.py --check` / `check_paper.py` 的退出码）与 18 条触发用例；改主链路时按 `evals/README.md` 做 A/B 对比，只盯"原来过、现在不过"的退化。
 
 ## 兼容别名
 

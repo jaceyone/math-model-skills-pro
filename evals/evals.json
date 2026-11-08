@@ -1,0 +1,81 @@
+{
+  "skill_name": "math-modeling-pro",
+  "version": "2.5.0",
+  "note": "任务回归用例。本技能的判据是机器可判的（G1/G2/G4 退出码），所以每条用例都配 assertions —— 用 assertions 里的命令跑一遍就知道技能有没有退化，不需要人读产出。files 为空表示用自带的 __fixtures__。",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "contract-first-order",
+      "prompt": "帮我做这道数模题，题目和附件在 input/ 下",
+      "expected_output": "S0 建骨架 → S1 先产出 results/schema.json + reports/tables/*.tpl.md + 图件规划 reads，check_contract.py 退出码 0 之后才出现 code/*.py",
+      "files": [],
+      "assertions": [
+        {"name": "先有契约后有代码", "check": "test -f results/schema.json && test -d reports/tables && python <skill>/scripts/check_contract.py --project . ; echo $?"},
+        {"name": "schema 键四要素齐全", "check": "python <skill>/scripts/check_contract.py --project . (退出码 0 即键含 label/unit/producer/consumers)"},
+        {"name": "表骨架无手写数值", "check": "grep -L '{{' reports/tables/*.tpl.md | wc -l == 0"},
+        {"name": "代码未早于契约", "check": "code/ 下 .py 的 mtime 不早于 results/schema.json"}
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "table-is-generated",
+      "prompt": "结果算完了，把表格填一下，然后编译论文",
+      "expected_output": "fill_tables.py 渲染出 results/tables/*.tex，论文用 \\input 引用，正文无手抄数字",
+      "files": [],
+      "assertions": [
+        {"name": "表已渲染且不落后", "check": "python <skill>/scripts/fill_tables.py --project . --check ; echo $? == 0"},
+        {"name": "正文只 input 不手抄", "check": "grep -c 'input{../results/tables' paper/sections/*.tex > 0 且 grep -cE '^\\s*[0-9]+\\.[0-9]+' paper/sections/*.tex == 0"},
+        {"name": "fill_tables 幂等", "check": "连跑两次 results/tables/*.tex 的 sha256 不变"}
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "single-source-of-numbers",
+      "prompt": "论文写完了，帮我检查一遍数字有没有写错",
+      "expected_output": "check_paper.py 退出码 0：正文数字全部对得回 results.json，参考文献与 \\cite 一一对应，无内部文件名泄露",
+      "files": [],
+      "assertions": [
+        {"name": "G4 通过", "check": "python <skill>/scripts/check_paper.py --project . ; echo $?"},
+        {"name": "无内部文件名", "check": "grep -cE 'reports/|code/|results\\.json|plan\\.md' paper/sections/*.tex == 0"},
+        {"name": "文献 8–15 条且全被 cite", "check": "bibitem 数 ≥8 且每个 key 在正文出现过"}
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "figure-gate",
+      "prompt": "画一下问题一的灵敏度曲线，要能直接进论文",
+      "expected_output": "只画图件规划 reads 里声明的键；data_*.pdf/png 双格式；check_figures.py 0 硬伤；已登记 manifest",
+      "files": [],
+      "assertions": [
+        {"name": "出图闸门通过", "check": "python check_figures.py ; echo $? != 1"},
+        {"name": "双格式 + 前缀正确", "check": "ls figures/data_*.pdf figures/data_*.png 均存在"},
+        {"name": "manifest 已登记", "check": "python -c \"json.load(open('figures/manifest.json'))\" 且含该图 route=data"},
+        {"name": "不读未声明键", "check": "脚本里读取的 results.json 键 ⊆ 图件规划 reads:"}
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "word-branch",
+      "prompt": "这个比赛强制交 Word，帮我出报告",
+      "expected_output": "走 Word 原生分支（report_kit.py → report/数据分析报告.docx），不经过 LaTeX，不生成 paper/",
+      "files": [],
+      "assertions": [
+        {"name": "只出 docx", "check": "test -f report/数据分析报告.docx && test ! -d paper"},
+        {"name": "三线表与题注在", "check": "docx 内表格边框只保留顶/底/表头线"},
+        {"name": "数值仍来自 results.json", "check": "报告里的关键数字能在 results.json 找到"}
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "review-before-submit",
+      "prompt": "评审一下我这篇论文能拿多少分",
+      "expected_output": "按 tools/review 的 100 分结构出 reports/REVIEW_REPORT.md：分维度得分 + 格式系数 + P0–P3 清单，分数可复算",
+      "files": [],
+      "assertions": [
+        {"name": "报告含四要素", "check": "REVIEW_REPORT.md 含 分维度得分表 / format_score / P0 / 复现命令"},
+        {"name": "分数可复算", "check": "final == raw * clamp((format_score+10)/20,0,1)，且 ≥90 维度已按 90% 封顶"},
+        {"name": "P0 有证据", "check": "每条 P0 挂具体文件名或行号"}
+      ]
+    }
+  ]
+}

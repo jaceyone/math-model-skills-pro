@@ -1,4 +1,4 @@
-# 数学建模 Pro v2.4.1
+# 数学建模 Pro v2.5.0
 
 数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**，主线是 **「先立结果键 → 写表格骨架 → 解题填数 → 出图 → 写文」**。默认主链路 **LaTeX → PDF**（默认模板 `default`，`ctexart`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -25,6 +25,8 @@
 - **LaTeX → Word 改稿**：仅 LaTeX 模式使用 Pandoc + python-docx，带差异报告。
 - **论文搜索**：Crossref + arXiv 双源，缓存、去重、DOI 校验。
 - **评委式评审**：100 分结构、格式质量系数、P0–P3 问题、优先提分建议（`tools/review`）。
+- **算法库可跳读**：`references/algorithms/` 七份说明合计约 1.2 万行，每份开头有带行号的目录（`scripts/gen_ref_toc.py` 生成），先按 `README.md` 的路由表定位文档，再按行号取那一节——不用整篇加载。
+- **技能本体也有门禁**：`scripts/check_skill.py` 查 frontmatter / SKILL.md 行数 / 内部路径 / 目录同步 / 脚本语法 / BOM / `evals` 结构；`evals/` 另有 6 条任务用例（退出码判据）与 18 条触发用例。
 
 ## 快速开始
 
@@ -57,7 +59,8 @@ math-modeling-pro/
 │   ├── contracts/           # 产物契约
 │   ├── checklists/          # G0–G4 门禁
 │   ├── knowledge/           # 建模规范 + 现役口径 10–14
-│   └── algorithms/          # 7 类算法库
+│   └── algorithms/          # 7 类算法库（每份开头有带行号的目录）
+├── evals/                   # 回归用例：6 条任务 + 18 条触发（含 near-miss 反例）
 ├── assets/
 │   ├── templates/latex/     # 3 套 LaTeX 模板（default 为默认，另 MCM / 华为杯）
 │   ├── templates/docx/      # Word 模板 + report_kit.py
@@ -80,6 +83,8 @@ math-modeling-pro/
 │   ├── build_paper.py
 │   ├── check_paper.py
 │   ├── check_links.py
+│   ├── check_skill.py       # G-Skill 技能自检（改完技能本体必跑）
+│   ├── gen_ref_toc.py       # 长参考文档目录生成（带行号）
 │   ├── latex2docx.py
 │   └── make_manifest.py
 ```
@@ -115,6 +120,13 @@ math-modeling-pro/
 python scripts/doctor.py
 ```
 
+体检技能本体（改 skill 之后跑）：
+
+```bash
+python scripts/check_skill.py     # frontmatter / 行数 / 内部路径 / 目录 / 语法 / BOM / evals
+python scripts/check_links.py     # 现役文档链接
+```
+
 ## 编译与导出
 
 ```bash
@@ -124,4 +136,4 @@ python scripts/latex2docx.py --project 项目1
 
 ## 版本
 
-当前 `2.4.1`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。
+当前 `2.5.0`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。

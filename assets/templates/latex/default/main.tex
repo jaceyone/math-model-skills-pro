@@ -100,14 +100,16 @@
 }
 
 % ---------- 页眉页脚（fancyhdr） ----------
-% 对应 Typst：页眉“数学建模竞赛论文”居中 + 下划线，页脚页码居中
+% 默认只保留页脚页码：页眉横幅 + 横线属于装饰，多数赛道不需要，评委也不加分。
+% 赛事明确要求页眉时，把下面两行的注释打开即可：
+%   \fancyhead[C]{\fontsize{10.5pt}{12.6pt}数学建模竞赛论文}
+%   \renewcommand{\headrulewidth}{0.4pt}
 \usepackage{fancyhdr}
-\setlength{\headheight}{17.65pt}   % fancyhdr 需要的最小高度，否则每页一条 headheight 警告
+\setlength{\headheight}{15pt}      % fancyhdr 需要的最小高度，否则每页一条 headheight 警告
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[C]{\fontsize{10.5pt}{12.6pt}数学建模竞赛论文}
 \fancyfoot[C]{\thepage}
-\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrulewidth}{0pt}
 
 % ---------- 自定义命令（对应 Typst 函数） ----------
 % \papertitle{标题}：居中 22pt 加粗标题

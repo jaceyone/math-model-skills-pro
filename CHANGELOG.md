@@ -7,6 +7,70 @@
 > 自动核对：`python scripts/check_links.py`（只看现役文档）；加 `--all` 会连本文件一起查，
 > 历史条目报失联属预期。
 
+## 2.5.0 — 技能自检 + 算法库可跳读（按 skill-creator 的包规范体检）
+
+> 触发：拿 anthropics/skills 的 `skill-creator`（SKILL.md + `quick_validate.py`）对技能包做一遍体检。
+> 基础项其实都过：frontmatter 合法、`name` kebab、`description` 452 字符、SKILL.md 338 行、链接 0 失联。
+> 但体检暴露两处**结构性缺陷**——都是"内容在，但模型到不了"。
+
+### 1. 1.2 万行算法库此前不可检索：七份文档全部没有目录
+
+- 现象：`references/algorithms/` 七份合计 12191 行（最长 `03-评价类` 2590 行），全部没有目录。
+  SKILL.md 只字未提这份库，唯一入口是 `stages/01-analysis.md` 的一行「（按题型选算法）」。
+  于是"要用 TOPSIS"的实际路径是：在 2590 行里找——模型的选择是不读，凭记忆答。
+  **算法库变成死重量**：占了仓库体积，没进过上下文。
+- 改法：新增 `scripts/gen_ref_toc.py`，按 `## ` 标题生成**带行号的目录块**（`<!-- TOC:BEGIN -->` 标记，幂等覆盖）。
+  行号是核心——目录给出行号，模型就能 `read(offset=893, limit=150)` 只取那一节，而不是整篇加载。
+- 落地：9 份 >300 行文档全部生成（7 份算法 + `tikz_rules.md` + `mechanism-diagram/SKILL.md`）；
+  逐条核对行号与标题一一对应（mismatch 0）；再跑一遍零变化（幂等）。
+- 同时改 SKILL.md：新增「算法库：先查路由，再按行号跳读」小节，写清三步——先读 `README.md`
+  的三张路由表定位文档 → 读前 40 行拿目录 → 按行号取节。并把它挂进「知识库索引」表。
+
+### 2. 技能本体一直没有门禁：只剩 `check_links.py` 管链接
+
+- 现象：项目有 G0–G4 五道门禁，技能自己没有。而技能坏掉的方式全是**静默**的：
+  `description` 少一个触发词 → 模型不加载，报错为零；参考文件改名 → 模型读到空文件，报错为零；
+  SKILL.md 涨过 500 行 → 模型读到一半丢掉后半段，报错为零。三种都只在交稿后暴露。
+- 改法：新增 `scripts/check_skill.py`（G-Skill），九项：frontmatter 合法性（含子工具 SKILL.md）、
+  SKILL.md ≤500 行、内部路径全部可达、长文档目录同步、37 个 `.py` 语法可编译、无 BOM、
+  `evals/evals.json` 结构、孤儿文档（WARN）。
+- 首次运行就抓到一处真问题：`tools/mechanism-diagram/SKILL.md` 的 frontmatter 用了非法键 `phases`
+  （只允许 name/description/license/allowed-tools/metadata/compatibility），严格校验的宿主会直接拒载。
+  改为 `metadata.phases`，信息不丢、键名合法。
+
+### 3. 新增 `evals/`：把"改技能"变成可自证
+
+- `evals/evals.json`：6 条任务用例（整题 / 填表 / 查数 / 出图 / Word 分支 / 评审），
+  每条 assertion 都是退出码判据（`check_contract` / `fill_tables --check` / `check_paper` / `check_figures`），
+  不靠人读产出。
+- `evals/trigger_evals.json`：18 条触发用例，10 条该触发 + 8 条**不该**触发（纯 matplotlib 出图、
+  xlsx 重算公式、查 TOPSIS 论文、docx 删页眉——都是共享关键词的 near-miss）。
+- `evals/README.md` 写清为什么不套 benchmark 打分：本技能每条断言都是确定性退出码，
+  同一输入同一输出，统计方差为零；只保留「改前过、改后不过」的退化和触发两类错误率。
+  这是 `skill-creator` 循环的裁剪版：它面向主观产出（写作/设计）要 pass_rate±stddev，
+  本技能面向流程，确定性判据更硬。
+
+### 4. `description` 重写：补赛事名与"没说建模"的说法
+
+- 现象：`description` 是唯一的触发机制，原文只有 CUMCM / MCM / ICM 三个赛事名。
+  用户说"帮我按数维杯格式写摘要""华为杯的页数限制是多少"时，描述里没有这些词，
+  模型可能不加载技能——**内容再好也没机会出场**。
+- 改法：补国内赛事（数维杯 / 华为杯 / 研赛 / 国赛 / 美赛）、补交付动作（摘要怎么写、排版格式、
+  页数超了、导出 Word）、并写死一句"即使没说建模两个字"。这是 `skill-creator` 说的
+  "模型天生偏向**不触发**技能，描述要稍微主动一点"。
+- 收支：452 → 642 字符（上限 1024），无尖括号。触发反例（只要一张箱线图、xlsx 重算、
+  查论文、删页眉）仍留在 `evals/trigger_evals.json` 里守边界。
+
+### 5. 清理与版本
+
+- 删掉 `assets/figures/_figure_lint.json`（12.5 KB）：作者自测遗留的 lint 记录，无人引用，
+  内容还是自己演示图违反自己规则的报错——留在包内只会误导。
+- `default/main.tex` 页眉默认关闭（上一轮改的，随本版一并提交）。
+- SKILL.md 338 → 367 行；frontmatter 补 `compatibility`（xelatex / Python / Edge / Pandoc 依赖清单），
+  让只读元数据的宿主也能判断环境能不能跑。
+- 门禁终态：`check_skill.py` 0 失败 0 警告，`check_links.py` 81 份 md 失联 0，
+  `gen_ref_toc.py` 9/9 已同步。
+
 ## 2.4.1 — 用真实论文回填 2.4.0：四处"设计对、落地卡"的修正
 
 > 触发：拿一篇已完稿的论文（数维杯 A 题，22 页英文，5 张表 + 8 张图）按 2.4.0 的契约流程回填。

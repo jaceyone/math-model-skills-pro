@@ -1,0 +1,20 @@
+[
+  {"query": "帮我做这道数学建模题，附件是一个 xlsx 和两页 PDF 的题面", "should_trigger": true},
+  {"query": "数模国赛 A 题，明天截稿，帮我把整篇论文跑出来", "should_trigger": true},
+  {"query": "我要先定一下论文里要交哪几个数，把表头和单位先立好", "should_trigger": true},
+  {"query": "第二轮结果出来了，但论文里的表还是旧的，怎么让它自动跟着变", "should_trigger": true},
+  {"query": "画个技术路线图放进第五章，要能进 LaTeX", "should_trigger": true},
+  {"query": "我的流程图判定框两条分支都从下面出来了，挤在一起怎么办", "should_trigger": true},
+  {"query": "帮我按数维杯格式写摘要和关键词，中文的", "should_trigger": true},
+  {"query": "这篇数模论文你评审一下，看看能拿多少分，哪里最容易掉分", "should_trigger": true},
+  {"query": "MCM 的 Summary Sheet 怎么排版，一页放得下吗", "should_trigger": true},
+  {"query": "赛题强制交 Word，别给我 LaTeX，直接出数据分析报告", "should_trigger": true},
+  {"query": "帮我用 matplotlib 画一张三组对比的箱线图，纯出图就行，不用管论文", "should_trigger": false},
+  {"query": "把这份 Excel 里 Sheet2 的公式缓存重算一下，看看数对不对", "should_trigger": false},
+  {"query": "解释一下卡尔曼滤波的更新公式怎么推的", "should_trigger": false},
+  {"query": "帮我把这个文件夹里的 PDF 合并成一个", "should_trigger": false},
+  {"query": "写个教务管理系统的后端，要 Spring Boot + MySQL", "should_trigger": false},
+  {"query": "我做了一份商业计划书，帮我润色一下融资那段", "should_trigger": false},
+  {"query": "帮我查一下近三年 TOPSIS 改进方法的论文，要 DOI", "should_trigger": false},
+  {"query": "把这个 .docx 的页眉删掉再转成 PDF", "should_trigger": false}
+]
