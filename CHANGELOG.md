@@ -7,6 +7,51 @@
 > 自动核对：`python scripts/check_links.py`（只看现役文档）；加 `--all` 会连本文件一起查，
 > 历史条目报失联属预期。
 
+## 2.5.2 — 二轮体检：承诺了却不存在的工具、死副本、易腐数字
+
+> 判据同上一版：文档里承诺的能力，包里必须有实物；没有就把话说明白，不许假装有。
+> 这轮查出 4 类，其中第 1 类是真会让模型走空的一类。
+
+### 1. `tikz_check.sh` 被引用 5 次，包里从来没有这个脚本
+
+- 现象：`tikz_rules.md` 反复写「`tikz_check.sh` 判 CRITICAL」「出图必须为 0 CRITICAL」，
+  还给出上游路径 `_utils/tikz_check.sh`、`skills/shared-scripts/tikz_check.sh`
+  ——三个路径都不属于本包。模型照做会去找一个不存在的检测器，然后跳过自检。
+- 改法：新增 `tools/mechanism-diagram/scripts/tikz_check.py`，只收**确定性**检查：
+  T1 编译日志（`!` 报错 / Overfull）、T2 裸颜色（同节点 `fill=<非 none>` 时文本里
+  又出现颜色名，会盖掉填充）、T3 环境配对、T4 曲线（WARN，机理图允许）、
+  T5 结果数值（WARN，只认 kN/N/% 这类指标单位，几何尺寸 12 mm 属参数不报）。
+- 边界写进文档：**重叠、中文超宽、连线穿框静态算不准**（要算节点包围盒，
+  `minimum width`/缩放/字体互相影响），明写必须在 PNG 上目检；原句
+  「出图必须为 0 CRITICAL」改成「四条目检全过才算完，不以脚本没报错收尾」。
+  宁可少一条机检，也不报假 CRITICAL——假阳性一多，人就再也不信 CRITICAL 了。
+- 验证：12 套骨架模板 0 CRITICAL；项目真图 0；人造正例（`fill=blue!6` + 文本裸 `black`）
+  准确报 1 条 CRITICAL。
+
+### 2. 四个 .bak 死副本（306 KB）
+
+`plot_style.py.bak`（239 KB）、`check_paper.py.bak`（33 KB）、
+`check_figures.py.bak`（27 KB）、`build_paper.py.bak`（7 KB）——
+改文件时留下的备份，没人引用、也不会有人读。删。
+
+### 3. 数字与磁盘对不上
+
+- `10-chapter-writing-prompts.md` 在 `00-index.md` / `04-writing.md` / `README.md`
+  三处都写成「17 节」，实际 18 个二级小节（总纲 + 摘要到附录 12 节 + 问题一 5 小节）。
+  三处统一改成 18 并写清结构。
+- `assets/figures/reference/README.md` 说「13 张参考版式」，却漏了同目录的 `totalflow/`
+  （5 套总流程图：实拍 jpg + 复刻 svg + 预览 png）。补上，并点明它服务 ④B。
+
+### 4. 验过没坏的（本轮排除）
+
+- 三套模板重编：default 8 页 / mcm 11 页 / 华为杯 10 页，均 0 error 0 Overfull。
+- `tools/review/references/{aigc,format,model-fit,rubric}.md` 都在——此前审计报失联是
+  误报，那几条路径是按工具目录相对解析的。
+- `assets/templates/latex/huaweibei/` 的 `logo.pdf` / `title.pdf` 都在，`main.tex` 引用正常。
+
+- 门禁：`check_skill` 0 / `check_links` 82 份 md 失联 0 / `gen_ref_toc` 9-9 /
+  `doctor` 0 / `quick_validate` 通过。
+
 ## 2.5.1 — 删掉没有锚点的幽灵概念
 
 > 触发：用户指着「不把 1381 张图库放进主包」说——这种"整个项目都没提"的条目要清掉。

@@ -176,7 +176,7 @@ bigarrow/.style={-stealth, line width=1.4pt, color=green!70!black},
 - TikZ 里裸颜色名(`black`/`red`…)等价于 `color=`，会**同时设描边和填充**。当节点已有 `fill=<浅色>`、后面又跟一个裸 `black`(想设文字色)，裸色会把浅填充**覆盖成黑填充**，加上文字也是黑 → **整块渲染成一条纯黑块，图例文字全看不见**。这是"图例框变黑块"的唯一根因。
   - ❌ 反例：`\node[draw=gray!40, fill=gray!8, font=\footnotesize, black, inner sep=4pt]{图例}` —— 裸 `black` 覆盖 `fill=gray!8` → 黑块。
   - ✅ 正例：`\node[draw=gray!40, fill=gray!8, font=\footnotesize, text=black, inner sep=4pt]{图例}` —— `text=black` 只设文字色，不碰填充。
-- **判据**：只要节点选项里有 `fill=<非 none>`，就**禁止**在其后出现裸颜色名；要黑字一律写 `text=black`。无 `fill=` 的纯标注节点(如 `\node[black]{$P_i$}`)不受此限（裸 black 只设 draw/text，无填充可覆盖）。`tikz_check.sh` 已加此项 CRITICAL 检测。
+- **判据**：只要节点选项里有 `fill=<非 none>`，就**禁止**在其后出现裸颜色名；要黑字一律写 `text=black`。无 `fill=` 的纯标注节点(如 `\node[black]{$P_i$}`)不受此限（裸 black 只设 draw/text，无填充可覆盖）。`scripts/tikz_check.py` 的 T2 就是查这一条。
 
 **⛔【默认单张图，多子图/序列图仅"必要时"用】**：一道推导题**首选一张几何构造图**说清（主图+分步中间量标注即可）。**只有当推导步骤多到一张图会挤糊、或阶段跳跃大（建系→约束→递推→临界是彼此独立的画面）时**，才拆成"多面板序列图"（横排/2×2 小面板+箭头串推导流）。⛔ 能一张说清就不拆；拆了每个子面板仍守上面全部规则（文字黑、≤3 色、不遮挡）。
 
@@ -235,7 +235,7 @@ bigarrow/.style={-stealth, line width=1.4pt, color=green!70!black},
 %  $C_{out}=1000\,C_{in}\prod_{i=1}^4(1-\eta_i)$……" —— 这些是正文的话，不是图的一部分。
 ```
 
-   - ⛔ 反例一（塞图内）：`\node[align=left] at (S.north east) {$\theta_i=\arg\min\lVert\cdots\rVert^2$ 约束说明……};` — 说明框砸在根节点右上角遮挡主体，`tikz_check.sh` 判 CRITICAL。
+   - ⛔ 反例一（塞图内）：`\node[align=left] at (S.north east) {$\theta_i=\arg\min\lVert\cdots\rVert^2$ 约束说明……};` — 说明框砸在根节点右上角遮挡主体——这类遮挡静态判不出来，必须看 PNG。
    - ⛔ 反例二（满宽长 parbox）：`\parbox{0.92\textwidth}{三行 Deutsch–Anderson 公式……}` 焊在 tikzpicture 后 — 撑大图 bounding box，嵌论文后主图被压扁、文字游离在图侧（本次电除尘图的真实翻车）。
    - ✅ 正例：主图只留节点与连线；图下窄 parbox 只写单行图例；长公式推导写进图正下方的**正文段落**。
    - 仅当说明极短（≤6 字，如单个变量名 `$\theta_0$`）且确有空白区、经确认不压任何节点时，才可留在图内。有疑问一律放正文。
@@ -293,7 +293,7 @@ bigarrow/.style={-stealth, line width=1.4pt, color=green!70!black},
 - ⛔ **禁止把公式/图例说明框用 `\node at (坐标)` 塞进图内挤压主体节点**（致命遮挡灾难）：
   - 长说明框（公式、参数注释、图例）**一律用 `\parbox` 放 `tikzpicture` 之后、`\caption` 之前**，禁止摆到图内角落
   - 尤其禁止相对锚点定位说明框：`\node at (S.north east) {长公式说明}`、`\node at (root.north) {...}` — 宽框会盖住锚点所在的主体节点
-  - `tikz_check.sh` 重叠检测已能解析相对锚点 + 按文字估框宽，说明框压节点会被判 CRITICAL，出图必须为 0 CRITICAL
+  - 重叠、超宽、穿框**没有**静态检测（要先算出每个节点的包围盒，`minimum width`/缩放/字体互相影响，静态算不准）。`scripts/tikz_check.py` 只机判编译日志、裸颜色、环境配对三件；其余三项必须在 PNG 上目检。**出图以「四条目检全过」收尾，不以「脚本没报错」收尾。**
   - 详见上文几何示意图规则第 5 条（铁律）
 - ⛔ 反馈/回路箭头必须走空白区域 — 如果底部有标注文字，反馈箭头走上方（`.north` 出发）；如果上方有标题，走下方但要在标注文字下方留足间距
 - ⛔ 禁止随机彩虹配色 — 单张图内的配色要有逻辑（按阶段分色或按功能分色），不要每个节点随机一个颜色
@@ -414,11 +414,11 @@ TikZ 图写完后，必须编译一次并运行自检脚本：
 # 1. 编译检查 overfull
 xelatex -interaction=nonstopmode main.tex 2>&1 | grep -i "overfull\|underfull\|badbox"
 
-# 2. 运行 tikz_check.sh 自动检测（节点重叠+中文宽度+连线穿过+配色）
-bash _utils/tikz_check.sh figures/tikz_diagrams.tex 2>/dev/null || bash skills/shared-scripts/tikz_check.sh figures/tikz_diagrams.tex
+# 2. 静态自检：编译日志 / 裸颜色 / 环境配对（重叠·超宽·穿框仍要目检）
+python tools/mechanism-diagram/scripts/tikz_check.py figures/mech_x.tex
 ```
 
-**⛔ tikz_check.sh 报告的所有 CRITICAL 必须修复后重新编译，不允许跳过。** 常见修复：
+**⛔ tikz_check.py 报的 CRITICAL 必须修复后重编，不允许跳过；它查不到的三项靠目检，同样不许跳。** 常见修复：
 - 节点重叠 → 调整坐标间距（同行 ≥ 1.0cm，上下 ≥ 0.8cm）
 - 中文宽度不足 → 加大 `minimum width` 或用 `text width` + `align=center` 换行
 - 连线穿过节点 → 改用 `|-` 或 `-|` 直角拐弯，或加 waypoint 绕行

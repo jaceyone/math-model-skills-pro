@@ -38,7 +38,7 @@
 
 **整目录复制到 `paper/`，不要从零写文档类**。`default` 走 `fontset=windows`（系统宋体/黑体/楷体），不依赖模板自带字体；用自带字体的模板时，字体目录必须与 `main.tex` 同级，并在 `paper/` 目录内编译。
 
-> **写作提示词与模板解耦**：口径全部在 `references/knowledge/10-chapter-writing-prompts.md`（17 节，按「章」组织，不绑定文件名），`default/` 的 `main.tex` 顶部另有一份 6 条写作提示。用 `mcm` 走英文链条（见 `knowledge/10` 的【英文链条】），用 `huaweibei` 按它自己的 `sections/` 顺序；**章节名不同不影响读哪一节**，映射见下表。
+> **写作提示词与模板解耦**：口径全部在 `references/knowledge/10-chapter-writing-prompts.md`（18 节，按「章」组织，不绑定文件名），`default/` 的 `main.tex` 顶部另有一份 6 条写作提示。用 `mcm` 走英文链条（见 `knowledge/10` 的【英文链条】），用 `huaweibei` 按它自己的 `sections/` 顺序；**章节名不同不影响读哪一节**，映射见下表。
 
 ### 2. 章节骨架
 

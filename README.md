@@ -1,4 +1,4 @@
-# 数学建模 Pro v2.5.1
+# 数学建模 Pro v2.5.2
 
 数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**，主线是 **「先立结果键 → 写表格骨架 → 解题填数 → 出图 → 写文」**。默认主链路 **LaTeX → PDF**（默认模板 `default`，`ctexart`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -9,7 +9,7 @@
 - **数值单一事实源**：正文数字由 `check_paper.py` 对回 `results.json`，表由 `fill_tables.py --check` 逐字比对，键覆盖与未申报键由 `check_results.py` 把关。
 - **5 阶段**：启动 → 建模分析（含契约三件套）→ 代码实现（填契约）→ 图件制作 → 论文撰写。
 - **5 门禁**：每阶段有可勾选清单，不达标不进入下一阶段。
-- **写作提示词独立成库**：17 节逐章口径在 `references/knowledge/10-chapter-writing-prompts.md`，按「章」组织、不绑定模板文件名；`default/main.tex` 顶部另有 6 条写作提示。模板章节名不同时按 `references/stages/04-writing.md` §2 的映射表落地。
+- **写作提示词独立成库**：18 节逐章口径在 `references/knowledge/10-chapter-writing-prompts.md`，按「章」组织、不绑定模板文件名；`default/main.tex` 顶部另有 6 条写作提示。模板章节名不同时按 `references/stages/04-writing.md` §2 的映射表落地。
 - **写作口径可追溯**：人称、断句、禁 AI 高频词、去 AI 味 10 条自查，口径参考开源项目 `XiaoMaColtAI/math-modeling-skill` 的《论文手说明》，落地为模板注释块与 `references/knowledge/13-writing-injection.md` 第七节。
 - **四路图件**（路径与执行顺序见 `SKILL.md` 同名小节）：
   - 数据图：`plot_style`（中文字体 + 9 套期刊配色 + 组图 API）+ `check_figures.py` 闸门 + 11 个科研图模板；
@@ -136,4 +136,4 @@ python scripts/latex2docx.py --project 项目1
 
 ## 版本
 
-当前 `2.5.1`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。
+当前 `2.5.2`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。

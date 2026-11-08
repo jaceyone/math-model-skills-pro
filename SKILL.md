@@ -4,7 +4,7 @@ description: 数学建模竞赛与项目工作流：从读题到交稿的完整�
 compatibility: Python 3.10+（数值/绘图需 numpy pandas matplotlib scipy scikit-learn）；LaTeX 分支需 xelatex（MiKTeX 或 TeX Live）+ windows 中文字体，机理图另需 TikZ；论文主图渲染需 Microsoft Edge；Word 分支需 python-docx、comtypes、Pandoc 3.10+、pdftoppm。纯 Python 与论文搜索部分无在线依赖、无 API Key。跑 python scripts/doctor.py 自查环境。
 ---
 
-# 数学建模 Pro v2.5.0
+# 数学建模 Pro v2.5.2
 
 本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -135,6 +135,7 @@ python scripts/check_paper.py    --project 项目N   # G4：正文数字 ↔ res
   pdfcrop figures/mech_x.pdf figures/mech_x.pdf     # 可选：缺 perl 会报 script engine 错 → 跳过，standalone border=3pt 已紧裁
   pdftoppm -r 300 -png -singlefile figures/mech_x.pdf figures/mech_x
   grep -c "Overfull\|Underfull" figures/mech_x.log   # 必须为 0
+  python tools/mechanism-diagram/scripts/tikz_check.py figures/mech_x.tex  # 编译日志 + 裸颜色 + 环境配对
   ```
 - 产物：`figures/mech_<图名>.{tex,pdf,png}` + `figures/mech_includes.tex`（`\begin{figure}` 片段，`width=0.82\textwidth`，`\label` 每张唯一）。
 - 只出 PDF + PNG：`ctex` 中文图出不了 SVG（`dvisvgm` 只吃纯英文 `latex` 产出的 dvi）。图内不写求解结果数值。
