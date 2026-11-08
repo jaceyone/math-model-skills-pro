@@ -41,12 +41,16 @@ class Report:
     def __init__(self) -> None:
         self.errors: list[str] = []
         self.warns: list[str] = []
+        self.infos: list[str] = []
 
     def err(self, msg: str) -> None:
         self.errors.append(msg)
 
     def warn(self, msg: str) -> None:
         self.warns.append(msg)
+
+    def info(self, msg: str) -> None:
+        self.infos.append(msg)
 
 
 def flatten_numbers(obj, prefix: str = "") -> dict[str, float]:
@@ -90,7 +94,12 @@ def check_schema_filled(schema: dict, results: dict, project: Path, rpt: Report)
         if not path.is_file():
             rpt.err(f"生产者缺失：{k} ← {prod} 不存在")
         elif not script_mentions(path, k):
-            rpt.warn(f"生产者可疑：{prod} 里找不到键名 {k}（可能是拼错或由别的脚本写入）")
+            tail = k.rsplit(".", 1)[-1]
+            if len(tail) < 3:
+                # f1 / id / n 这类短键名在脚本里必然满天飞，文本搜索核不了，只能人工确认
+                rpt.info(f"生产者无法文本核对（键名过短）：{k} ← {prod}，请人工确认")
+            else:
+                rpt.warn(f"生产者可疑：{prod} 里找不到键名 {k}（可能是拼错或由别的脚本写入）")
     if keys:
         print(f"  键覆盖：{len(keys) - len(missing)}/{len(keys)} 已填")
 
@@ -120,6 +129,10 @@ def check_undeclared(schema: dict, results: dict, rpt: Report, strict: bool) -> 
     undeclared = []
     for path in flat:
         if path in declared or path.startswith(META_PREFIX):
+            continue
+        # 带 __r<位数> 后缀的是同一键的定精度变体（四舍五入副本），跟着基键走
+        base = re.sub(r"__r\d+$", "", path)
+        if base in declared:
             continue
         # 允许用父级键申报整块（如 p2.params 覆盖 p2.params.cadd）
         if any(path.startswith(d + ".") or d.startswith(path + ".") for d in declared):
@@ -216,14 +229,17 @@ def main() -> int:
     code = 1 if rpt.errors else 0
     if args.json:
         print(json.dumps({"status": "PASS" if code == 0 else "FAIL", "project": str(project),
-                          "keys": len(schema["keys"]), "errors": rpt.errors, "warns": rpt.warns},
+                          "keys": len(schema["keys"]), "errors": rpt.errors,
+                          "warns": rpt.warns, "infos": rpt.infos},
                          ensure_ascii=False, indent=2))
     else:
+        for msg in rpt.infos:
+            print(f"  [INFO] {msg}")
         for msg in rpt.warns:
             print(f"  [WARN] {msg}")
         for msg in rpt.errors:
             print(f"  [FAIL] {msg}")
-        print(f"  合计：ERROR {len(rpt.errors)} / WARN {len(rpt.warns)}")
+        print(f"  合计：ERROR {len(rpt.errors)} / WARN {len(rpt.warns)} / INFO {len(rpt.infos)}")
         print()
         print("结果门禁通过：契约键全填、表已渲染、未申报键已说明。" if code == 0
               else "结果门禁未过：先把上面 ERROR 清掉再进 S3。")

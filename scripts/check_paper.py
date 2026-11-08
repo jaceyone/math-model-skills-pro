@@ -422,8 +422,11 @@ def check_artifacts(project: Path) -> tuple[int, list[str]]:
     empty_rows: list[str] = []
     if score.is_file():
         paper = _paper_dir(project)
-        body = "\n".join(p.read_text(encoding="utf-8-sig", errors="replace")
-                         for p in sorted(paper.rglob("*.tex")))
+        # 生成的数值表在 results/tables/*.tex，被 \input 进正文：它们的 \begin{table} 与
+        # \label 也算在论文里，否则把表迁到生成物后 SCORE_MAP 的「表 N」落点会被判超量
+        sources = sorted(paper.rglob("*.tex"))
+        sources += sorted((project / "results" / "tables").glob("*.tex"))
+        body = "\n".join(p.read_text(encoding="utf-8-sig", errors="replace") for p in sources)
         labels = set(re.findall(r"\\label\{([^}]+)\}", body))
         n_fig = len(re.findall(r"\\begin\{figure\*?\}", body))
         n_tab = len(re.findall(r"\\begin\{(?:table|longtable)\*?\}", body))

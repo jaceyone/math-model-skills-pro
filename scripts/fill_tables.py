@@ -83,21 +83,27 @@ def resolve(data, key: str):
 # ---------------------------------------------------------------- 格式化
 
 def tex_escape(text: str) -> str:
-    """只转义正文里的危险字符，$ ... $ 内的数学原样保留。"""
+    """只转义正文里的危险字符（% & _ #），$ ... $ 内的数学原样保留。
+
+    反斜杠不转义：模板里本来就允许写 LaTeX（`\\lvert`、`\\max`）；已经带反斜杠的 `\\%`
+    也不会被二次转义，否则会变成 `\\\\%`（换行 + 注释），把整张表打烂。
+    """
     out: list[str] = []
     for i, chunk in enumerate(text.split("$")):
         if i % 2 == 1:            # 数学模式
             out.append(chunk)
             continue
-        chunk = chunk.replace("\\", r"\textbackslash{}")
-        for a, b in (("%", r"\%"), ("&", r"\&"), ("_", r"\_"), ("#", r"\#")):
-            chunk = chunk.replace(a, b)
-        out.append(chunk)
+        out.append(re.sub(r"(?<!\\)([%&_#])", r"\\\1", chunk))
     return "$".join(out)
 
 
 def fmt_value(value, spec: str | None, digits: int | None) -> tuple[str, str]:
-    """返回 (markdown 文本, LaTeX 文本) 两种写法。"""
+    """返回 (markdown 文本, LaTeX 文本) 两种写法。
+
+    spec 支持：`pct`（×100 加 %）、`si`（千分位）、`*factor`（单位换算，如 `*1000` 把 m 变 mm）、
+    以及它们的组合 `*1000:.2f`；`*factor` 只用于**单位换算**，比值/降幅这类结论量必须在
+    results.json 里立键，不许在模板里现算（现算那一步没人复核）。
+    """
     if isinstance(value, bool):
         text = "是" if value else "否"
         return text, text
@@ -107,6 +113,13 @@ def fmt_value(value, spec: str | None, digits: int | None) -> tuple[str, str]:
 
     v = float(value)
     spec = (spec or "").strip()
+    if spec.startswith("*"):
+        head, _, rest = spec.partition(":")
+        try:
+            v *= float(head[1:].strip())
+        except ValueError as exc:
+            raise ValueError(f"换算因子写错了：{spec!r}（写法 `*1000:.2f`）") from exc
+        spec = rest.strip()
     if spec == "pct":
         nd = 2 if digits is None else digits
         md = f"{v * 100:.{nd}f} %"

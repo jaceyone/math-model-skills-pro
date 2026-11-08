@@ -37,10 +37,13 @@
 
 **键名规则**
 
-1. 键名 = `results.json` 里的路径，至少两级，小写 snake_case：`problem1.passive_index`、`sensitivity.damping.k_minus`。
-2. 扁平点号键与嵌套对象两种写法都支持（`{"problem1": {"passive_index": …}}` 与 `{"problem1.passive_index": …}` 等价）。
-3. 不同问题的同名指标必须带问题前缀，否则 `index` 这种键会被后写的覆盖。
-4. **没有消费者的键删掉**：`check_contract.py` 会报 `KEY_NO_CONSUMER`。声明了没人读，等于给自己加维护成本。
+1. 键名 = `results.json` 里的路径，至少两级：`problem1.passive_index`、`sensitivity.damping.k_minus`。
+2. 小写 snake_case 优先；**物理符号允许大写**（`const.M`、`const.T`、`problem2.capacity_8Hz`）——JSON 路径本来就长这样，不要为了形式改名。
+3. 扁平点号键与嵌套对象两种写法都支持（`{"problem1": {"passive_index": …}}` 与 `{"problem1.passive_index": …}` 等价）。
+4. 不同问题的同名指标必须带问题前缀，否则 `index` 这种键会被后写的覆盖。
+5. **结论量也要立键**：比值、降幅、误差率（`sensitivity.parameter_cases.0.ratio`、`problem3.inband_err_pct`）都是结论，不是"顺手一除"——论文表格与正文都会引用它们，现算那一步没人复核。
+6. `__r<位数>` 后缀（`problem1.passive_index__r2`）是同一键的定精度副本，跟着基键走，不用单独申报。
+7. **没有消费者的键删掉**：`check_contract.py` 会报 `KEY_NO_CONSUMER`。声明了没人读，等于给自己加维护成本。
 
 ## 二、`results/results.json`
 

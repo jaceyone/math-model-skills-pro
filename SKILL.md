@@ -3,7 +3,7 @@ name: math-modeling-pro
 description: 数学建模竞赛与项目工作流。用于“数学建模 / 建模比赛 / 数模论文 / 数学建模竞赛 / 建模分析 / 建模求解 / 结果键契约 / 数据表生成 / CUMCM / MCM / ICM / 画流程图 / 画机理图 / 技术路线图 / LaTeX 论文 / PDF 论文 / LaTeX 导出 Word / Word 数据分析报告 / 章节写作提示词 / 论文图片风格 / 得分点 / 论文搜索 / 论文评审 / 能拿多少分 / 怎么提分”等任务。主链路“先立结果键 → 写表格骨架 → 解题填数 → 出图 → 写文”，默认 LaTeX → PDF，默认模板为 default 中文论文模板（ctexart：摘要/目录/8 章/参考文献/附录，含 \fig/\tabcaption 排版宏）；赛题强制 Word 时走 Word 原生分支。内置数据图（plot_style 统一版式 + 出图闸门）、机理图、论文主图、流程图四路图件，S0–S4 阶段门禁、契约与数值单一事实源、得分点驱动验证与评委式评审。
 ---
 
-# 数学建模 Pro v2.4.0
+# 数学建模 Pro v2.4.1
 
 本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -311,7 +311,7 @@ TikZ 流程图**只许正交折线**：`--`（同一列/行直接连）、`-|`�
 | `scripts/fill_tables.py` | **表格渲染**：`reports/tables/*.tpl.md` + `results.json` → `results/tables/*.md|.tex`（`--check` 只校验是否最新，G2/G4 用） |
 | `scripts/check_results.py` | **G2 结果门禁**：契约键覆盖、生产者存在、`figure:data_*` 已出图、表未过期、未申报键清单（`--strict` 把未申报键升级为失败） |
 | `scripts/build_paper.py` | xelatex 编译 + PDF 页检查（退出码 0=PASS / 1=FAIL / 2=WARN） |
-| `scripts/check_paper.py` | 论文自检 7 项：数字↔`results.json`、文献↔`\cite`、章节结构（符号说明独立且前置）、产物闭环（含 SCORE_MAP 落点）、内部文件名、图件↔`manifest.json`、满载百分号转义（正文写 `35.7 %` 会被当注释吞掉整行后半句，编译却是 0 error）（G4 前必跑，退出码 0 才算过） |
+| `scripts/check_paper.py` | 论文自检 7 项：数字↔`results.json`、文献↔`\cite`、章节结构（符号说明独立且前置）、产物闭环（含 SCORE_MAP 落点；`\label` 与表数把 `results/tables/*.tex` 一并算入）、内部文件名、图件↔`manifest.json`、满载百分号转义（正文写 `35.7 %` 会被注释吞掉整行后半句，编译却是 0 error）（G4 前必跑，退出码 0 才算过） |
 | `scripts/check_links.py` | 文档链接体检：扫现役 md 里的技能内部路径（`--all` 连 `CHANGELOG.md` 历史条目一起查，历史失联属预期） |
 | `scripts/latex2docx.py` | LaTeX → Word 旁路导出 |
 | `scripts/make_manifest.py` | 扫描 `figures/` 生成 manifest（自动从 `paper/` 抓 caption/section；`flow_*` 按实存的 `.svg`/`.json` 推断 `spec`） |

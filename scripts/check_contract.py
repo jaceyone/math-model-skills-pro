@@ -28,7 +28,8 @@ from pathlib import Path
 
 PLACEHOLDER = re.compile(r"\{\{\s*([^{}]+?)\s*\}\}")
 META = re.compile(r"<!--(.*?)-->", re.S)
-KEY_RE = re.compile(r"^[a-z0-9][a-z0-9_]*(?:\.[a-z0-9_]+)+$")
+# 键名 = results.json 里的路径：小写 snake_case 优先；物理符号（const.M / const.T）允许大写
+KEY_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$")
 SEP_CELL = re.compile(r"^:?-{2,}:?$")
 NUM_CELL = re.compile(
     r"^[-+]?\d+(?:[.,]\d+)?\s*"
@@ -167,8 +168,8 @@ def check_schema(schema: dict, project: Path, rpt: Report) -> None:
         where = f"results/schema.json#{name}"
         if not KEY_RE.match(name):
             rpt.err("KEY_BAD_NAME", where,
-                    "键名须为小写 snake_case 且至少两级（如 p1.passive_index）；"
-                    "单段键会把不同问题的同名指标混在一起")
+                    "键名须至少两级、只含字母数字下划线（小写 snake_case 优先，物理符号允许大写，"
+                    "如 const.M）；单段键会把不同问题的同名指标混在一起")
         if not isinstance(spec, dict):
             rpt.err("KEY_BAD_SPEC", where, "键的值必须是对象：label/unit/producer/consumers")
             continue
