@@ -7,6 +7,42 @@
 > 自动核对：`python scripts/check_links.py`（只看现役文档）；加 `--all` 会连本文件一起查，
 > 历史条目报失联属预期。
 
+## 2.5.5 — shuweicup 按房子风格瘦身：从"写满的示例稿"改回"骨架"
+
+> 触发：把四套模板的 sections 逐文件量了一遍。房子风格是「正文只留通用占位句、
+> 写作指令进 `%` 注释」，我第一版把六章写成了填满内容的示例稿，比同门重 5–10 倍。
+
+### 1. 体量对齐（逐节行数）
+
+| 模板 | 逐节行数 | sections 合计 |
+|---|---|---|
+| `default` | 6–26 | 150 行 / 4.2 KB |
+| `huaweibei` | 6–25 | 163 行 / 4.6 KB |
+| `mcm` | 10–45 | 182 行 / 7.2 KB |
+| `shuweicup` 改前 | 34–121 | 30 KB |
+| `shuweicup` 改后 | 21–63 | 236 行 / 9.5 KB |
+
+`4_model` 仍是四套里最重的一节（6 小节 + 2 式 + 1 表），这是照原稿"模型章占六成"
+的比例留的，不是漏删。
+
+赛题相关的具体数字（M=2000、k=7.2252e6、三问交付物）全部移入
+`assets/templates/problem/main.tex`——论文模板里只留通用占位，换题不用删内容。
+
+### 2. 约定齐平
+
+- `\fig` 改 `[H]`（与 `default` 一致）；`\threelinetable` 五参数、`captionsetup{font=small,labelsep=quad}` 与 `default` 相同。
+- 加载 `tocloft` + `\cftdotfill`，目录点线引导与 `default` 一致。
+- main.tex 顶部补「写作提示（写作手必读）」六条，位置和写法照 `default`。
+- 每节尾部保留【Section writing prompt】——这条本来就是 `mcm` 的房规。
+
+### 3. 顺带修掉三个自己挖的坑
+
+- 目录列到小节会溢出到第二页，第二页只有两行；改 `tocdepth=1`，并写明要列小节怎么改。
+- 罗马页码与阿拉伯总数混排会印出 `Page ii of 6`；目录页改 `\thispagestyle{empty}`。
+- 表格单元格行首的 `[` 紧跟 `\\` 会被当成可选参数（`\\[quantity]` 当长度解析），占位符改成无括号写法。
+
+实测 8 页 / 0 error / 0 Overfull / 0 Underfull / 0 缺字。
+
 ## 2.5.4 — 新增「赛题拆解单」与数维杯英文稿模板
 
 > 触发：拿 2025 数维杯秋季赛 A 题优秀论文（ASHUWEICUP2518402）的骨架做参考。

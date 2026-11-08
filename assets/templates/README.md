@@ -22,7 +22,7 @@
 | `default/` | `ctexart` + `fontset=windows` + xelatex | 11（`main.tex` + `sections/` 8 篇 + `references.tex` + `A_code.tex`） | **8 页** / 0 error / 0 Overfull | **默认**：国赛、省赛、校赛、课程论文，无赛事特殊要求时一律用它 |
 | `mcm/` | `article` + `fontspec`（英文） | 12（`main.tex` + `summary.tex` + `references.tex` + `sections/` 9 篇） | 11 页 / 0 error / 0 Overfull | MCM/ICM 与英文赛事：Summary Sheet + 8 章英文链条 |
 | `huaweibei/` | `ctexart` + `fontset=windows` | 14（`main.tex` + `logo.pdf` + `title.pdf` + `sections/` 9 篇 + `references.tex`） | 10 页 / 0 error / 0 Overfull | 华为杯（研究生数学建模），封面四枚主办方 logo 已内置 |
-  | `shuweicup/` | `article` + `fontspec`（英文） | 11（`main.tex` + `summary.tex` + `references.tex` + `sections/` 7 篇） | 11 页 / 0 error / 0 Overfull / 0 Underfull | 数维杯与 MCM 式英文稿：Summary Sheet + **6 章**骨架（Introduction / Question Analysis / Symbols and Assumptions / Model / Sensitivity / Strengths and Weaknesses） |
+  | `shuweicup/` | `article` + `fontspec`（英文） | 11（`main.tex` + `summary.tex` + `references.tex` + `sections/` 7 篇） | 8 页 / 0 error / 0 Overfull / 0 Underfull | 数维杯与 MCM 式英文稿：Summary Sheet + **6 章**骨架（Introduction / Question Analysis / Symbols and Assumptions / Model / Sensitivity / Strengths and Weaknesses） |
 
 ### default（默认）
 
@@ -41,7 +41,8 @@
 
 - 骨架来源：2025 数维杯秋季赛 A 题优秀论文（ASHUWEICUP2518402）的六章结构——模型章占六成篇幅、逐问"力分析 → 方程 → 数值方法 → 结果 → 指标"同一节奏、假设绑场景。
 - 只借结构不借缺陷，与原稿的七处差异：目录带页码（原稿只有点线）、图题比正文小一号（原稿同号）、标题 16/13（原稿 18/14 太占页）、符号表两列且单位写在含义里（原稿列宽截断）、正文内置 4 张表（参数 / 三问指标 / 约束核验 / 敏感性排序，原稿正文 0 表）、附录带附件说明表（原稿 51 页代码无说明）、Summary 只印一次（原稿重复两遍）。
-- 每节尾部带【Section writing prompt】注释块，写明该节位置、必写要素与禁止事项；`summary.tex` 顶部三条铁律（量纲唯一、数字与结论同向、抑制率可复算）。
+- 体积与另外三套一致：正文只留标题层级 + 一两句通用占位 + 一张表骨架，写作指令全部进 `%` 注释；逐节 10–30 行（`default` 逐节 6–26 行、`mcm` 10–45 行）。赛题相关的具体数字不写进本模板——那是 `problem/main.tex` 的活。
+- 每节尾部带【Section writing prompt】，写明该节位置、必写要素与禁止事项；`summary.tex` 顶部三条铁律（量纲唯一、数字与结论同向、抑制率可复算）。宏与包与 `default` 齐平：`\fig` 用 `[H]`、`\threelinetable` 五参数、`captionsetup{font=small,labelsep=quad}`。
 
 ### huaweibei
 

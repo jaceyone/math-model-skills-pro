@@ -12,11 +12,23 @@
 %    - 图题比正文小一号（原稿图题与正文同号）
 %    - 章标题 16pt / 节 13pt（原稿 18/14，标题吃三行）
 %    - 符号表两列、单位写在含义里（原稿列宽截断成 “Descriptio”，且无单位）
-%    - 正文内置 4 张表骨架：参数 / 三问指标对照 / 约束核验 / 敏感性排序
+%    - 正文内置表骨架：参数表、附件说明表；三问指标对照 / 约束核验 / 敏感性排序
+%      三张在对应章节的写作提示里给出，按需展开
 %    - 附录带附件说明表（原稿 51 页代码，无文件名、无运行说明）
 %    - Summary Sheet 只印一次（原稿重复印了两遍）
 %
 %  编译：xelatex main.tex 连跑两遍（第二遍目录页码才准）
+% =============================================================================
+% =============================================================================
+%  写作提示（写作手必读，不要删除本块）
+%  1. 先把本模板整个目录复制到 paper/，只改 sections/*.tex、summary.tex 和
+%     references.tex；不要在本文件临时加包，也不要从零另写 main.tex。
+%  2. summary.tex 里一段一题，每段都要有精确数值；数值只来自 results/results.json。
+%  3. 图：\fig{0.85}{../figures/xxx.pdf}{Figure caption}{fig:label}
+%     表：\threelinetable{表题}{tab:label}{@{}lrr@{}}{表头}{表体}
+%  4. 每张图表后至少 100 词分析；正文不出现 figures/、results.json 这类内部文件名。
+%  5. 数值表优先 \input{../results/tables/*.tex}（技能生成的表），不要手抄。
+%  6. 编译：xelatex 两遍；不要重复加载 graphicx/float/caption/longtable/listings。
 % =============================================================================
 
 % ======== Packages ========
@@ -24,6 +36,8 @@
 \usepackage{amsmath,amssymb}
 \usepackage{fontspec}
 \usepackage{titlesec}
+\usepackage{tocloft}   % 目录点线引导，与 default 模板一致
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
 \usepackage{fancyhdr}
 \usepackage{booktabs}
 \usepackage{array}
@@ -96,7 +110,7 @@
 }
 % \fig{宽度比例}{图片路径}{图题}{label}
 \newcommand{\fig}[4]{%
-  \begin{figure}[htbp]
+  \begin{figure}[H]
     \centering
     \includegraphics[width=#1\textwidth]{\detokenize{#2}}
     \caption{#3}
@@ -155,8 +169,13 @@
 % ---------------------------------------------------------------- Contents
 % 原稿目录只有点线、没有页码（等于没有目录）。这里交给 \tableofcontents，
 % 页码随重建自动正确——不要手写目录。
+% 只列到节（tocdepth=1）：模板正文只有 6 章，列到小节会让目录溢到第二页，
+% 第二页只有两行条目，比没有目录还难看。要列小节就把下面一行改成 2，
+% 并把 \thispagestyle 换成 plain（页眉的 "Page X of Y" 只对阿拉伯页码成立）。
 \pagenumbering{roman}
 \setcounter{page}{1}
+\setcounter{tocdepth}{1}
+\thispagestyle{empty}
 \begin{center}{\fontsize{16pt}{19pt}\selectfont\bfseries Contents}\end{center}
 \vspace{1.2em}
 \renewcommand{\contentsname}{}

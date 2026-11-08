@@ -1,64 +1,21 @@
 \section{Question Analysis}
 
 \subsection{Data Analysis}
-
-% 数据预处理必须单独成节，而且每个处理都要给"为什么"，不是报流水账。
-% 这一节是全篇最容易做假的地方：只写"缺失值填 0"没有人信，写清
-% "填 0 表示无扰动，是工程上的保守策略，避免引入不合理的扰动量"才有说服力。
-The raw table carries columns beyond the model's needs, so the disturbance column is
-first located and the target variable matched to the physical quantity the model expects.
-Three operations follow.
-
-\paragraph{Missing values.} Non-numeric entries are coerced to \texttt{NaN} and then
-filled with zero, which reads as ``no disturbance'' in engineering terms: a conservative
-choice that avoids injecting an unreasonable force into the simulation.
-
-\paragraph{Length matching.} The simulation needs $N = T/\Delta t$ samples; when the raw
-series is longer it is truncated to the first $N$ points, otherwise it is extended to
-length $N$ so that the simulation does not starve in its later stage.
-
-\paragraph{Interpolation.} Within the sampled range the disturbance is linearly
-interpolated,
-\begin{equation}
-  F_d(t) = F_d(t_i) + \frac{F_d(t_{i+1}) - F_d(t_i)}{t_{i+1} - t_i}\,(t - t_i),
-  \qquad t \in [t_i, t_{i+1}],
-\end{equation}
-which preserves the trend of the original series; beyond the last sample the
-disturbance is held at its final observed value so the 10\,s window stays complete.
+The raw table carries columns beyond the model's needs, so the target variable is first
+located and matched to the physical quantity the model expects. [Then list each
+operation and its reason: fill / truncate / interpolate.]
 
 \subsection{Analysis of Problem 1}
-
-% 每问一小节，各一段：已知 → 未知 → 用什么框架 → 输出什么。
-% 原稿这里每问只有 1 段且不写"难点"，读起来像复述题面；补一句"关键难点在哪"。
-The disturbance is given and the actuator either off or driven by a prescribed schedule,
-so the task is a forward simulation ...
-(key difficulty) the actuator force depends on the second derivative of the angular
-displacement, so the forcing term is not known in closed form and must be evaluated
-numerically at every step ...
+[Known, unknown, framework, output — four beats in one paragraph.]
 
 \subsection{Analysis of Problem 2}
-
-The disturbance is still known but the schedule becomes the unknown ...
-(key difficulty) the index is a functional of the whole trajectory, so the schedule
-cannot be chosen pointwise; a receding-horizon formulation turns it into a sequence of
-finite-dimensional subproblems ...
+[Same four beats; name the key difficulty in one sentence.]
 
 \subsection{Analysis of Problem 3}
+[Same four beats; state what information is missing.]
 
-The disturbance is no longer measurable and only the lateral acceleration is observed ...
-(key difficulty) the missing input and the missing state have to be recovered from one
-signal, and the controller must stay stable while the estimate is still converging ...
-
-% ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 % 【Section writing prompt】
-% ════════════════════════════════════════════
-% Position: after Introduction, before Notation. 2.1 is data, 2.2–2.4 are one paragraph
-%           per question.
-% 2.1:      every operation (fill / truncate / interpolate) needs a why, not a what. If an
-%           operation has no justification, delete it.
-% 2.2–2.4:  four beats per paragraph — known, unknown, framework, output — plus one
-%           sentence naming the key difficulty. One paragraph per question is the floor;
-%           two (思路 + 难点) is better.
-% Do not:   restate the problem here. If a sentence could be copied from the task sheet,
-%           delete it.
-% ════════════════════════════════════════════
+% 2.1 每个处理都要给"为什么"，不是报流水账：只写"缺失值填 0"没人信，写清
+% "填 0 表示无输入，是保守策略，避免注入不合理扰动"才有说服力。
+% 2.2–2.4 一段一问：已知 → 未知 → 框架 → 输出，再加一句"关键难点在哪"。
+% 能从句面直接抄回题面的句子，删掉。

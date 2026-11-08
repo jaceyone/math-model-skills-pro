@@ -4,7 +4,7 @@ description: 数学建模竞赛与项目工作流：从读题到交稿的完整�
 compatibility: Python 3.10+（数值/绘图需 numpy pandas matplotlib scipy scikit-learn）；LaTeX 分支需 xelatex（MiKTeX 或 TeX Live）+ windows 中文字体，机理图另需 TikZ；论文主图渲染需 Microsoft Edge；Word 分支需 python-docx、comtypes、Pandoc 3.10+、pdftoppm。纯 Python 与论文搜索部分无在线依赖、无 API Key。跑 python scripts/doctor.py 自查环境。
 ---
 
-# 数学建模 Pro v2.5.4
+# 数学建模 Pro v2.5.5
 
 本技能把数学建模拆成 **5 个阶段 + 5 个门禁**。默认主链路 **LaTeX → PDF**（默认模板 `default`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -257,7 +257,7 @@ TikZ 流程图**只许正交折线**：`--`（同一列/行直接连）、`-|`�
 | **默认**（国赛/省赛/校赛/课程论文，无特殊要求） | `assets/templates/latex/default/`（`ctexart`：摘要/目录/8 章/参考文献/附录，`\fig`/`\tabcaption` 现成） | 11 | 8 页 / 0 error / 0 Overfull |
 | MCM/ICM（英文） | `assets/templates/latex/mcm/`（Summary Sheet + 8 章英文链条） | 12 | 11 页 / 0 error / 0 Overfull |
 | 华为杯 | `assets/templates/latex/huaweibei/`（封面 logo/title PDF 内置） | 14 | 10 页 / 0 error / 0 Overfull |
-| 数维杯 / MCM 式英文稿 | `assets/templates/latex/shuweicup/`（Summary Sheet + **6 章**：Introduction / Question Analysis / Symbols and Assumptions / Model / Sensitivity / Strengths and Weaknesses） | 11 | 11 页 / 0 error / 0 Overfull / 0 Underfull |
+| 数维杯 / MCM 式英文稿 | `assets/templates/latex/shuweicup/`（Summary Sheet + **6 章**：Introduction / Question Analysis / Symbols and Assumptions / Model / Sensitivity / Strengths and Weaknesses） | 11 | 8 页 / 0 error / 0 Overfull / 0 Underfull |
 
 模板清单、每套的文件/章节结构、Word 模板与四路图件母版（数据图 11 / 机理 12 / 主图 5 / 流程图 8+1）见 **`assets/templates/README.md`**；选模板先看那张总览表，再看这里的场景列。
 

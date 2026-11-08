@@ -1,45 +1,20 @@
 \section{Strengths and Weaknesses}
 
 \subsection{Strengths}
-
-% 每条挂具体机理，不写"模型简单""精度较高"这类空话。
 \begin{enumerate}
-  \item The force decomposition is explicit: disturbance, spring--damper constraint and
-        actuator resultant force are derived separately, so each term can be checked
-        against a physical measurement.
-  \item The three problems share one equation of motion; only the decision variable
-        changes. A reader who understands Problem 1 can follow Problem 3 without new
-        mechanics.
-  \item Every reported index is accompanied by a feasibility check on the angular
-        velocity and acceleration limits, so the schedule is executable rather than
-        merely optimal.
-  \item The data handling is justified operation by operation (fill, truncate,
-        interpolate), and the interpolation error is bounded by the sampling step.
-  \item The sensitivity analysis is run per problem, and the stiffness peak is explained
-        by the natural-frequency crossing rather than reported as a number.
+  \item [Which part of the model is checkable against a physical measurement, and why.]
+  \item [Which two questions share a derivation, so the reader can follow them together.]
+  \item [Which reported number is verified rather than asserted (limits, convergence).]
 \end{enumerate}
 
 \subsection{Weaknesses}
-
-% 不足要写"会因为什么原因、影响哪个结论"，最好带一条改进方向。
 \begin{enumerate}
-  \item Parameters are treated as constant; load, wear and temperature make $M$, $k$,
-        $c$ time-varying, so the robustness claim holds only near the nominal set.
-  \item Friction in the eccentric-block bearings and losses in the bevel-gear train are
-        ignored, which biases the derived angular acceleration and hence $F_a$.
-  \item The observer is tuned on the nominal model; gain scheduling for a strongly
-        time-varying disturbance is left open.
-  \item Only a single disturbance realisation per scenario is reported; a Monte Carlo
-        sweep over disturbance phase would give the suppression rate a confidence band.
+  \item [Which assumption is weakest, and which conclusion it would overturn.]
+  \item [Which physical effect is ignored, and how it biases the result.]
+  \item [What the next step is: gain scheduling / Monte Carlo / a second realisation.]
 \end{enumerate}
 
-% ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 % 【Section writing prompt】
-% ════════════════════════════════════════════
-% Counts:   at least 4 strengths and 4 weaknesses. Three-and-two (the usual) reads as
-%           filler.
-% Every item names a mechanism and its consequence: "friction in the bearings biases the
-%           angular acceleration, hence F_a" beats "the model is simplified".
-% Weakness items should hint at the fix — that is what turns a weakness list into a
-%           research direction.
-% ════════════════════════════════════════════
+% 条数：优点 ≥4 条、不足 ≥4 条。写成三条优点两条不足，读起来像凑数。
+% 每条挂机理与后果："轴承摩擦使角加速度偏小，进而 $F_a$ 失真"胜过"模型较简化"。
+% 不足要带改进方向——这一列是把"缺点"变成"研究点"的地方。

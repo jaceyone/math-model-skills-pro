@@ -2,15 +2,10 @@
 
 \subsection{Symbols}
 
-Table~\ref{tab:symbols} fixes the notation used throughout the paper. Rows follow the
-order of first appearance, each symbol denotes exactly one quantity, and the unit is
-written in parentheses inside the meaning cell. Numerical values are collected in
-Table~\ref{tab:params} instead of being repeated here.
+The notation used throughout the paper is fixed in Table~\ref{tab:symbols}: rows follow
+the order of first appearance, one symbol means exactly one quantity, and the unit is
+written in parentheses inside the meaning cell.
 
-% 两列（符号 / 含义含单位）。原稿做成三列且列宽不足，Description 被裁成
-% “Descriptio”、又漏了单位列——符号表只有 9 项也覆盖不了正文。
-% 列宽：两端 @{}，合计 1.04 - 0.04*N，N=2 → 0.96。
-\begingroup\small
 \begin{longtable}{@{}>{\centering\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.80\textwidth}@{}}
   \caption{Symbols.}
   \label{tab:symbols} \\
@@ -25,49 +20,23 @@ Table~\ref{tab:params} instead of being repeated here.
   \endhead
   \bottomrule
   \endfoot
-  $M$      & body mass (kg)\\
-  $m$      & eccentric block mass (kg)\\
-  $r$      & eccentric block radius (m)\\
-  $k$      & equivalent lateral stiffness (N/m)\\
-  $c$      & equivalent lateral damping (N$\cdot$s/m)\\
-  $y(t)$   & lateral displacement of the body (m)\\
-  $a_y(t)$ & lateral acceleration of the body (m/s$^2$)\\
-  $F_d(t)$ & lateral disturbance force (N)\\
-  $F_h(t)$ & spring--damper constraint force (N)\\
-  $F_a(t)$ & actuator resultant force (N)\\
-  $\theta_i(t)$ & angular displacement of block $i$ (rad)\\
-  $\omega(t)$   & angular velocity (rad/s)\\
-  $\alpha(t)$   & angular acceleration (rad/s$^2$)\\
-  $I_h$    & vibration index (unit)\\
+  $x_1$ & [quantity] (unit)\\
+  $x_2$ & [quantity] (unit)\\
+  $y(t)$ & [quantity] (unit)\\
+  $\theta$ & [quantity] (rad)\\
+  $\Delta t$ & sampling step (s)\\
+  $I$ & [objective / index] (unit)\\
 \end{longtable}
-\endgroup
 
 \subsection{Assumptions}
-
-% 假设要绑具体问题，不是十条套话。原稿的 (4)(5)(6) 分别对应问题二的控制目标、
-% 问题三的"扰动不可测"、时延是否可忽略——这种写法比"假设车辆是刚体"有用得多。
 \begin{enumerate}
-  \item The wheels' lateral motion, yaw and other rotational motions of the body are
-        neglected; relative deformation between base nodes is ignored.
-  \item The actuator's own mass is excluded from the body mass, as stated in the task.
-  \item The base is fixed, so the constraint force depends only on the relative
-        displacement and velocity between body and base.
-  \item \textbf{(Problem 2)} The disturbance is known, and the control target changes from
-        ``follow a prescribed schedule'' to ``choose the schedule that minimises
-        $I_h$''; displacement, velocity and acceleration are all measurable.
-  \item \textbf{(Problem 3)} The disturbance cannot be measured in real time; only
-        $a_y(t)$ is available, and the unmodelled part is lumped into an extended state.
-  \item Sensor sampling and actuator response delays (about $\Delta t$) are neglected,
-        or compensated by prediction.
+  \item [Simplification assumption shared by all questions.]
+  \item [Parameter / modelling assumption shared by all questions.]
+  \item \textbf{(Problem 2)} [What the scenario fixes: knowns, decision variable.]
+  \item \textbf{(Problem 3)} [What is unmeasurable, what replaces it.]
 \end{enumerate}
 
-% ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 % 【Section writing prompt】
-% ════════════════════════════════════════════
-% Position: after Question Analysis, before Model — a reader must meet every symbol
-%           before the first equation that uses it.
-% Symbols:  two columns only. The unit goes in parentheses in the meaning cell; the value
-%           goes in Table par:params. One symbol, one meaning; loop indices stay out.
-% Assumptions: each one names the question it serves when it is scenario-specific.
-%           A list of generic assumptions ("the body is rigid") earns nothing.
-% ════════════════════════════════════════════
+% 位置：Question Analysis 之后、Model 之前——读者必须先见到每个符号，才遇到用到它的公式。
+% 符号表：两列，单位写在含义里；一个符号一个含义；循环下标不进表；数值放参数表。
+% 假设：场景相关的那几条要标出服务哪一问（如上例 3、4），套话式假设（"本文假设…合理"）全部删。
