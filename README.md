@@ -1,4 +1,4 @@
-# 数学建模 Pro v2.3.22
+# 数学建模 Pro v2.3.23
 
 数学建模竞赛工作流：**5 阶段 + 5 门禁 + 四路图件**。默认主链路 **LaTeX → PDF**（默认模板 `default`，`ctexart`）；赛题强制 Word 时走 **Word 原生分支**，不经过 LaTeX。
 
@@ -72,7 +72,8 @@ math-modeling-pro/
 ├── scripts/
 │   ├── doctor.py
 │   ├── build_paper.py
-│   ├── build_prompts.py
+│   ├── check_paper.py
+│   ├── check_links.py
 │   ├── latex2docx.py
 │   └── make_manifest.py
 ```
@@ -101,9 +102,8 @@ python scripts/doctor.py
 ```bash
 python scripts/build_paper.py --project 项目1
 python scripts/latex2docx.py --project 项目1
-python scripts/build_prompts.py          # 改过模板提示词后重建 knowledge/10
 ```
 
 ## 版本
 
-当前 `2.3.19`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。
+当前 `2.3.23`。详见 `CHANGELOG.md`。第三方资产见 `VENDORED.md`，使用限制见 `LICENSE_NOTICE.md`。

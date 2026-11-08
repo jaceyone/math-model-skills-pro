@@ -317,8 +317,49 @@ _JOURNAL_BASE_PT = 8.5
 _JOURNAL_LINE_W = 1.2
 
 
+_CJK_PROBE_RE = re.compile(r"[\u4e00-\u9fff]")
+_CJK_PCT_COMMENT_RE = re.compile(r"(?<!\\)%.*$")
+
+
+def _lang_from_sources() -> str:
+    """没有语言标记时，用稿件本身判定：paper*/ 下的 .tex 里到底有没有汉字。
+
+    英文稿（MCM/ICM/HMCM）在 S0 不会生成 `_house_style.json`，旧版一律回落 `"zh"`，
+    于是英文图被中文拼音规则判硬伤——实测 `Pupils/teacher`、`Median income` 被切成
+    拼音音节报 `pinyin_labels`，合规英文图必须改词才能过闸门。这里用稿件自己说话：
+    有汉字判 zh，一个汉字都没有判 en，两者都读不到才退回 zh（保持旧行为）。
+    """
+    try:
+        root = os.path.dirname(_figdir_hint())
+    except Exception:  # noqa: BLE001
+        return "zh"
+    for name in ("paper", "paper_zh", "report"):
+        folder = os.path.join(root, name)
+        if not os.path.isdir(folder):
+            continue
+        n_tex = n_cjk = 0
+        for dirpath, _dirs, files in os.walk(folder):
+            for fn in files:
+                if not fn.endswith(".tex"):
+                    continue
+                try:
+                    # 只数正文(剥掉 % 注释):MCM/华为杯模板自带中文注释,
+                    # 连注释一起数会把英文稿判成中文稿,拼音规则照样误杀。
+                    with open(os.path.join(dirpath, fn), encoding="utf-8",
+                              errors="ignore") as f:
+                        for line in f:
+                            n_cjk += len(_CJK_PROBE_RE.findall(
+                                _CJK_PCT_COMMENT_RE.sub("", line)))
+                except OSError:
+                    continue
+                n_tex += 1
+        if n_tex:
+            return "zh" if n_cjk >= 30 else "en"
+    return "zh"
+
+
 def paper_lang() -> str:
-    """稿件语言 en / zh:环境变量 MS_PAPER_LANG > 工程 figures/_house_style.json > zh。"""
+    """稿件语言 en / zh：环境变量 > 工程 figures/_house_style.json > 稿件本身 > zh。"""
     env = (os.environ.get("MS_PAPER_LANG") or "").strip().lower()
     if env in ("en", "zh"):
         return env
@@ -330,7 +371,7 @@ def paper_lang() -> str:
             lang = str((json.load(f) or {}).get("lang") or "").strip().lower()
         return "en" if lang == "en" else "zh"
     except (OSError, ValueError, AttributeError):
-        return "zh"
+        return _lang_from_sources()
 
 
 def _latin_family_key(choice: str) -> str:
@@ -2946,7 +2987,7 @@ def _thin_line_figure_issues(axes) -> list:
     折线/散点漏了——模型会改画一条线绕过「禁简单柱」。
     多面板、热图、区间带、图内/图例里的数字标注都不判。
     """
-    from matplotlib.collections import PathCollection, PolyCollection, QuadMesh
+    from matplotlib.collections import LineCollection, PathCollection, PolyCollection, QuadMesh
     from matplotlib.patches import Rectangle
 
     groups = _panel_groups(axes)
@@ -2967,6 +3008,8 @@ def _thin_line_figure_issues(axes) -> list:
         n_other += sum(1 for p in ax.patches if not isinstance(p, Rectangle))
         if ax.images:
             has_heat = True
+        if _has_interval_bars(ax):
+            has_band = True       # hlines/vlines 画的区间图本身就是区间证据
         for c in ax.collections:
             if isinstance(c, QuadMesh):
                 has_heat = True
@@ -2989,6 +3032,28 @@ def _thin_line_figure_issues(axes) -> list:
 
 
 _THIN_SAMPLE_MAX = 5
+
+
+def _has_interval_bars(ax) -> bool:
+    """`hlines` / `vlines` 画的区间图：一条 LineCollection 里挂着 ≥5 段区间。
+
+    实测事故：名次/置信区间的「横线段 + 均值点」图被判成「一根光秃折线」——
+    区间段在 `ax.collections` 里是 LineCollection，旧版根本不数它，于是图上明明
+    有 16 段区间也报 `sparse_line_figure`。区间段是实打实的数据，必须算作证据。
+    """
+    from matplotlib.collections import LineCollection
+
+    for c in ax.collections:
+        if not isinstance(c, LineCollection):
+            continue
+        try:
+            if len(c.get_segments()) >= 5:
+                return True
+        except Exception:  # noqa: BLE001
+            continue
+    return False
+
+
 _THIN_SAMPLE_RECIPE = (
     '三个离散值不要画成散点撑满整张图:改一行两列,'
     'fig, axes = plt.subplots(1, 2, figsize=plot_style.figsize("row2")),'
@@ -3062,6 +3127,8 @@ def _thin_sample_figure_issues(axes) -> list:
         return []          # 箱线图由样本点闸门检查,不按折线采样数判断
     if any(_has_errorbar(ax) for ax in members):
         return []          # 少量离散实验点 + 误差棒本身就是完整证据
+    if any(_has_interval_bars(ax) for ax in members):
+        return []          # 区间段（hlines/vlines）自带密集采样,不按点数判稀
     counts = []
     for ax in members:
         counts.extend(_series_point_counts(ax))

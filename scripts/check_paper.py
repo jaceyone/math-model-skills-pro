@@ -269,8 +269,21 @@ def _paper_dir(project: Path) -> Path:
     return paper if paper.is_dir() else project / "paper_zh"
 
 
+_NOTATION_HEADER_FIRST = ("symbol", "base symbol", "符号", "变量", "notation")
+_NOTATION_HEADER_SECOND = ("meaning", "含义", "说明", "意义", "definition")
+
+
 def _notation_symbols(path: Path) -> list[str]:
-    r"""符号表里的符号 token（跳过表头与分隔线；一格里写多个符号就拆开）。"""
+    r"""符号表里的符号 token（跳过表头与分隔线；一格里写多个符号就拆开）。
+
+    两处旧缺陷（2026-11 实测）：
+    1. longtable 的续页表头（`\endfirsthead` 之后又一段「表头 + \midrule」）会被
+       `seen_body` 当成数据行读进来，`Symbol` 本身混进符号表，必然报
+       「1 个符号正文没出现」；这里按首列/次列词表剔除。
+    2. 花括号被剥掉（`$r_{ij}$` → `r_ij`），而正文公式里写的是 `r_{ij}`，
+       但比对侧 `s in math_text` 不做同样处理——凡多字符下标的规范符号表被判 fail。
+       归一化统一在 `check_structure` 里对正文再做一次（见 `_flat_math`）。
+    """
     if not path.is_file():
         return []
     out: list[str] = []
@@ -290,12 +303,25 @@ def _notation_symbols(path: Path) -> list[str]:
             continue
         if set(first) <= set("-: "):
             continue
+        flat_first = first.replace("$", "").replace("\\", "").strip().lower()
+        flat_second = second.replace("$", "").replace("\\", "").strip().lower()
+        if flat_first in _NOTATION_HEADER_FIRST or flat_second in _NOTATION_HEADER_SECOND:
+            continue
         for tok in re.split(r"[,，、]", first):
             t = tok.replace("$", "").replace("{", "").replace("}", "").strip()
             t = t.lstrip("\\").strip()
             if len(t) >= 1 and not set(t) <= set("-: ."):
                 out.append(t)
     return out
+
+
+def _flat_math(text: str) -> str:
+    """正文数学语境的花括号归一化版本，供符号比对使用。
+
+    符号表的 token 已经剥掉花括号（`r_{ij}` → `r_ij`），正文比对必须用同一口径，
+    否则「一符一义、每个符号都在公式里出现过」的规范稿会被判成只命中个位数。
+    """
+    return text.replace("{", "").replace("}", "")
 
 
 def check_structure(project: Path) -> tuple[int, list[str]]:
@@ -360,7 +386,8 @@ def check_structure(project: Path) -> tuple[int, list[str]]:
     math_bits += re.findall(r"\\begin\{(?:tabular|longtable)\}(.*?)\\end\{(?:tabular|longtable)\}",
                             body_text, re.S)
     math_text = "\n".join(math_bits)
-    used = [s for s in symbols if s in math_text]
+    math_flat = _flat_math(math_text)
+    used = [s for s in symbols if s in math_text or s in math_flat]
     if len(used) < max(3, int(0.6 * len(symbols))):
         missing_sym = [s for s in symbols if s not in used][:8]
         return 1, [f"符号表 {len(symbols)} 行，只有 {len(used)} 个符号在正文出现过（要求 ≥60%）",

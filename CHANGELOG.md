@@ -7,6 +7,56 @@
 > 自动核对：`python scripts/check_links.py`（只看现役文档）；加 `--all` 会连本文件一起查，
 > 历史条目报失联属预期。
 
+## 2.3.23 — 修三处「门禁误杀合规稿」
+
+> 触发：2026 HMCM Problem A 全流程实测（英文稿、16 城评价模型、5 张数据图 + 1 张 TikZ 流程图）。
+> 三处都不是风格问题，而是**合规交付被判 fail**。
+
+### 1. `scripts/check_paper.py` — 符号表判定对多字符下标全盘误杀
+
+- 现象：31 行规范符号表（`$r_{ij}$`、`$w^{A}_{j}$`、`$\bar{U}_{i}$`）只算出 9 个命中，
+  报「要求 ≥60%」→ structure FAIL；同时 `Symbol` 表头被当成符号混入统计。
+- 根因：`_notation_symbols` 把 token 的 `{}` 剥掉（`r_{ij}` → `r_ij`），而比对侧
+  `s in math_text` 用的是未剥括号的正文，两侧口径不一致；longtable 续页表头
+  （`\endfirsthead` 后第二段「表头 + \midrule」）被 `seen_body` 当成数据行。
+- 修法：新增 `_flat_math()` 对正文做同样的花括号归一化后参与比对；新增
+  `_NOTATION_HEADER_FIRST/_SECOND` 词表剔除表头行。
+- 回归：同一篇论文换成下标写法符号表 → 30/30 命中（旧版 9/31）；正式稿 26/26。
+
+### 2. `assets/style/plot_style.py` — 英文稿被中文拼音规则判硬伤
+
+- 现象：英文图标签 `Pupils per teacher`、`Median income` 被切成拼音音节，
+  报 `pinyin_labels` **error**，必须改词才能过闸门。
+- 根因：`paper_lang()` 只认 `MS_PAPER_LANG` 环境变量和 `figures/_house_style.json`，
+  MCM/ICM 英文稿在 S0 不会生成该文件 → 一律回落 `"zh"`。
+- 修法：新增 `_lang_from_sources()`，无标记时读 `paper*/**/*.tex` 判定：
+  **剥掉 `%` 注释**后数汉字（模板自带中文注释，不剥会把英文稿判成中文），
+  ≥30 个汉字判 `zh`，有 tex 但无汉字判 `en`，读不到才回落 `zh`。
+
+### 3. `assets/style/plot_style.py` — 区间图被当成「一根光秃折线」
+
+- 现象：`hlines` 画的 16 段名次/置信区间 + 均值点，被判 `sparse_line_figure`
+  与 `thin_sample_figure` 双 error（区间段在 `ax.collections` 里是 `LineCollection`，
+  旧版不数它；均值点因 y 恒定被 `_is_guide_line` 当成参考线）。
+- 修法：新增 `_has_interval_bars(ax)`（LineCollection ≥5 段即认定区间证据），
+  在 `_thin_line_figure_issues` 里置 `has_band`，在 `_thin_sample_figure_issues` 里直接放行。
+- 回归：区间图 lint 仅剩 `narrow_figure`（版式提醒），两条 error 消失。
+
+### 4. 版本号统一到 2.3.23
+
+- 三处主版本（`VERSION` / `SKILL.md` 标题 / `README.md` 标题）此前已齐在 2.3.22，
+  但 `README.md` 正文「版本」段仍停在 `2.3.19`（2.3.22 那条「版本号三处不一」只改了**标题**，
+  正文漏改），而 2.3.23 的代码（`plot_style.py` / `check_paper.py`）已先落进工作区 → 号没升。
+- 本次一次改齐：`VERSION` / `SKILL.md` 标题 / `README.md` 标题 / `README.md` §版本 /
+  `assets/style/check_figures.py` 的 `GATE_VERSION` 全部 = **2.3.23**。
+- 顺带修 `README.md` 两处陈旧引用：删掉已移除的 `scripts/build_prompts.py`（见本文件开头「读法」段），
+  目录树的 `scripts/` 补上实存的 `check_paper.py` / `check_links.py`；`SKILL.md` 脚本索引补 `check_links.py`。
+
+### 未改但已核实
+
+- `scripts/build_paper.py` 退出码本就是 `PASS=0 / FAIL=1 / WARN=2`，实测 25 页 0 Overfull 得 0；
+  早前误报的 "exit 1" 是 PowerShell 管道的 `$LASTEXITCODE`，不是脚本返回值。
+
 ## 2.3.22 — 修三类「工具静默失效」+ 路径写法归一
 
 > 本轮由一次外部实测审计触发：61 个 md、31 个 py、36 个 tex、347 条内部路径引用、19 个脚本逐个跑 `--help`。
